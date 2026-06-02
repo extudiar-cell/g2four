@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>ZOOM G2 FOUR – FX Editor</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@700;900&display=swap');
+
+:root {
+  --bg:     #000000;       
+  --panel:  #0a0a0f;
+  --card:   #111116;       
+  --border: #444455;       
+  --green:  #00ffaa;       
+  --green2: #00cc88;
+  --red:    #ff4455;
+  --text:   #ffffff;       
+  --dim:    #888899;       
+  --mono:   'Share Tech Mono', monospace;
+  --head:   'Orbitron', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--mono);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── HEADER ── */
+.header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 24px 12px;
+  border-bottom: 2px solid var(--border);
+  background: #050508;
+}
+.logo {
+  font-family: var(--head); font-size: 16px; font-weight: 900;
+  letter-spacing: 3px; color: #fff;
+}
+.logo em { color: var(--dim); font-style: normal; font-weight: 400; }
+
+.status-row { display: flex; align-items: center; gap: 10px; }
+.dot {
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--dim); flex-shrink: 0;
+}
+.dot.ok  { background: var(--green); box-shadow: 0 0 10px var(--green); }
+.dot.err { background: var(--red); }
+.status-text { font-size: 13px; color: var(--dim); font-weight: bold; }
+
+/* ── PATCH BAR (CENTRADA Y MÁS GRANDE) ── */
+.patch-bar {
+  display: flex; 
+  align-items: center;
+  justify-content: center;   /* Centra horizontalmente el contenido */
+  padding: 20px 24px;        /* Más espacio para albergar la fuente grande */
+  background: var(--panel);
+  border-bottom: 3px solid var(--border);
+}
+.patch-name {
+  font-family: var(--head); 
+  font-size: 42px;           /* Letra notablemente más grande para el suelo */
+  font-weight: 900;
+  color: #fff; 
+  letter-spacing: 1.5px;
+  text-align: center;
+}
+
+/* Nombre del parche en la lista (diferente de .patch-name principal) */
+.patch-item .patch-name {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  font-weight: normal;
+  color: var(--text);
+  letter-spacing: normal;
+  text-align: left;
+}
+
+/* ── FX GRID ── */
+.fx-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 3px;                 
+  background: var(--border);
+  flex: 1;
+}
+
+.fx-card {
+  background: var(--card);
+  padding: 20px 16px 12px;
+  position: relative;
+  display: flex; 
+  flex-direction: column;
+  align-items: stretch;
+  min-height: 250px;        
+  transition: background 0.15s, color 0.15s;
+}
+
+/* ═════ MODO ALTO CONTRASTE: EFECTO ENCENDIDO ═════ */
+.fx-card.on {
+  background: #ffffff !important;
+  color: #000000;
+}
+.fx-card.on .slot-num { 
+  color: #000000;
+}
+.fx-card.on .fx-name { 
+  color: #000000 !important;
+}
+.fx-card.on .fx-id {
+  border-top: 1px solid #e0e0e0;
+  color: #777777;
+}
+.fx-card.on .fx-id span { 
+  color: #000000; 
+}
+
+/* ═════ MODO ALTO CONTRASTE: EFECTO APAGADO ═════ */
+.fx-card.off { 
+  background: #0a0a0f !important;
+}
+.fx-card.off .slot-num { 
+  color: #339384; 
+}
+.fx-card.off .fx-name { 
+  color: #339384; 
+}
+.fx-card.off .cat-badge {
+  background: #151520 !important;
+  color: #339384 !important;
+  box-shadow: none;
+}
+.fx-card.off .fx-id {
+  border-top: 1px solid #151520;
+  color: #339384;
+}
+.fx-card.off .fx-id span { 
+  color: #339384; 
+}
+
+/* Número de Slot */
+.slot-num {
+  font-family: var(--head); 
+  font-size: 32px; 
+  font-weight: 900;
+  letter-spacing: 1px; 
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+/* Badge de Categoría */
+.cat-badge {
+  display: block;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 25px; 
+  font-weight: 900; 
+  letter-spacing: 1.5px; 
+  text-transform: uppercase;
+  padding: 6px 4px; 
+  border-radius: 4px;
+  margin-bottom: 20px;
+  width: 100%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+}
+.cat-DYNAMICS  { background: #88cc00; color: #000; }
+.cat-FILTER     { background: #0099cc; color: #fff; }
+.cat-DRIVE      { background: #ff7722; color: #000; }
+.cat-AMP        { background: #ff4488; color: #fff; }
+.cat-MODULATION { background: #aa66ff; color: #fff; }
+.cat-SFX        { background: #00ccaa; color: #000; }
+.cat-DELAY      { background: #4488ff; color: #fff; }
+.cat-REVERB     { background: #7777ff; color: #fff; }
+.cat-PEDAL      { background: #ccaa00; color: #000; }
+
+/* Nombre del Efecto */
+.fx-name {
+  font-family: var(--head); 
+  font-size: calc(24px + 1vw); 
+  font-weight: 900;
+  line-height: 1.1; 
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin-bottom: 16px;
+  word-break: break-word;
+}
+.fx-name.unknown { font-size: 20px; font-weight: 400; opacity: 0.5; }
+
+/* ID técnico */
+.fx-id {
+  font-size: 10px; 
+  padding-top: 6px;
+  letter-spacing: .5px;
+  text-align: center;
+}
+
+/* ── PATCH LIST PANEL ── */
+.patch-list-panel {
+  background: var(--panel);
+  border-top: 2px solid var(--border);
+  padding: 16px 24px 20px;
+}
+
+.patch-list-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.patch-list-title {
+  font-family: var(--head);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--dim);
+  text-transform: uppercase;
+}
+
+/* Botón de escaneo */
+.btn-scan {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  background: transparent;
+  color: var(--green);
+  border: 1px solid var(--green);
+  border-radius: 4px;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.btn-scan:hover:not(:disabled) {
+  background: var(--green);
+  color: #000;
+}
+.btn-scan:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Barra de progreso */
+.scan-progress-bar-wrap {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 200px;
+}
+.scan-progress-bar-wrap.visible { display: flex; }
+.scan-progress-bar {
+  flex: 1;
+  height: 6px;
+  background: #1a1a2e;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.scan-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--green);
+  border-radius: 3px;
+  transition: width 0.1s linear;
+}
+.scan-progress-text {
+  font-size: 11px;
+  color: var(--dim);
+  white-space: nowrap;
+  min-width: 80px;
+}
+
+/* Contenedor de parches en columnas */
+.patches-table-wrap {
+  display: none;
+  overflow-y: auto;
+  max-height: 600px;
+}
+.patches-table-wrap.visible { display: block; }
+
+/* Grid de parches - estilo compacto como la web original */
+.patches-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0;
+  background: #1a1a2e;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Elemento individual de parche */
+.patch-item {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 4px;
+  background: var(--card);
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.1s;
+  border: 1px solid #1a1a2e;
+  font-size: 11px;
+  min-height: 20px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+.patch-item:hover {
+  background: #1a1a2e;
+}
+.patch-item.selected {
+  background: #003322;
+  color: var(--green);
+}
+.patch-item.selected .patch-num {
+  color: var(--green2);
+}
+
+.patch-num {
+  color: var(--dim);
+  font-size: 10px;
+  min-width: 28px;
+  text-align: right;
+  font-weight: normal;
+  flex-shrink: 0;
+}
+
+/* EDITOR PANEL */
+.editor-panel {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--panel);
+  border-top: 3px solid var(--green);
+  padding: 20px 24px;
+  max-height: 40vh;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.8);
+}
+.editor-panel.visible { display: block; }
+
+.editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.editor-title {
+  font-family: var(--head);
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--green);
+  letter-spacing: 1px;
+}
+.editor-close {
+  background: none;
+  border: none;
+  color: var(--dim);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.editor-close:hover { color: var(--text); }
+
+.editor-params {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.param-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.param-label {
+  font-size: 12px;
+  color: var(--dim);
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.param-value {
+  font-size: 14px;
+  color: var(--green);
+  font-weight: bold;
+}
+.param-slider {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: #1a1a2e;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+}
+.param-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--green);
+  cursor: pointer;
+  box-shadow: 0 0 8px var(--green);
+}
+.param-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--green);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 0 8px var(--green);
+}
+
+
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">G2 FOUR <em>/ FX Viewer</em></div>
+  <div class="status-row">
+    <div class="dot" id="dot"></div>
+    <span class="status-text" id="statusText">Sin conexión MIDI</span>
+  </div>
+</div>
+
+<div class="patch-bar">
+  <span class="patch-name" id="patchName">—</span>
+</div>
+
+<div class="fx-grid" id="fxGrid">
+  <div class="fx-card off"><div class="slot-num">FX 1</div><div class="fx-name unknown">Sin datos</div></div>
+  <div class="fx-card off"><div class="slot-num">FX 2</div><div class="fx-name unknown">Sin datos</div></div>
+  <div class="fx-card off"><div class="slot-num">FX 3</div><div class="fx-name unknown">Sin datos</div></div>
+  <div class="fx-card off"><div class="slot-num">FX 4</div><div class="fx-name unknown">Sin datos</div></div>
+  <div class="fx-card off"><div class="slot-num">FX 5</div><div class="fx-name unknown">Sin datos</div></div>
+  <div class="fx-card off"><div class="slot-num">FX 6</div><div class="fx-name unknown">Sin datos</div></div>
+</div>
+
+<!-- ── PANEL DE LISTA DE PARCHES ── -->
+<div class="patch-list-panel">
+  <div class="patch-list-header">
+    <span class="patch-list-title">Biblioteca de parches</span>
+    <button class="btn-scan" id="btnScanPatches" disabled>Escanear todos los parches</button>
+    <div class="scan-progress-bar-wrap" id="scanProgressWrap">
+      <div class="scan-progress-bar">
+        <div class="scan-progress-fill" id="scanProgressFill"></div>
+      </div>
+      <span class="scan-progress-text" id="scanProgressText">0 / 0</span>
+    </div>
+  </div>
+  <div class="patches-table-wrap" id="patchesTableWrap">
+    <div class="patches-grid" id="patchesGrid"></div>
+  </div>
+</div>
+
+<!-- ── PANEL DE EDICIÓN DE EFECTOS ── -->
+<div class="editor-panel" id="editorPanel">
+  <div class="editor-header">
+    <div class="editor-title" id="editorTitle">Editar Efecto</div>
+    <button class="editor-close" id="editorClose">×</button>
+  </div>
+  <div class="editor-params" id="editorParams"></div>
+</div>
+
+<script>
+const EFFECTS = new Map([
+  [0x01000010,"Comp"],         [0x01000020,"RackComp"],   [0x01000030,"GrayComp"],
+  [0x01000040,"OptComp"],      [0x01000050,"BlackOpt"],   [0x01000060,"1176 LMT"],
+  [0x01000070,"ZNR"],          [0x01000080,"NoiseGate"],  [0x01000090,"SlowATTCK"],	[0x03000058,"Overdrive"],
+  [0x010000a0,"MuteSW"],
+  [0x02000010,"AutoWah"],      [0x02000020,"Reso FLTR"],  [0x02000030,"LowPassFL"],
+  [0x02000040,"CryFilter"],    [0x02000050,"EG Filter"],  [0x02000060,"LFO FLTR"],
+  [0x02000070,"SeqFLTR"],      [0x02000080,"RndmFLTR"],   [0x02000090,"StepFLTR"],
+  [0x020000a0,"Gt GEQ"],       [0x020000b0,"Gt GEQ 7"],   [0x020000c0,"St Gt GEQ"],
+  [0x020000d0,"ParaEQ"],       [0x020000e0,"Exciter"],    [0x020000f0,"Low EQ"],
+  [0x02000100,"High EQ"],
+  [0x03000010,"EP Drive"],     [0x03000020,"RC Drive"],   [0x03000030,"TS Drive"],
+  [0x03000040,"GoldDrive"],    [0x03000050,"SweetDrv"],   [0x03000060,"Zen O.DRV"],
+  [0x03000070,"BG GRID"],      [0x03000080,"DYN Drive"],  [0x03000090,"Plus DIST"],
+  [0x030000a0,"DIST One"],     [0x030000b0,"SqueakDST"],  [0x030000c0,"RedCrunch"],
+  [0x030000d0,"VioletDST"],    [0x030000e0,"TB MK1.5"],   [0x030000f0,"OctFuzz"],
+  [0x03000100,"NYC Muff"],     [0x03000110,"WaveSHPR"],   [0x03000120,"Razor DRV"],
+  [0x03000130,"MetalWRLD"],    [0x03000140,"HG THRTTL"],  [0x03000150,"TS+Boost"],
+  [0x03000160,"RedCR+BST"],    [0x03000170,"SpotBoost"],  [0x03000180,"UpOctBSTR"],
+  [0x03000190,"OutputBST"],    [0x030001a0,"Aco.Sim"],
+  [0x04000010,"MS 45os"],      [0x04000020,"MS 1959"],    [0x04000030,"MS 800"],
+  [0x04000040,"FD B-MAN"],     [0x04000050,"FD TWIN-R"],  [0x04000060,"FD DLX-R"],
+  [0x04000070,"FD MASTER"],    [0x04000080,"UK 30A"],     [0x04000090,"BG MARK1"],
+  [0x040000a0,"BG MARK3"],     [0x040000b0,"RectiDual"],  [0x040000c0,"XtasyBlue"],
+  [0x040000d0,"HW 100"],       [0x040000e0,"ORG120"],     [0x040000f0,"DZ Herb"],
+  [0x04000100,"MATCH30"],      [0x04000110,"KRAMPUS"],    [0x04000120,"REDLOOM"],
+  [0x04000130,"VELVET"],       [0x04000140,"MUDDY"],      [0x04000150,"7 HEAVEN"],
+  [0x04000160,"POLLEX"],
+  [0x06000010,"Chorus"],       [0x06000020,"CloneCho"],   [0x06000030,"ChorusOne"],
+  [0x06000040,"TriChorus"],    [0x06000050,"AnalogCho"],  [0x06000060,"StereoCho"],
+  [0x06000070,"BendCho"],      [0x06000080,"Detune"],     [0x06000090,"Tremolo"],
+  [0x060000a0,"Phaser"],       [0x060000b0,"StonePha"],   [0x060000c0,"WarpPhase"],
+  [0x060000d0,"Duo Phase"],    [0x060000e0,"TheVibe"],    [0x060000f0,"VinFLNGR"],
+  [0x06000100,"Kick FLNG"],    [0x06000110,"Vibrato"],    [0x06000120,"SwellVibe"],
+  [0x06000130,"Octaver"],      [0x06000140,"PitchSHFT"],  [0x06000150,"MonoPitch"],
+  [0x06000160,"HPS"],          [0x06000170,"PolyShift"],  [0x06000180,"GEMINOS"],
+  [0x06000190,"RingMod"],      [0x060001a0,"Slicer"],
+  [0x07000010,"AutoPan"],      [0x07000020,"LoopRoll"],   [0x07000030,"Sitar Sim"],
+  [0x07000040,"Bomber"],
+  [0x08000010,"Delay"],        [0x08000020,"AnalogDly"],  [0x08000030,"TapeEcho"],
+  [0x08000040,"TapeEcho3"],    [0x08000050,"DualDelay"],  [0x08000060,"SoftEcho"],
+  [0x08000070,"SlapBackD"],    [0x08000080,"P-P Delay"],  [0x08000090,"ReverseDL"],
+  [0x080000a0,"ModDelay"],     [0x080000b0,"FilterDly"],  [0x080000c0,"Pitch DLY"], [0x080000A8,"ModDelay 2"],
+  [0x080000d0,"PhaseDly"],     [0x080000e0,"A-Pan DLY"],  [0x080000f0,"SlwAtkDly"],
+  [0x08000100,"ICE Delay"],    [0x08000110,"HoldDelay"],
+  [0x09000010,"RoomREV"],      [0x09000020,"BrghtRoom"],  [0x09000030,"SpringREV"],
+  [0x09000040,"FD Spring"],    [0x09000050,"Plate REV"],  [0x09000060,"Hall REV"],
+  [0x09000070,"BrghtHall"],    [0x09000080,"HD Hall"],    [0x09000090,"ChurchREV"],
+  [0x090000a0,"Ambience"],     [0x090000b0,"Chamber"],    [0x090000c0,"AirReverb"],
+  [0x090000d0,"EarlyRef"],     [0x090000e0,"GateRevrb"],  [0x090000f0,"HoldRevrb"],
+  [0x09000100,"SpaceHole"],    [0x09000110,"ParticleR"],
+  [0x0b000010,"Output VP"],    [0x0b000020,"Pedal VOL"],  [0x0b000030,"BlackWah"],
+  [0x0b000040,"ChromeWah"],    [0x0b000050,"WAH100"],     [0x0b000060,"VoiceWah"],
+  [0x0b000070,"PDL Pitch"],    [0x0b000080,"PDL MnPit"],  [0x0b000090,"PDL Roto"],
+  [0x0b0000a0,"PDL FLNGR"],    [0x0b0000b0,"PDL Vibe"],   [0x0b0000c0,"PDL Drive"],
+  [0x0b0000d0,"PDL PHSR"],     [0x0b0000e0,"PDL Delay"],  [0x0b0000f0,"OSC Echo"],
+  [0x0b000100,"PDL Rev"],      [0x0b000110,"PDL Reso"],   [0x0b000120,"P-BitCRSH"],
+  [0x07000ff0,"BPM"],
+]);
+
+const GROUPS = {
+  1:"DYNAMICS", 2:"FILTER", 3:"DRIVE", 4:"AMP",
+  6:"MODULATION", 7:"SFX", 8:"DELAY", 9:"REVERB", 11:"PEDAL"
+};
+
+function seven2eight(data, start, end) {
+  const len = end - start + 1;
+  const rem = len % 8;
+  const outLen = Math.floor(len / 8) * 7 + (rem < 2 ? 0 : rem - 1);
+  const out = new Uint8Array(outLen);
+  let outIdx = 0, highBits = 0;
+  for (let i = start; i <= end; i++) {
+    const seven = data[i];
+    const bitIdx = 7 - (i - start) % 8;
+    if (bitIdx === 7) {
+      highBits = seven;
+    } else {
+      out[outIdx++] = seven + (((highBits >> bitIdx) & 1) << 7);
+    }
+  }
+  return out;
+}
+
+function getNumberFromBits(data, startBit, endBit) {
+  const startByte = Math.floor(startBit / 8);
+  const endByte   = Math.floor(endBit / 8);
+  const startOff  = startBit % 8;
+  const endOff    = endBit % 8;
+  const startMask = 0xFF >> startOff;
+  const endMask   = (0b1111111100000000 >> (endOff + 1)) & 0xFF;
+  let value = 0;
+  for (let i = endByte; i >= startByte; i--) {
+    let b = data[i];
+    if (i === startByte) b &= startMask;
+    if (i === endByte)   b &= endMask;
+    value += b << ((endByte - i) * 8);
+  }
+  return value >> (7 - endOff);
+}
+
+function parseSysEx(raw) {
+  if (raw.length < 12) return null;
+  if (raw[0]!==0xF0||raw[1]!==0x52||raw[2]!==0x00||raw[3]!==0x6E) return null;
+  if (raw[4]!==0x64||raw[5]!==0x12) return null;
+
+  const dataStart = 9;
+  const dataEnd   = raw.length - 1 - 5 - 1;
+  const eight = seven2eight(raw, dataStart, dataEnd);
+
+  let ptcfOff = -1;
+  for (let i = 0; i < eight.length - 3; i++) {
+    if (eight[i]===0x50&&eight[i+1]===0x54&&eight[i+2]===0x43&&eight[i+3]===0x46) {
+      ptcfOff = i; break;
+    }
+  }
+  if (ptcfOff < 0) return null;
+
+  const ptcfLen    = readI32(eight, ptcfOff + 4);
+  const version    = readI32(eight, ptcfOff + 8);
+  const numEffects = readI32(eight, ptcfOff + 12);
+
+  const subStart = ptcfOff + 8 + 4 + 4 + 4 + 6 + 10 + numEffects * 4;
+  const subEnd   = ptcfOff + 8 + ptcfLen;
+
+  const chunks = {};
+  let off = subStart;
+  while (off + 8 <= subEnd) {
+    const id  = String.fromCharCode(eight[off],eight[off+1],eight[off+2],eight[off+3]);
+    const len = readI32(eight, off + 4);
+    if (len < 0 || off + 8 + len > eight.length) break;
+    chunks[id] = eight.slice(off + 8, off + 8 + len);
+    off += 8 + len;
+  }
+
+  const effects = [];
+  if (chunks['EDTB']) {
+    const edtb = chunks['EDTB'];
+    const count = Math.floor(edtb.length / 24);
+    for (let i = 0; i < count; i++) {
+      const rev = edtb.slice(i * 24, i * 24 + 24).reverse();
+      const bitpos = rev.length * 8 - 1;
+      const enabled  = getNumberFromBits(rev, bitpos, bitpos) === 1;
+      const id       = getNumberFromBits(rev, bitpos - 29, bitpos - 1);
+      effects.push({ enabled, id });
+    }
+  }
+
+  let name = '—';
+  if (chunks['NAME']) {
+    name = '';
+    for (const b of chunks['NAME']) {
+      if (b === 0) break;
+      name += String.fromCharCode(b);
+    }
+    name = name.trim() || '—';
+  }
+
+  let tempo = 0;
+  if (chunks['PRM2'] && chunks['PRM2'].length >= 2) {
+    const p = chunks['PRM2'];
+    tempo = ((p[p.length-2] & 0xF0) >> 4) | ((p[p.length-1] & 0x0F) << 4);
+  }
+
+  return { name, tempo, effects };
+}
+
+/**
+ * Parsea un mensaje SysEx de respuesta a un requestPatchDumpForMemoryLocationV1
+ * (comando 09 00 00 NN → respuesta 08 00 00 NN ...)
+ * Extrae únicamente el nombre del parche.
+ */
+function parsePatchNameFromMemorySlotV1(raw) {
+  // Cabecera: F0 52 00 6E 08 00 00 <slot> <lenLSB> <lenMSB> <7-bit data...> <F7>
+  if (raw.length < 12) return null;
+  if (raw[0]!==0xF0||raw[1]!==0x52||raw[2]!==0x00||raw[3]!==0x6E) return null;
+  if (raw[4]!==0x08||raw[5]!==0x00||raw[6]!==0x00) return null;
+
+  const dataStart = 10;
+  const dataEnd   = raw.length - 2; // antes del F7 y los bytes CRC (si los hay)
+  if (dataEnd < dataStart) return null;
+
+  const eight = seven2eight(raw, dataStart, dataEnd);
+  return extractNameFromPTCF(eight);
+}
+
+/**
+ * Parsea un mensaje SysEx de respuesta a un requestPatchDumpForMemoryLocationV2
+ * (comando 46 00 00 BB BB PP PP → respuesta 45 00 00 BB BB PP PP ...)
+ * Extrae únicamente el nombre del parche.
+ */
+function parsePatchNameFromMemorySlotV2(raw) {
+  // Cabecera: F0 52 00 6E 45 00 00 <bank LSB> <bank MSB> <prog LSB> <prog MSB> <lenLSB> <lenMSB> <7-bit data...> <F7>
+  if (raw.length < 16) return null;
+  if (raw[0]!==0xF0||raw[1]!==0x52||raw[2]!==0x00||raw[3]!==0x6E) return null;
+  if (raw[4]!==0x45||raw[5]!==0x00||raw[6]!==0x00) return null;
+
+  const dataStart = 13;
+  const dataEnd   = raw.length - 2;
+  if (dataEnd < dataStart) return null;
+
+  const eight = seven2eight(raw, dataStart, dataEnd);
+  return extractNameFromPTCF(eight);
+}
+
+/**
+ * Extrae el nombre del parche de un bloque de datos PTCF de 8 bits.
+ */
+function extractNameFromPTCF(eight) {
+  // Buscar la firma PTCF
+  let ptcfOff = -1;
+  for (let i = 0; i < eight.length - 3; i++) {
+    if (eight[i]===0x50&&eight[i+1]===0x54&&eight[i+2]===0x43&&eight[i+3]===0x46) {
+      ptcfOff = i; break;
+    }
+  }
+  if (ptcfOff < 0) return null;
+
+  const ptcfLen    = readI32(eight, ptcfOff + 4);
+  const numEffects = readI32(eight, ptcfOff + 12);
+
+  const subStart = ptcfOff + 8 + 4 + 4 + 4 + 6 + 10 + numEffects * 4;
+  const subEnd   = ptcfOff + 8 + ptcfLen;
+
+  let off = subStart;
+  while (off + 8 <= subEnd && off + 8 <= eight.length) {
+    const id  = String.fromCharCode(eight[off],eight[off+1],eight[off+2],eight[off+3]);
+    const len = readI32(eight, off + 4);
+    if (len < 0 || off + 8 + len > eight.length) break;
+    if (id === 'NAME') {
+      let name = '';
+      for (let b = 0; b < len; b++) {
+        if (eight[off + 8 + b] === 0) break;
+        name += String.fromCharCode(eight[off + 8 + b]);
+      }
+      return name.trim() || '—';
+    }
+    off += 8 + len;
+  }
+  return '—';
+}
+
+function readI32(data, off) {
+  return (data[off]|(data[off+1]<<8)|(data[off+2]<<16)|(data[off+3]<<24)) >>> 0;
+}
+
+// ── ESTADO MIDI ──────────────────────────────────────────────────────────────
+let midiIn = null, midiOut = null;
+let rawBytes = [];
+
+// Variables para el escaneo de parches
+let scanInProgress = false;
+let patchList = [];       // Array de { slot, name }
+let selectedPatchRow = null;
+
+// Protocolo detectado: 'v1' | 'v2' | null
+let detectedProtocol = null;
+let numPatches = -1;
+let patchesPerBank = -1;
+let currentEffectStates = [false, false, false, false, false, false];
+
+// ── INICIALIZACIÓN MIDI ──────────────────────────────────────────────────────
+navigator.requestMIDIAccess({ sysex: true })
+  .then(midi => {
+    midiIn  = [...midi.inputs.values()][0];
+    midiOut = [...midi.outputs.values()][0];
+    if (!midiIn || !midiOut) { setStatus('err', 'G2 FOUR no detectado'); return; }
+    midiIn.onmidimessage = msg => {
+      if (msg.data.length < 50) return;
+      rawBytes = Array.from(msg.data);
+      const patch = parseSysEx(rawBytes);
+      if (patch) render(patch);
+    };
+    setStatus('ok', 'G2 FOUR conectado');
+    document.getElementById('btnScanPatches').disabled = false;
+    sync();
+    setInterval(sync, 1500);
+  })
+  .catch(() => setStatus('err', 'Sin acceso MIDI (requiere HTTPS o localhost)'));
+
+function sync() {
+  if (midiOut) midiOut.send([0xF0, 0x52, 0x00, 0x6E, 0x64, 0x13, 0x00, 0xF7]);
+}
+
+function setStatus(cls, txt) {
+  document.getElementById('dot').className = 'dot ' + cls;
+  document.getElementById('statusText').textContent = txt;
+}
+
+function render(patch) {
+  document.getElementById('patchName').textContent = patch.name;
+
+  const grid = document.getElementById('fxGrid');
+  grid.innerHTML = '';
+
+  const show = patch.effects.slice(0, 6);
+
+  show.forEach((fx, i) => {
+    const name    = EFFECTS.get(fx.id >>> 0);
+    const group   = (fx.id >>> 24) & 0xFF;
+    const grpName = GROUPS[group] || '';
+    const idHex   = '0x' + (fx.id >>> 0).toString(16).toUpperCase().padStart(8, '0');
+
+    const card = document.createElement('div');
+    card.className = 'fx-card ' + (fx.enabled ? 'on' : 'off');
+    card.dataset.fxSlot = i;  // Guardar el slot del efecto
+    card.style.cursor = 'pointer';  // Indicar que es clickeable
+
+    card.innerHTML = `
+      <div class="slot-num">FX ${i + 1}</div>
+      <div class="cat-badge cat-${grpName}">${grpName || '—'}</div>
+      <div class="fx-name ${name ? '' : 'unknown'}">${name || 'Desconocido'}</div>
+      <div class="fx-id">ID <span>${idHex}</span></div>
+    `;
+    
+    // Evento de click para conmutar el efecto (toggle On/Off)
+    card.addEventListener('click', (e) => {
+      if (e.detail === 1) {
+        // Click simple: toggle
+        toggleEffect(i, fx.enabled);
+      }
+    });
+    
+    // Evento de doble clic para abrir el editor
+    card.addEventListener('dblclick', () => {
+      openEffectEditor(i, fx);
+    });
+    
+    grid.appendChild(card);
+  });
+
+  for (let i = show.length; i < 6; i++) {
+    const card = document.createElement('div');
+    card.className = 'fx-card off';
+    card.innerHTML = `<div class="slot-num">FX ${i + 1}</div><div class="fx-name unknown">Vacío</div>`;
+    grid.appendChild(card);
+  }
+}
+
+/**
+ * Conmuta el estado (On/Off) de un efecto en el slot especificado.
+ * Envía el comando MIDI SysEx correcto para el protocolo V2 del G2 Four.
+ * Basado en los comandos capturados:
+ * - DESACTIVAR: F0 52 00 6E 64 20 00 <slot> 00 00 00 00 00 00 F7
+ * - ACTIVAR:   F0 52 00 6E 64 20 00 <slot> 00 01 00 00 00 00 F7
+ */
+async function toggleEffect(fxSlot, currentState) {
+  if (!midiOut) {
+    console.warn('MIDI no disponible');
+    return;
+  }
+
+  // Alternar el estado: si está ON (true), enviar 0 (OFF); si está OFF (false), enviar 1 (ON)
+  const newValue = currentState ? 0 : 1;
+  
+  // Construir el comando SysEx para cambiar parámetro (protocolo V2):
+  // Cabecera: F0 52 00 6E
+  // Comando: 64 20 00
+  // Parámetros: <fxSlot> <paramNum> <value> <0> <0> <0> <0>
+  const parameterBuffer = [
+    fxSlot & 0x7F,           // Slot del efecto (0-5)
+    0x00,                    // Parámetro 0 = On/Off
+    newValue & 0x7F,         // Valor: 0=OFF, 1=ON
+    0x00,                    // Byte 4
+    0x00,                    // Byte 5
+    0x00,                    // Byte 6
+    0x00                     // Byte 7
+  ];
+  
+  const cmd = [
+    0xF0, 0x52, 0x00, 0x6E,  // Cabecera SysEx Zoom
+    0x64, 0x20, 0x00,         // Comando: parámetro de efecto V2
+    ...parameterBuffer,       // Parámetros
+    0xF7                       // Fin SysEx
+  ];
+  
+  try {
+    const stateStr = newValue === 1 ? 'ON' : 'OFF';
+    console.log(`Enviando comando para FX ${fxSlot + 1} (${stateStr}): ${cmd.map(b => '0x' + b.toString(16).padStart(2, '0')).join(' ')}`);
+    midiOut.send(cmd);
+    
+    console.log(`Comando toggle enviado para FX ${fxSlot + 1}: ${stateStr}`);
+  } catch (err) {
+    console.error('Error al enviar comando toggle:', err);
+  }
+}
+
+// ── ESCANEO DE TODOS LOS PARCHES ─────────────────────────────────────────────
+
+/**
+ * Envía un comando SysEx y espera una respuesta que cumpla el predicado,
+ * con un timeout en milisegundos.
+ */
+function sendSysExAndWaitReply(command, matchFn, timeoutMs = 500) {
+  return new Promise((resolve) => {
+    if (!midiOut || !midiIn) { resolve(undefined); return; }
+
+    let resolved = false;
+    const timer = setTimeout(() => {
+      if (!resolved) {
+        resolved = true;
+        midiIn.removeEventListener('midimessage', handler);
+        resolve(undefined);
+      }
+    }, timeoutMs);
+
+    function handler(msg) {
+      if (!resolved && matchFn(msg.data)) {
+        resolved = true;
+        clearTimeout(timer);
+        midiIn.removeEventListener('midimessage', handler);
+        resolve(msg.data);
+      }
+    }
+
+    midiIn.addEventListener('midimessage', handler);
+    midiOut.send(command);
+  });
+}
+
+/**
+ * Detecta el protocolo soportado por la pedalera (V1 o V2) y obtiene
+ * el número total de parches y parches por banco.
+ * Retorna true si se detectó correctamente.
+ */
+async function probeDeviceProtocol() {
+  // Habilitar edición de parámetros (necesario para algunos comandos de sondeo)
+  midiOut.send([0xF0, 0x52, 0x00, 0x6E, 0x50, 0xF7]);
+  await sleep(100);
+
+  // Probar protocolo V2: comando 44
+  const cmdV2 = [0xF0, 0x52, 0x00, 0x6E, 0x44, 0xF7];
+  const replyV2 = await sendSysExAndWaitReply(
+    cmdV2,
+    d => d.length > 5 && d[0]===0xF0 && d[1]===0x52 && d[2]===0x00 && d[3]===0x6E && d[4]===0x43,
+    400
+  );
+  if (replyV2 && replyV2.length > 13) {
+    numPatches    = replyV2[5] + (replyV2[6] << 7);
+    patchesPerBank = replyV2[11] + (replyV2[12] << 7);
+    detectedProtocol = 'v2';
+    return true;
+  }
+
+  // Probar protocolo V1: comando 07
+  const cmdV1 = [0xF0, 0x52, 0x00, 0x6E, 0x07, 0xF7];
+  const replyV1 = await sendSysExAndWaitReply(
+    cmdV1,
+    d => d.length > 5 && d[0]===0xF0 && d[1]===0x52 && d[2]===0x00 && d[3]===0x6E && d[4]===0x06,
+    400
+  );
+  if (replyV1 && replyV1.length >= 10) {
+    numPatches    = replyV1[5] + (replyV1[6] << 7);
+    patchesPerBank = -1;
+    detectedProtocol = 'v1';
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Descarga el parche de un slot de memoria específico y devuelve su nombre.
+ * Usa el protocolo detectado (V1 o V2).
+ */
+async function downloadPatchNameFromSlot(slot) {
+  let command, matchFn;
+
+  if (detectedProtocol === 'v2') {
+    const bank    = Math.floor(slot / patchesPerBank);
+    const program = slot % patchesPerBank;
+    command = [
+      0xF0, 0x52, 0x00, 0x6E,
+      0x46, 0x00, 0x00,
+      bank    & 0x7F, (bank    >> 7) & 0x7F,
+      program & 0x7F, (program >> 7) & 0x7F,
+      0xF7
+    ];
+    matchFn = d => d.length > 6 && d[0]===0xF0 && d[1]===0x52 && d[2]===0x00 && d[3]===0x6E
+                    && d[4]===0x45 && d[5]===0x00 && d[6]===0x00;
+  } else {
+    // V1: el número de slot va directamente en el byte 7
+    command = [0xF0, 0x52, 0x00, 0x6E, 0x09, 0x00, 0x00, slot & 0x7F, 0xF7];
+    matchFn = d => d.length > 6 && d[0]===0xF0 && d[1]===0x52 && d[2]===0x00 && d[3]===0x6E
+                    && d[4]===0x08 && d[5]===0x00 && d[6]===0x00;
+  }
+
+  const reply = await sendSysExAndWaitReply(command, matchFn, 600);
+  if (!reply) return null;
+
+  const name = detectedProtocol === 'v2'
+    ? parsePatchNameFromMemorySlotV2(Array.from(reply))
+    : parsePatchNameFromMemorySlotV1(Array.from(reply));
+
+  return name;
+}
+
+function sleep(ms) {
+  return new Promise(r => setTimeout(r, ms));
+}
+
+// ── BOTÓN: ESCANEAR TODOS LOS PARCHES ────────────────────────────────────────
+document.getElementById('btnScanPatches').addEventListener('click', async () => {
+  if (scanInProgress) return;
+  if (!midiOut || !midiIn) {
+    alert('La pedalera no está conectada.');
+    return;
+  }
+
+  scanInProgress = true;
+  const btn = document.getElementById('btnScanPatches');
+  btn.disabled = true;
+  btn.textContent = 'Escaneando…';
+
+  // Ocultar tabla anterior y mostrar barra de progreso
+  document.getElementById('patchesTableWrap').classList.remove('visible');
+  document.getElementById('scanProgressWrap').classList.add('visible');
+  setProgressBar(0, 0, 1);
+
+  // Desactivar el listener normal para no interferir
+  const prevHandler = midiIn.onmidimessage;
+  midiIn.onmidimessage = null;
+
+  try {
+    // 1. Detectar protocolo y número de parches
+    setStatus('ok', 'Detectando protocolo…');
+    const probeOk = await probeDeviceProtocol();
+
+    if (!probeOk || numPatches <= 0) {
+      // Fallback: intentar con un número fijo de 100 parches usando V1
+      detectedProtocol = 'v1';
+      numPatches = 100;
+      patchesPerBank = -1;
+    }
+
+    setStatus('ok', `Protocolo ${detectedProtocol.toUpperCase()} · ${numPatches} parches`);
+
+    // 2. Descargar cada parche
+    patchList = [];
+    for (let i = 0; i < numPatches; i++) {
+      setProgressBar(i, numPatches, 1);
+
+      const name = await downloadPatchNameFromSlot(i);
+
+      if (name === null) {
+        // La pedalera no respondió: asumimos que hemos llegado al final
+        numPatches = i;
+        break;
+      }
+
+      patchList.push({ slot: i, name });
+    }
+
+    setProgressBar(patchList.length, patchList.length, 1);
+
+    // 3. Renderizar tabla
+    renderPatchesTable();
+    document.getElementById('patchesTableWrap').classList.add('visible');
+    setStatus('ok', `G2 FOUR conectado · ${patchList.length} parches cargados`);
+
+  } catch (err) {
+    console.error('Error durante el escaneo:', err);
+    setStatus('err', 'Error durante el escaneo');
+  } finally {
+    // Restaurar listener normal
+    midiIn.onmidimessage = prevHandler;
+    document.getElementById('scanProgressWrap').classList.remove('visible');
+    btn.disabled = false;
+    btn.textContent = 'Escanear todos los parches';
+    scanInProgress = false;
+  }
+});
+
+function setProgressBar(current, total, step) {
+  const fill = document.getElementById('scanProgressFill');
+  const text = document.getElementById('scanProgressText');
+  const pct  = total > 0 ? Math.round((current / total) * 100) : 0;
+  fill.style.width = pct + '%';
+  text.textContent = `${current} / ${total}`;
+}
+
+/**
+ * Renderiza la grilla de parches descargados en varias columnas.
+ */
+function renderPatchesTable() {
+  const grid = document.getElementById('patchesGrid');
+  grid.innerHTML = '';
+  selectedPatchRow = null;
+
+  patchList.forEach(({ slot, name }) => {
+    const item = document.createElement('div');
+    item.className = 'patch-item';
+    item.dataset.slot = slot;
+
+    const numSpan = document.createElement('span');
+    numSpan.className = 'patch-num';
+    numSpan.textContent = (slot + 1).toString().padStart(3, ' ');
+
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'patch-name';
+    nameSpan.textContent = name;
+    nameSpan.title = name; // Mostrar nombre completo en tooltip
+
+    item.appendChild(numSpan);
+    item.appendChild(nameSpan);
+
+    item.addEventListener('click', () => selectPatch(item, slot));
+    grid.appendChild(item);
+  });
+}
+
+/**
+ * Selecciona un parche de la grilla y lo carga en la pedalera.
+ */
+async function selectPatch(item, slot) {
+  // Resaltar elemento
+  if (selectedPatchRow) selectedPatchRow.classList.remove('selected');
+  item.classList.add('selected');
+  selectedPatchRow = item;
+
+  if (!midiOut) return;
+
+  // Enviar cambio de programa a la pedalera
+  // El G2 Four usa Bank Select (CC 0 y CC 32) + Program Change
+  if (patchesPerBank > 0 && detectedProtocol === 'v2') {
+    const bank    = Math.floor(slot / patchesPerBank);
+    const program = slot % patchesPerBank;
+    // Bank Select MSB (CC 0)
+    midiOut.send([0xB0, 0x00, (bank >> 7) & 0x7F]);
+    // Bank Select LSB (CC 32)
+    midiOut.send([0xB0, 0x20, bank & 0x7F]);
+    // Program Change
+    midiOut.send([0xC0, program & 0x7F]);
+  } else {
+    // Protocolo V1 o sin banco: program change directo
+    midiOut.send([0xC0, slot & 0x7F]);
+  }
+}
+
+// ── EDITOR DE EFECTOS ───────────────────────────────────────────────────────
+
+let currentEditingFX = null;
+let currentEditingSlot = null;
+
+// Mapeo de parámetros comunes para efectos
+const COMMON_PARAMETERS = {
+  // Parámetro 0 es siempre On/Off (no se edita aquí)
+  2: 'Level',
+  3: 'Mix',
+  4: 'Tone',
+  5: 'Gain',
+  6: 'Drive',
+  7: 'Time',
+  8: 'Feedback',
+  9: 'Depth',
+  10: 'Rate',
+  11: 'Resonance',
+  12: 'Cutoff',
+  13: 'Attack',
+  14: 'Release',
+  15: 'Decay'
+};
+
+function openEffectEditor(slot, effect) {
+  currentEditingSlot = slot;
+  currentEditingFX = effect;
+  
+  const panel = document.getElementById('editorPanel');
+  const title = document.getElementById('editorTitle');
+  const paramsContainer = document.getElementById('editorParams');
+  
+  const effectName = EFFECTS.get(effect.id >>> 0) || 'Desconocido';
+  title.textContent = `FX ${slot + 1}: ${effectName}`;
+  paramsContainer.innerHTML = '';
+  
+  // Crear sliders para los parámetros disponibles
+  // Para este ejemplo, mostraremos los parámetros 2-15 (los más comunes)
+  for (let paramNum = 2; paramNum <= 15; paramNum++) {
+    const paramName = COMMON_PARAMETERS[paramNum] || `Param ${paramNum}`;
+    const paramValue = effect.parameters[paramNum - 2] || 0;
+    const maxValue = 127; // Valor máximo estándar en MIDI
+    
+    const group = document.createElement('div');
+    group.className = 'param-group';
+    
+    const label = document.createElement('div');
+    label.className = 'param-label';
+    label.textContent = paramName;
+    
+    const valueDisplay = document.createElement('div');
+    valueDisplay.className = 'param-value';
+    valueDisplay.textContent = `${paramValue} / ${maxValue}`;
+    
+    const slider = document.createElement('input');
+    slider.type = 'range';
+    slider.className = 'param-slider';
+    slider.min = '0';
+    slider.max = maxValue;
+    slider.value = paramValue;
+    slider.dataset.paramNum = paramNum;
+    
+    slider.addEventListener('input', (e) => {
+      const newValue = parseInt(e.target.value);
+      valueDisplay.textContent = `${newValue} / ${maxValue}`;
+      sendEffectParameter(slot, paramNum, newValue);
+    });
+    
+    group.appendChild(label);
+    group.appendChild(slider);
+    group.appendChild(valueDisplay);
+    paramsContainer.appendChild(group);
+  }
+  
+  panel.classList.add('visible');
+}
+
+function sendEffectParameter(slot, paramNum, value) {
+  if (!midiOut) {
+    console.warn('MIDI no disponible');
+    return;
+  }
+  
+  // Construir el comando SysEx para cambiar parámetro (protocolo V2):
+  // F0 52 00 6E 64 20 00 <slot> <paramNum> <value_LSB> <value_MSB> <0> <0> <0> F7
+  const parameterBuffer = [
+    slot & 0x7F,             // Slot del efecto (0-5)
+    paramNum & 0x7F,         // Número de parámetro
+    value & 0x7F,            // LSB del valor
+    (value >> 7) & 0x7F,     // MSB del valor
+    0x00,                    // Byte 5
+    0x00,                    // Byte 6
+    0x00                     // Byte 7
+  ];
+  
+  const cmd = [
+    0xF0, 0x52, 0x00, 0x6E,  // Cabecera SysEx Zoom
+    0x64, 0x20, 0x00,         // Comando: parámetro de efecto V2
+    ...parameterBuffer,       // Parámetros
+    0xF7                       // Fin SysEx
+  ];
+  
+  try {
+    console.log(`Enviando parámetro FX ${slot + 1}, param ${paramNum}: ${cmd.map(b => '0x' + b.toString(16).padStart(2, '0')).join(' ')}`);
+    midiOut.send(cmd);
+  } catch (err) {
+    console.error('Error al enviar parámetro:', err);
+  }
+}
+
+function closeEffectEditor() {
+  const panel = document.getElementById('editorPanel');
+  panel.classList.remove('visible');
+  currentEditingFX = null;
+  currentEditingSlot = null;
+}
+
+// Evento para cerrar el editor
+document.getElementById('editorClose').addEventListener('click', closeEffectEditor);
+
+// Cerrar el editor al presionar Escape
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeEffectEditor();
+  }
+});
+</script>
+</body>
+</html>
