@@ -1032,4 +1032,259 @@ document.getElementById('btnScanPatches').addEventListener('click', async () => 
 
   // Ocultar tabla anterior y mostrar barra de progreso
   document.getElementById('patchesTableWrap').classList.remove('visible');
-  document.getElementById('scanProgressWrap').classList
+  document.getElementById('scanProgressWrap').classList.add('visible');
+  setProgressBar(0, 0, 1);
+
+  // Desactivar el listener normal para no interferir
+  const prevHandler = midiIn.onmidimessage;
+  midiIn.onmidimessage = null;
+
+  try {
+    // 1. Detectar protocolo y número de parches
+    setStatus('ok', 'Detectando protocolo…');
+    const probeOk = await probeDeviceProtocol();
+
+    if (!probeOk || numPatches <= 0) {
+      // Fallback: intentar con un número fijo de 100 parches usando V1
+      detectedProtocol = 'v1';
+      numPatches = 100;
+      patchesPerBank = -1;
+    }
+
+    setStatus('ok', `Protocolo ${detectedProtocol.toUpperCase()} · ${numPatches} parches`);
+
+    // 2. Descargar cada parche
+    patchList = [];
+    for (let i = 0; i < numPatches; i++) {
+      setProgressBar(i, numPatches, 1);
+
+      const name = await downloadPatchNameFromSlot(i);
+
+      if (name === null) {
+        // La pedalera no respondió: asumimos que hemos llegado al final
+        numPatches = i;
+        break;
+      }
+
+      patchList.push({ slot: i, name });
+    }
+
+    setProgressBar(patchList.length, patchList.length, 1);
+
+    // 3. Renderizar tabla
+    renderPatchesTable();
+    document.getElementById('patchesTableWrap').classList.add('visible');
+    setStatus('ok', `G2 FOUR conectado · ${patchList.length} parches cargados`);
+
+  } catch (err) {
+    console.error('Error durante el escaneo:', err);
+    setStatus('err', 'Error durante el escaneo');
+  } finally {
+    // Restaurar listener normal
+    midiIn.onmidimessage = prevHandler;
+    document.getElementById('scanProgressWrap').classList.remove('visible');
+    btn.disabled = false;
+    btn.textContent = 'Escanear todos los parches';
+    scanInProgress = false;
+  }
+});
+
+function setProgressBar(current, total, step) {
+  const fill = document.getElementById('scanProgressFill');
+  const text = document.getElementById('scanProgressText');
+  const pct  = total > 0 ? Math.round((current / total) * 100) : 0;
+  fill.style.width = pct + '%';
+  text.textContent = `${current} / ${total}`;
+}
+
+/**
+ * Renderiza la grilla de parches descargados en varias columnas.
+ */
+function renderPatchesTable() {
+  const grid = document.getElementById('patchesGrid');
+  grid.innerHTML = '';
+  selectedPatchRow = null;
+
+  patchList.forEach(({ slot, name }) => {
+    const item = document.createElement('div');
+    item.className = 'patch-item';
+    item.dataset.slot = slot;
+
+    const numSpan = document.createElement('span');
+    numSpan.className = 'patch-num';
+    numSpan.textContent = (slot + 1).toString().padStart(3, ' ');
+
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'patch-name';
+    nameSpan.textContent = name;
+    nameSpan.title = name; // Mostrar nombre completo en tooltip
+
+    item.appendChild(numSpan);
+    item.appendChild(nameSpan);
+
+    item.addEventListener('click', () => {
+      // Forzar pantalla completa también al seleccionar parches de la lista
+      activarPantallaCompletaHorizontal();
+      selectPatch(item, slot);
+    });
+    grid.appendChild(item);
+  });
+}
+
+/**
+ * Selecciona un parche de la grilla y lo carga en la pedalera.
+ */
+async function selectPatch(item, slot) {
+  // Resaltar elemento
+  if (selectedPatchRow) selectedPatchRow.classList.remove('selected');
+  item.classList.add('selected');
+  selectedPatchRow = item;
+
+  if (!midiOut) return;
+
+  // Enviar cambio de programa a la pedalera
+  // El G2 Four usa Bank Select (CC 0 y CC 32) + Program Change
+  if (patchesPerBank > 0 && detectedProtocol === 'v2') {
+    const bank    = Math.floor(slot / patchesPerBank);
+    const program = slot % patchesPerBank;
+    // Bank Select MSB (CC 0)
+    midiOut.send([0xB0, 0x00, (bank >> 7) & 0x7F]);
+    // Bank Select LSB (CC 32)
+    midiOut.send([0xB0, 0x20, bank & 0x7F]);
+    // Program Change
+    midiOut.send([0xC0, program & 0x7F]);
+  } else {
+    // Protocolo V1 o sin banco: program change directo
+    midiOut.send([0xC0, slot & 0x7F]);
+  }
+}
+
+// ── EDITOR DE EFECTOS ───────────────────────────────────────────────────────
+
+let currentEditingFX = null;
+let currentEditingSlot = null;
+
+// Mapeo de parámetros comunes para efectos
+const COMMON_PARAMETERS = {
+  // Parámetro 0 es siempre On/Off (no se edita aquí)
+  2: 'Level',
+  3: 'Mix',
+  4: 'Tone',
+  5: 'Gain',
+  6: 'Drive',
+  7: 'Time',
+  8: 'Feedback',
+  9: 'Depth',
+  10: 'Rate',
+  11: 'Resonance',
+  12: 'Cutoff',
+  13: 'Attack',
+  14: 'Release',
+  15: 'Decay'
+};
+
+function openEffectEditor(slot, effect) {
+  currentEditingSlot = slot;
+  currentEditingFX = effect;
+  
+  const panel = document.getElementById('editorPanel');
+  const title = document.getElementById('editorTitle');
+  const paramsContainer = document.getElementById('editorParams');
+  
+  const effectName = EFFECTS.get(effect.id >>> 0) || 'Desconocido';
+  title.textContent = `FX ${slot + 1}: ${effectName}`;
+  paramsContainer.innerHTML = '';
+  
+  // Crear sliders para los parámetros disponibles
+  // Para este ejemplo, mostraremos los parámetros 2-15 (los más comunes)
+  for (let paramNum = 2; paramNum <= 15; paramNum++) {
+    const paramName = COMMON_PARAMETERS[paramNum] || `Param ${paramNum}`;
+    const paramValue = effect.parameters[paramNum - 2] || 0;
+    const maxValue = 127; // Valor máximo estándar en MIDI
+    
+    const group = document.createElement('div');
+    group.className = 'param-group';
+    
+    const label = document.createElement('div');
+    label.className = 'param-label';
+    label.textContent = paramName;
+    
+    const valueDisplay = document.createElement('div');
+    valueDisplay.className = 'param-value';
+    valueDisplay.textContent = `${paramValue} / ${maxValue}`;
+    
+    const slider = document.createElement('input');
+    slider.type = 'range';
+    slider.className = 'param-slider';
+    slider.min = '0';
+    slider.max = maxValue;
+    slider.value = paramValue;
+    slider.dataset.paramNum = paramNum;
+    
+    slider.addEventListener('input', (e) => {
+      const newValue = parseInt(e.target.value);
+      valueDisplay.textContent = `${newValue} / ${maxValue}`;
+      sendEffectParameter(slot, paramNum, newValue);
+    });
+    
+    group.appendChild(label);
+    group.appendChild(slider);
+    group.appendChild(valueDisplay);
+    paramsContainer.appendChild(group);
+  }
+  
+  panel.classList.add('visible');
+}
+
+function sendEffectParameter(slot, paramNum, value) {
+  if (!midiOut) {
+    console.warn('MIDI no disponible');
+    return;
+  }
+  
+  // Construir el comando SysEx para cambiar parámetro (protocolo V2):
+  // F0 52 00 6E 64 20 00 <slot> <paramNum> <value_LSB> <value_MSB> <0> <0> <0> F7
+  const parameterBuffer = [
+    slot & 0x7F,             // Slot del efecto (0-5)
+    paramNum & 0x7F,         // Número de parámetro
+    value & 0x7F,            // LSB del valor
+    (value >> 7) & 0x7F,     // MSB del valor
+    0x00,                    // Byte 5
+    0x00,                    // Byte 6
+    0x00                     // Byte 7
+  ];
+  
+  const cmd = [
+    0xF0, 0x52, 0x00, 0x6E,  // Cabecera SysEx Zoom
+    0x64, 0x20, 0x00,         // Comando: parámetro de efecto V2
+    ...parameterBuffer,       // Parámetros
+    0xF7                       // Fin SysEx
+  ];
+  
+  try {
+    console.log(`Enviando parámetro FX ${slot + 1}, param ${paramNum}: ${cmd.map(b => '0x' + b.toString(16).padStart(2, '0')).join(' ')}`);
+    midiOut.send(cmd);
+  } catch (err) {
+    console.error('Error al enviar parámetro:', err);
+  }
+}
+
+function closeEffectEditor() {
+  const panel = document.getElementById('editorPanel');
+  panel.classList.remove('visible');
+  currentEditingFX = null;
+  currentEditingSlot = null;
+}
+
+// Evento para cerrar el editor
+document.getElementById('editorClose').addEventListener('click', closeEffectEditor);
+
+// Cerrar el editor al presionar Escape
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeEffectEditor();
+  }
+});
+</script>
+</body>
+</html>
