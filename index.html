@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Zoom G2 Four Editor - Profesional</title>
+  <title>Zoom G2 Four Editor</title>
   <style>
     * {
       margin: 0;
@@ -23,36 +23,66 @@
     .top-bar {
       background: #11141f;
       border-radius: 32px;
-      padding: 18px 28px;
+      padding: 14px 24px;
       margin-bottom: 30px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 16px;
+      gap: 12px;
       box-shadow: 0 8px 20px rgba(0,0,0,0.3);
       border: 1px solid #2a3448;
     }
     .patch-info {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 4px;
+    }
+    .preset-nav-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .preset-nav-btn {
+      background: #1a2a3c;
+      border: 1px solid #2a3d5a;
+      border-radius: 50%;
+      width: 34px;
+      height: 34px;
+      font-size: 1rem;
+      color: #8fa8c8;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.15s;
+      flex-shrink: 0;
+    }
+    .preset-nav-btn:hover:not(:disabled) {
+      border-color: #6bc9b0;
+      color: #6bc9b0;
+    }
+    .preset-nav-btn:disabled { opacity: 0.3; cursor: default; }
+    .preset-slot-badge {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #f0c040;
+      line-height: 1.1;
+      min-width: 3ch;
+      text-align: center;
     }
     .patch-name {
-      font-size: 1.8rem;
+      font-size: 1.6rem;
       font-weight: 700;
       background: linear-gradient(135deg, #c0f0e4, #6bc9b0);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
+      line-height: 1.1;
     }
     .patch-details {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       color: #8f9bb5;
-    }
-    .button-group {
-      display: flex;
-      gap: 12px;
     }
     button {
       background: #1e293b;
@@ -92,11 +122,12 @@
       text-align: center;
       transition: all 0.2s;
       border: 1px solid #2a3448;
+      border-left-width: 4px;
+      border-left-style: solid;
       box-shadow: 0 8px 16px rgba(0,0,0,0.2);
     }
     .effect-card.selected {
-      border-left-width: 6px;
-      border-left-style: solid;
+      border-left-width: 10px;
       transform: translateY(-3px);
       background: #1c2338;
       box-shadow: 0 12px 24px rgba(0,0,0,0.4);
@@ -105,6 +136,17 @@
       opacity: 0.55;
       filter: grayscale(0.2);
       background: #0e111c;
+    }
+    .effect-card:not(.off) {
+      background: white;
+      color: black;
+    }
+    .effect-card:not(.off) .effect-name,
+    .effect-card:not(.off) .effect-group {
+      color: black;
+    }
+    .effect-card.selected:not(.off) {
+      background: white;
     }
     .effect-name {
       font-weight: 700;
@@ -147,14 +189,12 @@
     .card-btn.change {
       background: #3a6b9b;
     }
-    /* ── Bottom two-zone layout ── */
     .bottom-layout {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 16px;
       align-items: stretch;
     }
-    /* PANEL DE PARÁMETROS */
     .params-panel {
       background: #0f121e;
       border-radius: 32px;
@@ -242,6 +282,44 @@
       justify-content: center;
       margin-top: 0;
     }
+    /* Toggle visual para parámetros booleanos (DETCT, Boost, Tail) */
+    .param-value.bool-value.on  { color: #6bc9b0; }
+    .param-value.bool-value.off { color: #5a6478; }
+    .bool-toggle-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .bool-toggle-btn {
+      width: 46px;
+      height: 26px;
+      border-radius: 14px;
+      border: none;
+      cursor: pointer;
+      position: relative;
+      padding: 0;
+      transition: background 0.15s;
+      background: #2a3448;
+    }
+    .bool-toggle-btn.on {
+      background: #1e5a4a;
+      box-shadow: 0 0 8px rgba(107,201,176,0.4);
+    }
+    .bool-toggle-knob {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #5a6478;
+      transition: left 0.15s, background 0.15s;
+    }
+    .bool-toggle-btn.on .bool-toggle-knob {
+      left: 23px;
+      background: #6bc9b0;
+      box-shadow: 0 0 6px rgba(107,201,176,0.8);
+    }
     input[type="range"].vertical {
       -webkit-appearance: slider-vertical;
       appearance: slider-vertical;
@@ -288,7 +366,6 @@
       padding: 48px;
       color: #6f7c91;
     }
-    /* ── ZONA LIBRE – panel con tabs ── */
     .side-panel {
       background: #0d1020;
       border-radius: 32px;
@@ -335,7 +412,6 @@
     .zone-section { display: none; height: 100%; }
     .zone-section.active { display: flex; flex-direction: column; gap: 12px; }
 
-    /* Presets */
     .presets-toolbar {
       display: flex;
       gap: 8px;
@@ -406,7 +482,7 @@
       display: flex;
       align-items: center;
       gap: 5px;
-      padding: 5px 8px;
+      padding: 6px 8px;
       border-radius: 8px;
       cursor: pointer;
       transition: 0.1s;
@@ -417,13 +493,13 @@
     .preset-item.selected { background: #0d1f30; border-color: #6bc9b0; }
     .preset-num {
       font-family: monospace;
-      font-size: 0.62rem;
-      color: #3a5070;
-      min-width: 22px;
+      font-size: 0.68rem;
+      color: #f0c040;
+      min-width: 24px;
       flex-shrink: 0;
     }
     .preset-name {
-      font-size: 0.72rem;
+      font-size: 0.82rem;
       color: #c8daf0;
       white-space: nowrap;
       overflow: hidden;
@@ -437,7 +513,6 @@
       grid-column: 1/-1;
     }
 
-    /* Backing Tracks (antes Audio) */
     .audio-drop-zone {
       border: 2px dashed #2a3d5a;
       border-radius: 20px;
@@ -568,7 +643,6 @@
     .audio-track-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .audio-track-dur { color: #3a5070; font-size: 0.65rem; font-family: monospace; }
 
-    /* Gestión de archivos (vacío) */
     .empty-zone {
       display: flex;
       align-items: center;
@@ -578,6 +652,147 @@
       font-size: 0.85rem;
       text-align: center;
       padding: 32px;
+    }
+    .fm-section {
+      background: #080c16;
+      border-radius: 16px;
+      padding: 14px 16px;
+      border: 1px solid #1a2a3a;
+    }
+    .fm-section-title {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #3a5a7a;
+      margin-bottom: 10px;
+    }
+    .fm-btn-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .fm-btn {
+      background: #1a2a3c;
+      border: 1px solid #2a3d5a;
+      border-radius: 20px;
+      padding: 7px 14px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #8fa8c8;
+      cursor: pointer;
+      transition: 0.15s;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .fm-btn:hover:not(:disabled) {
+      border-color: #6bc9b0;
+      color: #6bc9b0;
+      background: #0d1a2a;
+    }
+    .fm-btn:disabled { opacity: 0.35; cursor: default; }
+    .fm-btn.danger:hover:not(:disabled) {
+      border-color: #e74c3c;
+      color: #e74c3c;
+    }
+    .fm-btn.primary-action {
+      background: #1a3a2c;
+      border-color: #2c6e5c;
+      color: #6bc9b0;
+    }
+    .fm-btn.primary-action:hover:not(:disabled) {
+      background: #1e4a38;
+      border-color: #6bc9b0;
+    }
+    .fm-status-bar {
+      font-size: 0.68rem;
+      color: #4a6080;
+      margin-top: 8px;
+      min-height: 16px;
+      font-family: monospace;
+      padding: 0 2px;
+    }
+    .fm-status-bar.ok   { color: #6bc9b0; }
+    .fm-status-bar.err  { color: #e74c3c; }
+    .fm-status-bar.warn { color: #e9a23b; }
+    .fm-backup-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      max-height: 110px;
+      overflow-y: auto;
+      margin-top: 8px;
+    }
+    .fm-backup-list::-webkit-scrollbar { width: 4px; }
+    .fm-backup-list::-webkit-scrollbar-track { background: #0d1020; }
+    .fm-backup-list::-webkit-scrollbar-thumb { background: #2a3d5a; border-radius: 4px; }
+    .fm-backup-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 10px;
+      border-radius: 10px;
+      background: #0d1828;
+      border: 1px solid #1a2a3a;
+      font-size: 0.68rem;
+    }
+    .fm-backup-item-name {
+      flex: 1;
+      color: #c8daf0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .fm-backup-item-date {
+      color: #3a5070;
+      font-family: monospace;
+      font-size: 0.62rem;
+      white-space: nowrap;
+    }
+    .fm-backup-item-btn {
+      background: #1a2a3c;
+      border: 1px solid #2a3d5a;
+      border-radius: 12px;
+      padding: 2px 8px;
+      font-size: 0.6rem;
+      font-weight: 600;
+      color: #8fa8c8;
+      cursor: pointer;
+      transition: 0.1s;
+    }
+    .fm-backup-item-btn:hover { border-color: #6bc9b0; color: #6bc9b0; }
+    .fm-backup-item-btn.del:hover { border-color: #e74c3c; color: #e74c3c; }
+    .fm-separator {
+      height: 1px;
+      background: #1a2a3a;
+      margin: 2px 0;
+    }
+    .fm-progress-track {
+      background: #0d1828;
+      border-radius: 6px;
+      height: 6px;
+      overflow: hidden;
+      flex: 1;
+    }
+    .fm-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #2c6e5c, #6bc9b0);
+      border-radius: 6px;
+      width: 0%;
+      transition: width 0.2s;
+    }
+    .fm-progress-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .fm-progress-text {
+      font-size: 0.62rem;
+      font-family: monospace;
+      color: #4a7090;
+      white-space: nowrap;
     }
 
     .modal {
@@ -815,11 +1030,15 @@
 <body>
 <div class="container">
   <div class="top-bar">
-    <div class="patch-info">
-      <div class="patch-name" id="patchName">—</div>
-      <div class="patch-details" id="tempoRouting">Routing: --</div>
-      <div id="midiStatus" style="font-size:0.7rem; color:#6bc9b0;">⚫ No conectado</div>
+    <div class="preset-nav-bar">
+      <button class="preset-nav-btn" id="topPrevBtn" title="Preset anterior" disabled>◀</button>
+      <button class="preset-nav-btn" id="topNextBtn" title="Preset siguiente" disabled>▶</button>
+      <div class="preset-slot-badge" id="topPresetSlot">—</div>
+      <div class="patch-info">
+        <div class="patch-name" id="patchName">—</div>
+      </div>
     </div>
+
     <div class="bpm-wrapper">
       <div class="tap-group">
         <div class="tap-bpm-display" id="bpmDisplay">120</div>
@@ -828,9 +1047,10 @@
       <button id="tapTempoBtn" type="button" class="tap-tempo">🥁 TAP</button>
       <button id="tunerBtn" type="button" class="tuner-btn">🎸 Afinador</button>
     </div>
-    <div class="button-group">
-      <button id="connectBtn" class="primary">🔌 Conectar MIDI</button>
-      <button id="syncBtn">🔄 Sincronizar</button>
+
+    <div class="button-group" style="display:flex;gap:10px;align-items:center;">
+      <div id="midiStatus" style="font-size:0.7rem; color:#6bc9b0;">⚫ No conectado</div>
+      <button id="topSaveBtn" style="background:#1a3a2c;border:1px solid #2c6e5c;color:#6bc9b0;border-radius:20px;padding:8px 16px;font-size:0.78rem;font-weight:600;cursor:pointer;" disabled title="Guardar cambios del preset actual en la pedalera">💾 Guardar preset</button>
     </div>
   </div>
 
@@ -844,7 +1064,6 @@
         <button type="button" class="zone-tab" data-zone="filemanager">📁 Gestión de archivos</button>
       </div>
       <div class="zone-body">
-        <!-- Presets -->
         <div class="zone-section active" id="zone-presets">
           <div class="presets-toolbar">
             <button type="button" class="presets-nav-btn" id="presetPrevBtn">◀ Anterior</button>
@@ -862,7 +1081,7 @@
             <div class="presets-empty">Sin presets cargados aún</div>
           </div>
         </div>
-        <!-- Backing Tracks (ex Audio) -->
+
         <div class="zone-section" id="zone-audio">
           <div class="audio-drop-zone" id="audioDropZone">
             <input type="file" id="audioFileInput" accept="audio/*" multiple>
@@ -888,10 +1107,51 @@
           </div>
           <div class="audio-playlist" id="audioPlaylist"></div>
         </div>
-        <!-- Gestión de archivos (vacío, antes YouTube) -->
+
         <div class="zone-section" id="zone-filemanager">
-          <div class="empty-zone">
-            ⚙️ Gestión de archivos<br>Próximamente: importar/exportar presets, copias de seguridad, etc.
+          <div class="fm-section">
+            <div class="fm-section-title">💾 Guardar cambios en pedalera</div>
+            <div class="fm-btn-row">
+              <button type="button" class="fm-btn primary-action" id="fmSaveToDeviceBtn">💾 Guardar en slot activo</button>
+              <button type="button" class="fm-btn" id="fmRenameBtn">✏️ Renombrar</button>
+            </div>
+            <div class="fm-status-bar" id="fmSaveStatus">Persiste el buffer de edición en el slot actual de la pedalera</div>
+          </div>
+
+          <div class="fm-section">
+            <div class="fm-section-title">📤 Guardar preset a archivo (Save)</div>
+            <div class="fm-btn-row">
+              <button type="button" class="fm-btn primary-action" id="fmExportJsonBtn">📄 Guardar .json</button>
+              <button type="button" class="fm-btn" id="fmExportSysexBtn">🔌 Guardar .syx</button>
+            </div>
+            <div class="fm-status-bar" id="fmExportStatus">Guarda el preset activo del editor en un archivo local</div>
+          </div>
+
+          <div class="fm-section">
+            <div class="fm-section-title">📥 Cargar preset desde archivo (Load)</div>
+            <div class="fm-btn-row">
+              <button type="button" class="fm-btn primary-action" id="fmImportBtn">📂 Abrir archivo…</button>
+              <button type="button" class="fm-btn" id="fmSendToDeviceBtn" disabled>⬆️ Enviar al slot activo</button>
+            </div>
+            <input type="file" id="fmFileInput" accept=".json,.syx" style="display:none">
+            <div class="fm-status-bar" id="fmImportStatus">Carga .json o .syx y lo envía al slot seleccionado en la pedalera</div>
+          </div>
+
+          <div class="fm-section">
+            <div class="fm-section-title">🗄️ Copia de seguridad completa (Backup / Restore)</div>
+            <div class="fm-btn-row">
+              <button type="button" class="fm-btn primary-action" id="fmFullBackupBtn">📦 Backup todos los presets</button>
+              <button type="button" class="fm-btn" id="fmFullRestoreBtn" disabled>🔄 Restore desde backup</button>
+            </div>
+            <input type="file" id="fmRestoreFileInput" accept=".json" style="display:none">
+            <div class="fm-progress-wrap" id="fmBackupProgressWrap" style="display:none;margin-top:6px;">
+              <div class="fm-progress-track"><div class="fm-progress-fill" id="fmBackupProgressFill"></div></div>
+              <div class="fm-progress-text" id="fmBackupProgressText">0 / 0</div>
+            </div>
+            <div class="fm-status-bar" id="fmBackupStatus">Vuelca y restaura TODOS los presets de la pedalera</div>
+            <div class="fm-backup-list" id="fmBackupList">
+              <div style="color:#2a3d5a;font-size:0.68rem;padding:8px 4px;text-align:center">Sin backups en esta sesión</div>
+            </div>
           </div>
         </div>
       </div>
@@ -925,7 +1185,7 @@
 
 <script>
   // --------------------------------------------------------------
-  // 1. MAPA DE EFECTOS (ID -> nombre)
+  // MAPA DE EFECTOS
   // --------------------------------------------------------------
   const EFFECTS_MAP = new Map([
     [0x00000000, "Empty (THRU)"],
@@ -983,9 +1243,11 @@
     [0x0B000070, "PDL Pitch"], [0x0B000080, "PDL MnPit"], [0x0B000090, "PDL Roto"],
     [0x0B0000A0, "PDL FLNGR"], [0x0B0000B0, "PDL Vibe"], [0x0B0000C0, "PDL Drive"],
     [0x0B0000D0, "PDL PHSR"], [0x0B0000E0, "PDL Delay"], [0x0B0000F0, "OSC Echo"],
-    [0x0B000100, "PDL Rev"], [0x0B000110, "PDL Reso"], [0x0B000120, "P-BitCRSH"]
+    [0x0B000100, "PDL Rev"], [0x0B000110, "PDL Reso"], [0x0B000120, "P-BitCRSH"],
+    [0x1E000010, "rhythm"],
+    [0x1F000010, "monolooper"]
   ]);
-  // Lista ordenada de IDs de efectos para navegación
+
   const SORTED_EFFECT_IDS = Array.from(EFFECTS_MAP.keys()).sort((a,b) => a - b);
 
   function getEffectName(id) {
@@ -1020,176 +1282,167 @@
   }
 
   // --------------------------------------------------------------
-  // MAPA DE PARÁMETROS (con comentarios identificando cada efecto)
+  // MAPA DE PARÁMETROS
   // --------------------------------------------------------------
   const PARAM_NAMES = new Map([
-    // ========== DYNAMICS (0x01) ==========
-    [0x01000010, ["Sense","ATTCK","Tone","VOL"]],          // Comp
-    [0x01000020, ["THRSH","Ratio","ATTCK","VOL"]],        // RackComp
-    [0x01000030, ["SUSTN","Lo","Hi","VOL"]],              // GrayComp
-    [0x01000040, ["COMP","LOW","HI","VOL"]],              // OptComp
-    [0x01000050, ["Comp","Lo","Hi","VOL"]],               // BlackOpt
-    [0x01000060, ["Input","Ratio","REL","Output"]],       // 1176 LMT
-    [0x01000070, ["DETCT","Depth","THRSH","Decay"]],      // ZNR
-    [0x01000080, ["DETCT","Depth","THRSH","Decay"]],      // NoiseGate
-    [0x01000090, ["Time","Curve","Tone","VOL"]],          // SlowATTCK
-    [0x010000A0, ["EDGE","SPEED","INVERT","ON/OFF"]],     // Mute SWITCH
-    // ========== FILTER (0x02) ==========
-    [0x02000010, ["Mode","Sense","RESO","VOL"]],          // AutoWah
-    [0x02000020, ["Mode","Sense","RESO","VOL"]],           // Reso FLTR
-    [0x02000030, ["FREQ","Sense","RESO","BAL"]],          // LowPassFL
-    [0x02000040, ["RANGE","RESO","SENSE","BAL"]],         // CryFilter
-    [0x02000050, ["FREQ1","FREQ2","RESO","TYPE","SPEED","BAL","VOL"]], // EG Filter
-    [0x02000060, ["Depth","Rate","RESO","WAVE"]],       // LFO FLTR
-    [0x02000070, ["Step","PTTRN","Speed","RESO"]],        // SeqFLTR
-    [0x02000080, ["TYPE","SPEED","BAL","VOL"]],          // RndmFLTR
-    [0x02000090, ["Depth","Rate","RESO","Shape"]],        // StepFLTR
-    [0x020000A0, ["160","400","800","3.2","6.4","12","VOL"]], // Gt GEQ
-    [0x020000B0, ["100Hz","200Hz","400Hz","800Hz","1.6kHz","3.2kHz","6.4kHz","VOL"]], // Gt GEQ 7
-    [0x020000C0, ["160","400","800","3.2","6.4","12","VOL"]], // St Gt GEQ
-    [0x020000D0, ["FREQ","Q","Gain","VOL"]],              // ParaEQ
-    [0x020000E0, ["BASS","TREBLE","VOL","ON/OFF"]],       // Exciter
-    [0x020000F0, ["Type","FREQ","Gain","VOL"]],           // Low EQ
-    [0x02000100, ["Type","FREQ","Gain","VOL"]],           // High EQ
-    // ========== DRIVE (0x03) ==========
-    [0x03000010, ["Gain","Bass","Treble","VOL"]],         // EP Drive
-    [0x03000020, ["Gain","Bass","Treble","VOL"]],         // RC Drive
-    [0x03000030, ["Gain","Boost","Tone","VOL"]],          // TS Drive
-    [0x03000040, ["Gain","Bass","Treble","VOL"]],         // GoldDrive
-    [0x03000050, ["Gain","Tone","Focus","VOL"]],          // SweetDrv
-    [0x03000060, ["Gain","Tone","Voice","VOL"]],          // Zen O.DRV
-    [0x03000058, ["Gain","Bass","Treble","VOL"]],         // Overdrive
-    [0x03000070, ["Gain","Tone","BAL","VOL"]],            // BG GRID
-    [0x03000080, ["Gain","Tone","Mode","VOL"]],           // DYN Drive
-    [0x03000090, ["Gain","VOL","DryMx","Comp"]],          // Plus DIST
-    [0x030000A0, ["Gain","Tone","VOL","Comp"]],           // DIST One
-    [0x030000B0, ["Gain","FLTR","VOL","DryMx"]],          // SqueakDST
-    [0x030000C0, ["Gain","Tone","PRESENC","VOL"]],        // RedCrunch
-    [0x030000D0, ["Gain","Tone","Voice","VOL"]],          // VioletDST
-    [0x030000E0, ["ATTCK","Tone","Color","VOL"]],         // TB MK1.5
-    [0x030000F0, ["Boost","Color","Tone","VOL"]],         // OctFuzz
-    [0x03000100, ["SUSTN","Tone","BAL","VOL"]],           // NYC Muff
-    [0x03000110, ["Gain","Shape","Comp","VOL"]],          // WaveSHPR
-    [0x03000120, ["Gain","Edge","Lo","VOL"]],             // Razor DRV
-    [0x03000130, ["Gain","Bass","Treble","VOL"]],         // MetalWRLD
-    [0x03000140, ["Gain","Tone","MdCut","VOL"]],          // HG THRTTL
-    [0x03000150, ["Gain","Tone","VOL","Comp","Boost","Bass","Treble","Order"]], // TS+Boost
-    [0x03000160, ["GAIN","TONE","PRESENC","VOL","COM","LO/HI","BOOST","ORDER"]], // RedCR+BST
-    [0x03000170, ["BOOST","BASS","TREBLE","ON/OFF"]],     // SpotBoost
-    [0x03000180, ["UpOct","DRYMX","BOTTOM","PRESENC"]],   // UpOctBSTR
-    [0x03000190, ["RANGE","BOOST","TONE","VOL"]],         // OutputBST
-    [0x030001A0, ["Top","Body","Tone","VOL"]],            // Aco.Sim
-    // ========== AMP (0x04) ==========
-    [0x04000010, ["Bass","MID","Treble","PRESENC","Input1","Input2","VOL"]], // MS 45os
-    [0x04000020, ["Bass","MID","Treble","PRESENC","Input1","Input2","VOL"]], // MS 1959
-    [0x04000030, ["Input","Bass","MID","Treble","PRESENC","Gain","VOL"]],    // MS 800
-    [0x04000040, ["Input","Bass","MID","Treble","PRESENC","Gain","VOL"]],    // FD B-MAN
-    [0x04000050, ["Bass","MID","Treble","BRGHT","Gain","VOL","Depth","Speed"]], // FD TWIN-R
-    [0x04000060, ["Input","Bass","Treble","Gain","VOL","Depth","Speed"]],    // FD DLX-R
-    [0x04000070, ["Bass","MID","Treble","Fat","Gain","VOL"]],                // FD MASTER
-    [0x04000080, ["Bass","Treble","Gain","VOL","Tone Cut","Depth","Speed"]], // UK 30A
-    [0x04000090, ["Bass","MID","Treble","PRESENC","Gain1","Gain2","VOL"]],   // BG MARK1
-    [0x040000A0, ["Bass","MID","Treble","PRESENC","Gain1","Gain2","VOL"]],   // BG MARK3
-    [0x040000B0, ["Mode","Bass","MID","Treble","PRESENC","Gain","VOL"]],     // RectiDual
-    [0x040000C0, ["Bass","MID","Treble","PRESENC","STRUCT","Gain","VOL"]],   // XtasyBlue
-    [0x040000D0, ["Input","Bass","MID","Treble","PRESENC","Gain","VOL"]],    // HW 100
-    [0x040000E0, ["Input","Color","Bass","Treble","PRESENC","Gain","VOL"]],  // ORG120
-    [0x040000F0, ["Bass","MID","Treble","PRESENC","Gain","VOL","Deep","MidCut"]], // DZ Herb
-    [0x04000100, ["Gain1","Bass1","TRBL1","Gain2","Tone2","Cut","VOL"]],     // MATCH30
-    [0x04000110, ["Bass","MID","Treble","PRESENC","Gain","VOL"]],            // KRAMPUS
-    [0x04000120, ["Bass","MID","Treble","PRESENC","Gain","VOL"]],            // REDLOOM
-    [0x04000130, ["Bass","MID","Treble","PRESENC","Gain","VOL"]],            // VELVET
-    [0x04000140, ["Bass","MID","Treble","PRESENC","Gain","VOL"]],            // MUDDY
-    [0x04000150, ["Bass","MID","Treble","PRESENC","Gain","VOL"]],            // 7 HEAVEN
-    [0x04000160, ["Bass","MID","Treble","PRESENC","Gain","VOL"]],            // POLLEX
-    // ========== MODULATION (0x06) ==========
-    [0x06000010, ["Depth","Rate","Tone","Mix"]],          // Chorus
-    [0x06000020, ["Depth","Rate","Tone","Mix"]],          // CloneCho
-    [0x06000030, ["Depth","Rate","Tone","Mix"]],          // ChorusOne
-    [0x06000040, ["Depth","Speed","Tone","Mix"]],         // TriChorus
-    [0x06000050, ["DEPTH","Rate","Tone","Mix"]],          // AnalogCho
-    [0x06000060, ["Depth","Rate","Tone","Mix"]],          // StereoCho
-    [0x06000070, ["MODE","DEPTH","TIME","BAL"]],          // BendCho
-    [0x06000080, ["Cent","Pre DLY","Tone","Mix"]],        // Detune
-    [0x06000090, ["Wave","Depth","Rate","VOL"]],          // Tremolo
-    [0x060000A0, ["Color","Depth","Rate","RESO"]],        // Phaser
-    [0x060000B0, ["Color","Depth","Rate","RESO"]],        // StonePha
-    [0x060000C0, ["Mode","Speed","RESO","VOL"]],        // WarpPhase
-    [0x060000D0, ["Depth A","Rate A","RESO A","LINK","Depth B","Rate B","RESO B","VOL"]],                                      // Duo Phase
-    [0x060000E0, ["Speed","Depth","Mode","VOL"]],         // TheVibe
-    [0x060000F0, ["Pre DLY","Depth","Rate","RESO"]],      // VinFLNGR
-    [0x06000100, ["Pre DLY","Depth","Rate","RESO","Mix","Reset-F","ON/OFF"]],  // Kick FLNG
-    [0x06000110, ["DEPTH","RATE","TONE","BAL"]],          // Vibrato
-    [0x06000120, ["Depth","Speed","Rise","Vol"]],         // SwellVibe
-    [0x06000130, ["OCT1","OCT2","Tone","Dry"]],           // Octaver
-    [0x06000140, ["SHIFT","FINE","TONE","BAL"]],          // PitchSHFT
-    [0x06000150, ["Shift","Fine","Tone","BAL"]],          // MonoPitch
-    [0x06000160, ["Scale","Key","Tone","Mix"]],           // HPS
-    [0x06000170, ["Shift","Tone","Wet","Dry"]],           // PolyShift
-    [0x06000180, ["Tight","Mode","Wet","Dry"]],           // GEMINOS
-    [0x06000190, ["FREQ","Tone","BAL","VOL"]],            // RingMod
-    [0x060001A0, ["PTTRN","SPEED","THRSH","VOL"]],        // Slicer
-    // ========== SFX (0x07) ==========
-    [0x07000010, ["Rate","Width","Clip","VOL"]],          // AutoPan
-    [0x07000020, ["Time","Duty","BAL","ON/OFF"]],         // LoopRoll
-    [0x07000030, ["BEND","BUZZ","+1OCT","VOL"]],          // Sitar Sim
-    [0x07000040, ["Decay","Tone","Mix","ON/OFF"]],        // Bomber
-    [0x07000FF0, ["BPM ?"]],                               // BPM
-    // ========== DELAY (0x08) ==========
-    [0x08000010, ["Time","Mode","Repeat","Mix"]],         // Delay
-    [0x08000020, ["Time","Mode","Repeat","Mix"]],         // AnalogDly
-    [0x08000030, ["Time","Mode","Repeat","Mix"]],         // TapeEcho
-    [0x08000040, ["Time","Mode","Repeat","Mix","Gain","Hi","Lo","VOL"]], // TapeEcho3
-    [0x08000050, ["TimeA","TimeB","Mode","BAL","REP A","REP B","DlyMx","Depth"]], // DualDelay
-    [0x08000060, ["MOD","Time","Repeat","Mix"]],          // SoftEcho
-    [0x08000070, ["Time","Repeat","Mix","SUBDB"]],        // SlapBackD
-    [0x08000080, ["Time","Mode","Repeat","Mix"]],         // P-P Delay
-    [0x08000090, ["Time","Mode","Repeat","BAL"]],         // ReverseDL
-    [0x080000A0, ["Time","Mode","Repeat","Mix"]],         // ModDelay
-    [0x080000B0, ["Time","Mode","Repeat","Mix"]],         // FilterDly
-    [0x080000C0, ["Pitch","Time","Repeat","Mix"]],       // Pitch DLY
-    [0x080000D0, ["Time","Mode","Repeat","Mix","Color","Depth","Rate","Reso"]],                                      // PhaseDly
-    [0x080000E0, ["Time","Mode","Repeat","Mix","Link","Cycle","Width","Clip"]], // A-Pan DLY
-    [0x080000F0, ["Swell","Time","Mode","Repeat","Mix"]],    // SlwAtkDly
-    [0x08000100, ["INTVL","Time","Mode","Repeat","Mix","Blend","Smear","DAMP"]], // ICE Delay
-    [0x08000110, ["TIME","MODE","REPEAT","HI","TONE","MIX","PP","TAIL"]], // HoldDelay
-    // ========== REVERB (0x09) ==========
-    [0x09000010, ["Pre DLY","Decay","Mix","Tail"]],       // RoomREV
-    [0x09000020, ["PREDLY","DECAY","TONE","MIX"]],        // BrghtRoom
-    [0x09000030, ["Pre DLY","Decay","Mix","Tail"]],       // SpringREV
-    [0x09000040, ["Color","Lo","Hi","Mix"]],              // FD Spring
-    [0x09000050, ["Pre DLY","Decay","Mix","Tail"]],       // Plate REV
-    [0x09000060, ["Pre DLY","Decay","Mix","Tail"]],       // Hall REV
-    [0x09000070, ["PREDLY","DECAY","TONE","MIX"]],        // BrghtHall
-    [0x09000080, ["Pre DLY","Decay","Mix","Tail"]],       // HD Hall
-    [0x09000090, ["Pre DLY","Decay","Mix","Tail"]],       // ChurchREV
-    [0x090000A0, ["PREDLY","DECAY","MIX","TAIL"]],        // Ambience
-    [0x090000B0, ["PREDLY","DECAY","MIX","TAIL"]],        // Chamber
-    [0x090000C0, ["Size","Reflect","Mix","Tail"]],        // AirReverb
-    [0x090000D0, ["Decay","Shape","Tone","Mix"]],         // EarlyRef
-    [0x090000E0, ["Color","Decay","Tone","BAL"]],         // GateRevrb
-    [0x090000F0, ["Pre DLY","Decay","Mix","Tail","Color","LO","HI"]], // HoldRevrb
-    [0x09000100, ["Pre DLY","Decay","Repeat","Mix","Depth","Speed","Size"]], // SpaceHole
-    [0x09000110, ["Mode","Decay","Mix","Tail"]],          // ParticleR
-    // ========== PEDAL (0x0B) ==========
-    [0x0B000010, []],                                      // Output VP no param
-    [0x0B000020, ["VOL","Min","Max","Curve"]],            // Pedal VOL
-    [0x0B000030, ["FREQ","Range","Dry","VOL"]],           // BlackWah
-    [0x0B000040, ["FREQ","Range","Dry","VOL"]],           // ChromeWah
-    [0x0B000050, ["FREQ","Depth","Dry","VOL"]],           // WAH100
-    [0x0B000060, ["Vowel","PTTRN","Voice","Mode"]],       // VoiceWah
-    [0x0B000070, ["BEND","COLOR","TONE","MODE"]],         // PDL Pitch
-    [0x0B000080, ["Bend","Color","Tone","Mode"]],         // PDL MnPit
-    [0x0B000090, ["Mode","Drive","BAL","VOL"]],           // PDL Roto
-    [0x0B0000A0, ["P freq","Reso","Hi-DMP","Mix"]],      // PDL FLNGR
-    [0x0B0000B0, ["SPEED","DEPTH","MODE","VOL"]],         // PDL Vibe
-    [0x0B0000C0, ["GAIN","TONE","PRESENC","VOL"]],        // PDL Drive
-    [0x0B0000D0, ["P Rate","Depth","Reso","Color"]],      // PDL PHSR
-    [0x0B0000E0, ["Input","Time","Repeat","Mix"]],        // PDL Delay
-    [0x0B0000F0, ["P OSC","T-min","T-max","Mix"]],        // OSC Echo
-    [0x0B000100, ["P in LVL","Pre DLY","Decay","Mix"]],  // PDL Rev
-    [0x0B000110, ["P Freq","Reso","Dry","VOL"]],     // PDL Reso
-    [0x0B000120, ["P Sample","Bit","Tone","BAL"]],     // P-BitCRSH
+    [0x01000010, ["Sense","ATTCK","Tone","VOL"]],
+    [0x01000020, ["THRSH","Ratio","ATTCK","VOL"]],
+    [0x01000030, ["SUSTN","Lo","Hi","VOL"]],
+    [0x01000040, ["COMP","LOW","HI","VOL"]],
+    [0x01000050, ["Comp","Lo","Hi","VOL"]],
+    [0x01000060, ["Input","Ratio","REL","Output"]],
+    [0x01000070, ["DETCT","Depth","THRSH","Decay"]],
+    [0x01000080, ["DETCT","Depth","THRSH","Decay"]],
+    [0x01000090, ["Time","Curve","Tone","VOL"]],
+    [0x010000A0, ["EDGE","SPEED","INVERT","ON/OFF"]],
+    [0x02000010, ["Mode","Sense","RESO","VOL"]],
+    [0x02000020, ["Mode","Sense","RESO","VOL"]],
+    [0x02000030, ["FREQ","Sense","RESO","BAL"]],
+    [0x02000040, ["RANGE","RESO","SENSE","BAL"]],
+    [0x02000050, ["FREQ1","FREQ2","RESO","TYPE","SPEED","BAL","VOL"]],
+    [0x02000060, ["Depth","Rate","RESO","WAVE"]],
+    [0x02000070, ["Step","PTTRN","Speed","RESO"]],
+    [0x02000080, ["TYPE","SPEED","BAL","VOL"]],
+    [0x02000090, ["Depth","Rate","RESO","Shape"]],
+    [0x020000A0, ["160","400","800","3.2","6.4","12","VOL"]],
+    [0x020000B0, ["100Hz","200Hz","400Hz","800Hz","1.6kHz","3.2kHz","6.4kHz","VOL"]],
+    [0x020000C0, ["160","400","800","3.2","6.4","12","VOL"]],
+    [0x020000D0, ["FREQ","Q","Gain","VOL"]],
+    [0x020000E0, ["BASS","TREBLE","VOL","ON/OFF"]],
+    [0x020000F0, ["Type","FREQ","Gain","VOL"]],
+    [0x02000100, ["Type","FREQ","Gain","VOL"]],
+    [0x03000010, ["Gain","Bass","Treble","VOL"]],
+    [0x03000020, ["Gain","Bass","Treble","VOL"]],
+    [0x03000030, ["Gain","Boost","Tone","VOL"]],
+    [0x03000040, ["Gain","Bass","Treble","VOL"]],
+    [0x03000050, ["Gain","Tone","Focus","VOL"]],
+    [0x03000060, ["Gain","Tone","Voice","VOL"]],
+    [0x03000058, ["Gain","Bass","Treble","VOL"]],
+    [0x03000070, ["Gain","Tone","BAL","VOL"]],
+    [0x03000080, ["Gain","Tone","Mode","VOL"]],
+    [0x03000090, ["Gain","VOL","DryMx","Comp"]],
+    [0x030000A0, ["Gain","Tone","VOL","Comp"]],
+    [0x030000B0, ["Gain","FLTR","VOL","DryMx"]],
+    [0x030000C0, ["Gain","Tone","PRESENC","VOL"]],
+    [0x030000D0, ["Gain","Tone","Voice","VOL"]],
+    [0x030000E0, ["ATTCK","Tone","Color","VOL"]],
+    [0x030000F0, ["Boost","Color","Tone","VOL"]],
+    [0x03000100, ["SUSTN","Tone","BAL","VOL"]],
+    [0x03000110, ["Gain","Shape","Comp","VOL"]],
+    [0x03000120, ["Gain","Edge","Lo","VOL"]],
+    [0x03000130, ["Gain","Bass","Treble","VOL"]],
+    [0x03000140, ["Gain","Tone","MdCut","VOL"]],
+    [0x03000150, ["Gain","Tone","VOL","Comp","Boost","Bass","Treble","Order"]],
+    [0x03000160, ["GAIN","TONE","PRESENC","VOL","COM","LO/HI","BOOST","ORDER"]],
+    [0x03000170, ["BOOST","BASS","TREBLE","ON/OFF"]],
+    [0x03000180, ["UpOct","DRYMX","BOTTOM","PRESENC"]],
+    [0x03000190, ["RANGE","BOOST","TONE","VOL"]],
+    [0x030001A0, ["Top","Body","Tone","VOL"]],
+    [0x04000010, ["Bass","MID","Treble","PRESENC","Input1","Input2","VOL"]],
+    [0x04000020, ["Bass","MID","Treble","PRESENC","Input1","Input2","VOL"]],
+    [0x04000030, ["Input","Bass","MID","Treble","PRESENC","Gain","VOL"]],
+    [0x04000040, ["Input","Bass","MID","Treble","PRESENC","Gain","VOL"]],
+    [0x04000050, ["Bass","MID","Treble","BRGHT","Gain","VOL","Depth","Speed"]],
+    [0x04000060, ["Input","Bass","Treble","Gain","VOL","Depth","Speed"]],
+    [0x04000070, ["Bass","MID","Treble","Fat","Gain","VOL"]],
+    [0x04000080, ["Bass","Treble","Gain","VOL","Tone Cut","Depth","Speed"]],
+    [0x04000090, ["Bass","MID","Treble","PRESENC","Gain1","Gain2","VOL"]],
+    [0x040000A0, ["Bass","MID","Treble","PRESENC","Gain1","Gain2","VOL"]],
+    [0x040000B0, ["Mode","Bass","MID","Treble","PRESENC","Gain","VOL"]],
+    [0x040000C0, ["Bass","MID","Treble","PRESENC","STRUCT","Gain","VOL"]],
+    [0x040000D0, ["Input","Bass","MID","Treble","PRESENC","Gain","VOL"]],
+    [0x040000E0, ["Input","Color","Bass","Treble","PRESENC","Gain","VOL"]],
+    [0x040000F0, ["Bass","MID","Treble","PRESENC","Gain","VOL","Deep","MidCut"]],
+    [0x04000100, ["Gain1","Bass1","TRBL1","Gain2","Tone2","Cut","VOL"]],
+    [0x04000110, ["Bass","MID","Treble","PRESENC","Gain","VOL"]],
+    [0x04000120, ["Bass","MID","Treble","PRESENC","Gain","VOL"]],
+    [0x04000130, ["Bass","MID","Treble","PRESENC","Gain","VOL"]],
+    [0x04000140, ["Bass","MID","Treble","PRESENC","Gain","VOL"]],
+    [0x04000150, ["Bass","MID","Treble","PRESENC","Gain","VOL"]],
+    [0x04000160, ["Bass","MID","Treble","PRESENC","Gain","VOL"]],
+    [0x06000010, ["Depth","Rate","Tone","Mix"]],
+    [0x06000020, ["Depth","Rate","Tone","Mix"]],
+    [0x06000030, ["Depth","Rate","Tone","Mix"]],
+    [0x06000040, ["Depth","Speed","Tone","Mix"]],
+    [0x06000050, ["DEPTH","Rate","Tone","Mix"]],
+    [0x06000060, ["Depth","Rate","Tone","Mix"]],
+    [0x06000070, ["MODE","DEPTH","TIME","BAL"]],
+    [0x06000080, ["Cent","Pre DLY","Tone","Mix"]],
+    [0x06000090, ["Wave","Depth","Rate","VOL"]],
+    [0x060000A0, ["Color","Depth","Rate","RESO"]],
+    [0x060000B0, ["Color","Depth","Rate","RESO"]],
+    [0x060000C0, ["Mode","Speed","RESO","VOL"]],
+    [0x060000D0, ["Depth A","Rate A","RESO A","LINK","Depth B","Rate B","RESO B","VOL"]],
+    [0x060000E0, ["Speed","Depth","Mode","VOL"]],
+    [0x060000F0, ["Pre DLY","Depth","Rate","RESO"]],
+    [0x06000100, ["Pre DLY","Depth","Rate","RESO","Mix","Reset-F","ON/OFF"]],
+    [0x06000110, ["DEPTH","RATE","TONE","BAL"]],
+    [0x06000120, ["Depth","Speed","Rise","Vol"]],
+    [0x06000130, ["OCT1","OCT2","Tone","Dry"]],
+    [0x06000140, ["SHIFT","FINE","TONE","BAL"]],
+    [0x06000150, ["Shift","Fine","Tone","BAL"]],
+    [0x06000160, ["Scale","Key","Tone","Mix"]],
+    [0x06000170, ["Shift","Tone","Wet","Dry"]],
+    [0x06000180, ["Tight","Mode","Wet","Dry"]],
+    [0x06000190, ["FREQ","Tone","BAL","VOL"]],
+    [0x060001A0, ["PTTRN","SPEED","THRSH","VOL"]],
+    [0x07000010, ["Rate","Width","Clip","VOL"]],
+    [0x07000020, ["Time","Duty","BAL","ON/OFF"]],
+    [0x07000030, ["BEND","BUZZ","+1OCT","VOL"]],
+    [0x07000040, ["Decay","Tone","Mix","ON/OFF"]],
+    [0x07000FF0, ["BPM ?"]],
+    [0x08000010, ["Time","Mode","Repeat","Mix"]],
+    [0x08000020, ["Time","Mode","Repeat","Mix"]],
+    [0x08000030, ["Time","Mode","Repeat","Mix"]],
+    [0x08000040, ["Time","Mode","Repeat","Mix","Gain","Hi","Lo","VOL"]],
+    [0x08000050, ["TimeA","TimeB","Mode","BAL","REP A","REP B","DlyMx","Depth"]],
+    [0x08000060, ["MOD","Time","Repeat","Mix"]],
+    [0x08000070, ["Time","Repeat","Mix","SUBDB"]],
+    [0x08000080, ["Time","Mode","Repeat","Mix"]],
+    [0x08000090, ["Time","Mode","Repeat","BAL"]],
+    [0x080000A0, ["Time","Mode","Repeat","Mix"]],
+    [0x080000B0, ["Time","Mode","Repeat","Mix"]],
+    [0x080000C0, ["Pitch","Time","Repeat","Mix"]],
+    [0x080000D0, ["Time","Mode","Repeat","Mix","Color","Depth","Rate","Reso"]],
+    [0x080000E0, ["Time","Mode","Repeat","Mix","Link","Cycle","Width","Clip"]],
+    [0x080000F0, ["Swell","Time","Mode","Repeat","Mix"]],
+    [0x08000100, ["INTVL","Time","Mode","Repeat","Mix","Blend","Smear","DAMP"]],
+    [0x08000110, ["TIME","MODE","REPEAT","HI","TONE","MIX","PP","TAIL"]],
+    [0x09000010, ["Pre DLY","Decay","Mix","Tail"]],
+    [0x09000020, ["PREDLY","DECAY","TONE","MIX"]],
+    [0x09000030, ["Pre DLY","Decay","Mix","Tail"]],
+    [0x09000040, ["Color","Lo","Hi","Mix"]],
+    [0x09000050, ["Pre DLY","Decay","Mix","Tail"]],
+    [0x09000060, ["Pre DLY","Decay","Mix","Tail"]],
+    [0x09000070, ["PREDLY","DECAY","TONE","MIX"]],
+    [0x09000080, ["Pre DLY","Decay","Mix","Tail"]],
+    [0x09000090, ["Pre DLY","Decay","Mix","Tail"]],
+    [0x090000A0, ["PREDLY","DECAY","MIX","TAIL"]],
+    [0x090000B0, ["PREDLY","DECAY","MIX","TAIL"]],
+    [0x090000C0, ["Size","Reflect","Mix","Tail"]],
+    [0x090000D0, ["Decay","Shape","Tone","Mix"]],
+    [0x090000E0, ["Color","Decay","Tone","BAL"]],
+    [0x090000F0, ["Pre DLY","Decay","Mix","Tail","Color","LO","HI"]],
+    [0x09000100, ["Pre DLY","Decay","Repeat","Mix","Depth","Speed","Size"]],
+    [0x09000110, ["Mode","Decay","Mix","Tail"]],
+    [0x0B000010, []],
+    [0x0B000020, ["VOL","Min","Max","Curve"]],
+    [0x0B000030, ["FREQ","Range","Dry","VOL"]],
+    [0x0B000040, ["FREQ","Range","Dry","VOL"]],
+    [0x0B000050, ["FREQ","Depth","Dry","VOL"]],
+    [0x0B000060, ["Vowel","PTTRN","Voice","Mode"]],
+    [0x0B000070, ["BEND","COLOR","TONE","MODE"]],
+    [0x0B000080, ["Bend","Color","Tone","Mode"]],
+    [0x0B000090, ["Mode","Drive","BAL","VOL"]],
+    [0x0B0000A0, ["P freq","Reso","Hi-DMP","Mix"]],
+    [0x0B0000B0, ["SPEED","DEPTH","MODE","VOL"]],
+    [0x0B0000C0, ["GAIN","TONE","PRESENC","VOL"]],
+    [0x0B0000D0, ["P Rate","Depth","Reso","Color"]],
+    [0x0B0000E0, ["Input","Time","Repeat","Mix"]],
+    [0x0B0000F0, ["P OSC","T-min","T-max","Mix"]],
+    [0x0B000100, ["P in LVL","Pre DLY","Decay","Mix"]],
+    [0x0B000110, ["P Freq","Reso","Dry","VOL"]],
+    [0x0B000120, ["P Sample","Bit","Tone","BAL"]]
   ]);
 
   function getParamNames(effectId) {
@@ -1238,12 +1491,22 @@
   DEFAULT_PARAMS_MAP.set(0x020000B0, [0x0c, 0x0c, 0x0e, 0x0f, 0x0c, 0x0b, 0x0c, 0x64]);
 
   // --------------------------------------------------------------
-  // 3. MIDI y parseo
+  // MIDI y parseo
   // --------------------------------------------------------------
   let currentPatchData = null;
   let midiOut = null;
   let selectedSlot = 0;
   let midiIn = null;
+  let currentPresetSlot = -1;
+
+  window._g2 = {
+    get currentPatchData() { return currentPatchData; },
+    set currentPatchData(v) { currentPatchData = v; },
+    get midiOut() { return midiOut; },
+    get midiIn() { return midiIn; },
+    get fullRefresh() { return fullRefresh; },
+    get currentPresetSlot() { return currentPresetSlot; }
+  };
 
   function seven2eight(data, start, end) {
     if (end === undefined) end = data.length - 1;
@@ -1400,7 +1663,6 @@
     }, 150);
   }
 
-  // Navegación entre efectos (siguiente/anterior en la lista global)
   function changeToAdjacentEffect(delta) {
     if (!currentPatchData) return;
     const currentId = currentPatchData.effects[selectedSlot].id;
@@ -1416,13 +1678,17 @@
   function nextEffect() { changeToAdjacentEffect(1); }
   function prevEffect() { changeToAdjacentEffect(-1); }
 
+  let _syncIntervalId = null;
+  let _lastSyncedName = null;
+  Object.defineProperty(window, '_g2LastSyncedName', { get: () => _lastSyncedName, configurable: true });
+
   function syncCurrentPatch() {
     if (!midiOut) return;
     midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x13,0x00,0xF7]);
   }
 
   // --------------------------------------------------------------
-  // 4. UI: strip de efectos
+  // UI: strip de efectos
   // --------------------------------------------------------------
   function renderStrip() {
     if (!currentPatchData) {
@@ -1484,7 +1750,7 @@
   }
 
   // --------------------------------------------------------------
-  // 5. Modal de selección de efectos
+  // Modal de selección de efectos
   // --------------------------------------------------------------
   function openEffectModal(slot) {
     const modal = document.getElementById('effectModal');
@@ -1524,8 +1790,27 @@
   }
 
   // --------------------------------------------------------------
-  // 6. Panel de parámetros con sliders verticales + botones de navegación
+  // Panel de parámetros con sliders verticales
   // --------------------------------------------------------------
+  function isBassTrebleDrive(effectId, paramIndex) {
+    // Solo EP Drive (0x03000010) usa Bass/Treble en escala bipolar -10..+10.
+    // El resto de drives (RC Drive, TS Drive, etc.) usan escala normal 0-100.
+    if (effectId !== 0x03000010) return false;
+    const names = getParamNames(effectId);
+    if (!names || paramIndex >= names.length) return false;
+    const name = names[paramIndex].toLowerCase();
+    return name === "bass" || name === "treble";
+  }
+
+  // Parámetros que solo toman valores 0/1 (interruptor on/off), no un rango continuo.
+  // Ejemplos: DETCT (ZNR, NoiseGate), Boost (TS Drive y otros drives con boost), Tail (delays/reverbs)
+  function isBooleanParam(effectId, paramIndex) {
+    const names = getParamNames(effectId);
+    if (!names || paramIndex >= names.length) return false;
+    const name = names[paramIndex].toLowerCase();
+    return name === "detct" || name === "boost" || name === "tail";
+  }
+
   function renderParamsPanel() {
     const panel = document.getElementById('paramsPanel');
     if (!currentPatchData || !currentPatchData.effects[selectedSlot]) {
@@ -1548,25 +1833,61 @@
     let columnsHtml = '';
     for (let p of paramList) {
       const rawVal = paramsRaw[p.index] ?? 0;
-      const maxVal = getParamMax(effectId, p.index);
-      const displayVal = Math.min(rawVal, maxVal);
-      columnsHtml += `
-        <div class="param-col">
-          <div class="param-value" id="pval-${p.index}">${displayVal}</div>
-          <div class="vertical-slider-wrap">
-            <input type="range" class="vertical" min="0" max="${maxVal}" value="${displayVal}" step="1"
-              data-paramindex="${p.index}" data-slot="${selectedSlot}" data-paramnum="${p.index + 2}">
+      const isSpecial = isBassTrebleDrive(effectId, p.index);
+      const isBool = isBooleanParam(effectId, p.index);
+      let displayVal = rawVal;
+      let sliderMin = 0, sliderMax = 100, sliderVal = rawVal;
+      if (isSpecial) {
+        displayVal = Math.round(rawVal - 10);
+        sliderMin = -10;
+        sliderMax = 10;
+        sliderVal = displayVal;
+      } else if (isBool) {
+        displayVal = rawVal >= 1 ? 'ON' : 'OFF';
+        sliderMin = 0;
+        sliderMax = 1;
+        sliderVal = rawVal >= 1 ? 1 : 0;
+      } else {
+        displayVal = rawVal;
+        sliderMin = 0;
+        sliderMax = 100;
+        sliderVal = rawVal;
+      }
+
+      if (isBool) {
+        // Toggle visual tipo switch en vez de slider continuo — el parámetro solo admite 0/1
+        columnsHtml += `
+          <div class="param-col">
+            <div class="param-value bool-value ${sliderVal ? 'on' : 'off'}" id="pval-${p.index}">${displayVal}</div>
+            <div class="vertical-slider-wrap bool-toggle-wrap">
+              <button type="button" class="bool-toggle-btn ${sliderVal ? 'on' : 'off'}"
+                data-paramindex="${p.index}" data-slot="${selectedSlot}" data-paramnum="${p.index + 2}"
+                data-boolval="${sliderVal}" data-isbool="true" title="Click para alternar ON/OFF">
+                <span class="bool-toggle-knob"></span>
+              </button>
+            </div>
+            <div class="param-label">${p.name}</div>
           </div>
-          <div class="param-label">${p.name}</div>
-        </div>
-      `;
+        `;
+      } else {
+        columnsHtml += `
+          <div class="param-col">
+            <div class="param-value" id="pval-${p.index}">${displayVal}</div>
+            <div class="vertical-slider-wrap">
+              <input type="range" class="vertical" min="${sliderMin}" max="${sliderMax}" value="${sliderVal}" step="1"
+                data-paramindex="${p.index}" data-slot="${selectedSlot}" data-paramnum="${p.index + 2}" data-isspecial="${isSpecial}">
+            </div>
+            <div class="param-label">${p.name}</div>
+          </div>
+        `;
+      }
     }
     panel.innerHTML = `
       <div class="panel-header">
         <div class="param-nav-buttons">
           <button class="param-nav-btn" id="prevEffectBtn" title="Efecto anterior">◀</button>
-          <div class="current-effect-title">${effectName}</div>
           <button class="param-nav-btn" id="nextEffectBtn" title="Efecto siguiente">▶</button>
+          <div class="current-effect-title">${effectName}</div>
         </div>
         <button class="card-btn ${fx.enabled ? 'on' : 'off'}" id="panelToggleBtn">${fx.enabled ? 'ON' : 'OFF'}</button>
       </div>
@@ -1581,16 +1902,59 @@
     document.getElementById('nextEffectBtn')?.addEventListener('click', nextEffect);
     document.querySelectorAll('#paramsGrid input[type="range"]').forEach(slider => {
       slider.addEventListener('input', (e) => {
-        const val = parseInt(e.target.value);
+        const sliderVal = parseFloat(e.target.value);
         const paramIdx = parseInt(e.target.dataset.paramindex);
         const slot = parseInt(e.target.dataset.slot);
         const paramNum = parseInt(e.target.dataset.paramnum);
+        const isSpecial = e.target.dataset.isspecial === 'true';
+        let rawVal;
+        if (isSpecial) {
+          rawVal = Math.round(sliderVal + 10);
+          rawVal = Math.min(20, Math.max(0, rawVal));
+        } else {
+          rawVal = Math.round(sliderVal);
+        }
         if (currentPatchData && currentPatchData.effects[slot]) {
-          currentPatchData.effects[slot].parameters[paramIdx] = val;
+          currentPatchData.effects[slot].parameters[paramIdx] = rawVal;
         }
         const display = document.getElementById(`pval-${paramIdx}`);
-        if (display) display.innerText = val;
-        setParameterRaw(slot, paramNum, val);
+        if (display) {
+          let displayVal = rawVal;
+          if (isSpecial) {
+            displayVal = sliderVal;
+          }
+          display.innerText = displayVal;
+        }
+        setParameterRaw(slot, paramNum, rawVal);
+      });
+    });
+
+    // Listener para los toggles booleanos (DETCT, Boost, Tail) — alternan entre 0 y 1
+    document.querySelectorAll('#paramsGrid .bool-toggle-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const target = e.currentTarget;
+        const paramIdx = parseInt(target.dataset.paramindex);
+        const slot = parseInt(target.dataset.slot);
+        const paramNum = parseInt(target.dataset.paramnum);
+        const currentVal = parseInt(target.dataset.boolval);
+        const newVal = currentVal ? 0 : 1;
+
+        target.dataset.boolval = newVal;
+        target.classList.toggle('on', !!newVal);
+        target.classList.toggle('off', !newVal);
+
+        if (currentPatchData && currentPatchData.effects[slot]) {
+          currentPatchData.effects[slot].parameters[paramIdx] = newVal;
+        }
+
+        const display = document.getElementById(`pval-${paramIdx}`);
+        if (display) {
+          display.innerText = newVal ? 'ON' : 'OFF';
+          display.classList.toggle('on', !!newVal);
+          display.classList.toggle('off', !newVal);
+        }
+
+        setParameterRaw(slot, paramNum, newVal);
       });
     });
   }
@@ -1598,9 +1962,12 @@
   function updateTopBar() {
     if (!currentPatchData) return;
     document.getElementById('patchName').innerText = currentPatchData.name;
-    const routingNames = ['Serie', 'Paralelo', 'Alternado'];
-    document.getElementById('tempoRouting').innerHTML = `🎚️ Routing: ${routingNames[currentPatchData.routing] ?? currentPatchData.routing}`;
     document.getElementById('bpmDisplay').innerText = currentPatchData.tempo || 120;
+    if (typeof currentPresetSlot !== 'undefined' && currentPresetSlot >= 0) {
+      document.getElementById('topPresetSlot').textContent = String(currentPresetSlot + 1).padStart(3, '0');
+    }
+    const topSaveBtn = document.getElementById('topSaveBtn');
+    if (topSaveBtn) topSaveBtn.disabled = false;
   }
 
   function fullRefresh() {
@@ -1610,7 +1977,7 @@
   }
 
   // --------------------------------------------------------------
-  // 7. Conexión MIDI con escaneo automático de presets
+  // Conexión MIDI
   // --------------------------------------------------------------
   async function connectMIDI() {
     try {
@@ -1635,25 +2002,137 @@
       midiIn = targetInput;
       targetInput.onmidimessage = (msg) => {
         const data = msg.data;
-        if (data.length < 10) return;
-        if (data[4] === 0x64 && data[5] === 0x12 && data.length > 200) {
-          const parsed = parsePatchFromSysex(data);
-          if (parsed) {
-            currentPatchData = parsed;
-            fullRefresh();
+
+        if (data.length >= 3 && (data[0] & 0xF0) === 0xB0) {
+          const controller = data[1];
+          const value = data[2];
+          if (controller === 0)  { window._g2BankMSB = value; }
+          if (controller === 32) { window._g2BankLSB = value; }
+          return;
+        }
+        if (data.length >= 2 && (data[0] & 0xF0) === 0xC0) {
+          const prog = data[1] & 0x7F;
+          const bankMSB = window._g2BankMSB ?? 0;
+          const bankLSB = window._g2BankLSB ?? 0;
+          const bank = (bankMSB << 7) | bankLSB;
+          const ppb = (typeof window._g2GetPatchesPerBank === 'function')
+            ? window._g2GetPatchesPerBank() : -1;
+          if (ppb > 0) {
+            // Solo calculamos y mostramos el slot absoluto si ya conocemos
+            // el tamaño real de banco (tras el escaneo). Antes de eso, mejor
+            // dejar el guion que mostrar un número provisional incorrecto.
+            const absSlot = bank * ppb + prog;
+            if (absSlot !== currentPresetSlot) {
+              currentPresetSlot = absSlot;
+              document.getElementById('topPresetSlot').textContent =
+                String(absSlot + 1).padStart(3, '0');
+              if (!window._g2PCIgnore && typeof window._g2SyncPresetHighlight === 'function') {
+                window._g2SyncPresetHighlight(absSlot);
+              }
+            }
           }
+          return;
+        }
+
+        if (data[0]===0xF0 && data[1]===0x52 && data[2]===0x00 &&
+            data[3]===0x6E && data[4]===0x64 && data[5]===0x26 && data.length >= 12) {
+          const bank = data[8] + (data[9] << 7);
+          const prog = data[10] + (data[11] << 7);
+          const ppb = (typeof window._g2GetPatchesPerBank === 'function')
+            ? window._g2GetPatchesPerBank() : -1;
+          if (ppb > 0) {
+            const absSlot = bank * ppb + prog;
+            currentPresetSlot = absSlot;
+            document.getElementById('topPresetSlot').textContent =
+              String(absSlot + 1).padStart(3, '0');
+            if (!window._g2PCIgnore && typeof window._g2SyncPresetHighlight === 'function') {
+              window._g2SyncPresetHighlight(absSlot);
+            }
+          }
+          return;
+        }
+
+        if (data.length > 200 && data[0]===0xF0 && data[1]===0x52 &&
+            data[4]===0x64 && data[5]===0x12) {
+          const parsed = parsePatchFromSysex(data);
+          if (!parsed) return;
+          _lastSyncedName = parsed.name;
+          currentPatchData = parsed;
+          fullRefresh();
+          if (currentPresetSlot < 0 && typeof window._g2SyncPresetHighlight === 'function') {
+            window._g2SyncPresetHighlight(parsed.name);
+          }
+          if (currentPresetSlot < 0) {
+            setTimeout(() => midiOut && midiOut.send([0xF0,0x52,0x00,0x6E,0x33,0xF7]), 50);
+          }
+          return;
+        }
+
+        if (data[0]===0xF0 && data[1]===0x52 && data[2]===0x00 &&
+            data[3]===0x6E && data[4]===0x64 && data[5]===0x20 &&
+            data.length >= 14) {
+          const slot = data[7];
+          const paramNum = data[8];
+          const lsb = data[9];
+          const msb = data[10];
+          const value = (msb << 7) | lsb;
+          if (currentPatchData && currentPatchData.effects && slot < currentPatchData.effects.length) {
+            const paramIndex = paramNum - 2;
+            if (paramIndex >= 0 && paramIndex < currentPatchData.effects[slot].parameters.length) {
+              currentPatchData.effects[slot].parameters[paramIndex] = value;
+              if (selectedSlot === slot) {
+                const effectId = currentPatchData.effects[slot].id;
+                const isBool = isBooleanParam(effectId, paramIndex);
+                const display = document.getElementById(`pval-${paramIndex}`);
+
+                if (isBool) {
+                  // Actualizar el switch booleano (botón), no un slider
+                  const boolOn = value >= 1;
+                  if (display) {
+                    display.innerText = boolOn ? 'ON' : 'OFF';
+                    display.classList.toggle('on', boolOn);
+                    display.classList.toggle('off', !boolOn);
+                  }
+                  const toggleBtn = document.querySelector(
+                    `.bool-toggle-btn[data-paramindex="${paramIndex}"][data-slot="${slot}"]`
+                  );
+                  if (toggleBtn) {
+                    toggleBtn.dataset.boolval = boolOn ? 1 : 0;
+                    toggleBtn.classList.toggle('on', boolOn);
+                    toggleBtn.classList.toggle('off', !boolOn);
+                  }
+                } else {
+                  let displayVal = value;
+                  if (isBassTrebleDrive(effectId, paramIndex)) {
+                    displayVal = Math.round(value - 10);
+                  }
+                  if (display) display.innerText = displayVal;
+                  const slider = document.querySelector(`input[data-paramindex="${paramIndex}"][data-slot="${slot}"]`);
+                  if (slider) {
+                    if (isBassTrebleDrive(effectId, paramIndex)) {
+                      slider.value = Math.round(value - 10);
+                    } else {
+                      slider.value = value;
+                    }
+                  }
+                }
+              }
+            }
+          }
+          return;
         }
       };
-      document.getElementById('midiStatus').innerHTML = `✅ Conectado a ${targetOutput.name || 'Zoom G2 Four'}`;
+      document.getElementById('midiStatus').innerHTML =
+        `✅ ${targetOutput.name || 'Zoom G2 Four'}`;
+      document.getElementById('topSaveBtn').disabled = false;
       midiOut.send([0xF0, 0x52, 0x00, 0x6E, 0x50, 0xF7]);
-      setTimeout(() => syncCurrentPatch(), 200);
-      // Escaneo automático de presets después de conectar
+
+      setTimeout(() => midiOut.send([0xF0, 0x52, 0x00, 0x6E, 0x33, 0xF7]), 100);
+      setTimeout(() => syncCurrentPatch(), 400);
       setTimeout(() => {
         const scanBtn = document.getElementById('presetsScanBtn');
-        if (scanBtn && !scanBtn.disabled) {
-          scanBtn.click();
-        }
-      }, 800);
+        if (scanBtn && !scanBtn.disabled) scanBtn.click();
+      }, 3000);
     } catch (e) {
       console.error(e);
       document.getElementById('midiStatus').innerHTML = '❌ Error de conexión MIDI';
@@ -1661,7 +2140,7 @@
   }
 
   // --------------------------------------------------------------
-  // TAP TEMPO logic
+  // TAP TEMPO
   // --------------------------------------------------------------
   (function() {
     const tapTimes = [];
@@ -1707,7 +2186,6 @@
   // --------------------------------------------------------------
   (function() {
     const NOTE_NAMES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
-    let tunerActive = false;
     let audioCtx = null;
     let analyser = null;
     let mediaStream = null;
@@ -1802,8 +2280,7 @@
     }
     document.getElementById('tunerBtn').addEventListener('click', (e) => {
       e.stopPropagation();
-      const modal = document.getElementById('tunerModal');
-      modal.style.display = 'flex';
+      document.getElementById('tunerModal').style.display = 'flex';
       startTuner();
     });
     document.getElementById('tunerCloseBtn').addEventListener('click', () => {
@@ -1811,8 +2288,10 @@
       stopTuner();
     });
     window.addEventListener('click', (e) => {
-      const modal = document.getElementById('tunerModal');
-      if (e.target === modal) { modal.style.display = 'none'; stopTuner(); }
+      if (e.target === document.getElementById('tunerModal')) {
+        document.getElementById('tunerModal').style.display = 'none';
+        stopTuner();
+      }
     });
   })();
 
@@ -1820,16 +2299,15 @@
     document.getElementById('effectModal').style.display = 'none';
   });
   window.addEventListener('click', (e) => {
-    const modal = document.getElementById('effectModal');
-    if (e.target === modal) modal.style.display = 'none';
+    if (e.target === document.getElementById('effectModal')) {
+      document.getElementById('effectModal').style.display = 'none';
+    }
   });
 
-  document.getElementById('connectBtn').addEventListener('click', connectMIDI);
-  document.getElementById('syncBtn').addEventListener('click', () => syncCurrentPatch());
   if (navigator.requestMIDIAccess) connectMIDI().catch(e=>console.warn);
 
   // ================================================================
-  // ZONA LIBRE – Tabs (Presets, Backing Tracks, Gestión archivos)
+  // Tabs
   // ================================================================
   document.querySelectorAll('.zone-tab').forEach(tab => {
     tab.addEventListener('click', () => {
@@ -1840,7 +2318,9 @@
     });
   });
 
-  // Backing Tracks (ex Audio)
+  // ================================================================
+  // Backing Tracks
+  // ================================================================
   (function() {
     const audio = new Audio();
     let playlist = [];
@@ -1879,16 +2359,19 @@
     dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('drag-over'); addFiles(e.dataTransfer.files); });
   })();
 
-  // PRESETS con navegación anterior/siguiente y escaneo automático
+  // ================================================================
+  // PRESETS – escaneo y navegación
+  // ================================================================
   (function() {
     let scanPresetInProgress = false;
     let detectedPresetProtocol = null;
     let numPresetPatches = -1;
     let patchesPerBankPreset = -1;
-    let patchLengthPreset = -1;
+    window._g2GetPatchesPerBank = () => patchesPerBankPreset;
     let presetList = [];
     let selectedPresetItem = null;
-    let currentPresetSlot = -1;
+    // currentPresetSlot vive ahora en el scope principal; se referencia siempre
+    // a través de la variable currentPresetSlot declarada arriba (mismo scope superior).
 
     async function sleepPreset(ms) { return new Promise(r => setTimeout(r, ms)); }
 
@@ -1981,7 +2464,6 @@
       );
       if (r2 && r2.length > 13) {
         numPresetPatches = r2[5] + (r2[6] << 7);
-        patchLengthPreset = r2[7] + (r2[8] << 7);
         patchesPerBankPreset = r2[11] + (r2[12] << 7);
         detectedPresetProtocol = 'v2';
         return true;
@@ -2049,7 +2531,10 @@
           item.classList.add('selected');
           selectedPresetItem = item;
           currentPresetSlot = slot;
+          document.getElementById('topPresetSlot').textContent = String(slot + 1).padStart(3, '0');
           if (midiOut) {
+            window._g2PCIgnore = true;
+            setTimeout(() => { window._g2PCIgnore = false; }, 500);
             if (detectedPresetProtocol === 'v2' && patchesPerBankPreset > 0) {
               const bank = Math.floor(slot / patchesPerBankPreset);
               const program = slot % patchesPerBankPreset;
@@ -2082,6 +2567,41 @@
         }
       }
     }
+
+    window._g2LoadPresetBySlot = function(absoluteSlot) {
+      const items = document.querySelectorAll('.preset-item');
+      for (let item of items) {
+        if (parseInt(item.dataset.slot) === absoluteSlot) {
+          item.click();
+          return true;
+        }
+      }
+      currentPresetSlot = absoluteSlot;
+      document.getElementById('topPresetSlot').textContent =
+        String(absoluteSlot + 1).padStart(3, '0');
+      if (typeof syncCurrentPatch === 'function') syncCurrentPatch();
+      return false;
+    };
+
+    window._g2SyncPresetHighlight = function(slotOrName) {
+      const items = document.querySelectorAll('.preset-item');
+      for (let item of items) {
+        const match = typeof slotOrName === 'number'
+          ? parseInt(item.dataset.slot) === slotOrName
+          : item.querySelector('.preset-name')?.textContent.trim() === String(slotOrName).trim();
+        if (match) {
+          if (selectedPresetItem) selectedPresetItem.classList.remove('selected');
+          item.classList.add('selected');
+          selectedPresetItem = item;
+          currentPresetSlot = parseInt(item.dataset.slot);
+          document.getElementById('topPresetSlot').textContent =
+            String(currentPresetSlot + 1).padStart(3, '0');
+          item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+          return true;
+        }
+      }
+      return false;
+    };
 
     document.getElementById('presetsScanBtn').addEventListener('click', async () => {
       if (scanPresetInProgress) return;
@@ -2118,7 +2638,15 @@
         setPresetProgress(presetList.length, presetList.length);
         renderPresetsGrid();
         document.getElementById('presetsStatus').textContent = `${presetList.length} presets cargados`;
-        if (presetList.length) currentPresetSlot = -1;
+        if (presetList.length && window._g2LastSyncedName) {
+          if (typeof window._g2SyncPresetHighlight === 'function') {
+            window._g2SyncPresetHighlight(window._g2LastSyncedName);
+          }
+        }
+        document.getElementById('topPrevBtn').disabled = false;
+        document.getElementById('topNextBtn').disabled = false;
+        document.getElementById('presetPrevBtn').disabled = false;
+        document.getElementById('presetNextBtn').disabled = false;
       } catch(err) {
         document.getElementById('presetsStatus').textContent = '❌ Error durante el escaneo';
         console.error(err);
@@ -2129,10 +2657,376 @@
         scanPresetInProgress = false;
       }
     });
+
     document.getElementById('presetPrevBtn').addEventListener('click', () => loadPresetByOffset(-1));
     document.getElementById('presetNextBtn').addEventListener('click', () => loadPresetByOffset(1));
+    document.getElementById('topPrevBtn').addEventListener('click', () => loadPresetByOffset(-1));
+    document.getElementById('topNextBtn').addEventListener('click', () => loadPresetByOffset(1));
   })();
 
+  // ================================================================
+  // GESTIÓN DE ARCHIVOS
+  // ================================================================
+  (function() {
+    const g2 = window._g2;
+
+    function fmStatus(elId, msg, type) {
+      const el = document.getElementById(elId);
+      if (!el) return;
+      el.textContent = msg;
+      el.className = 'fm-status-bar' + (type ? ' ' + type : '');
+    }
+    function downloadBlob(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename; a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+    }
+    function safeName(name) {
+      return (name || 'preset').replace(/[^a-zA-Z0-9_\-áéíóúüñÁÉÍÓÚÜÑ ]/g,'_').trim() || 'preset';
+    }
+    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+    function patchToJSON(patch) {
+      return JSON.stringify({
+        _editor: 'Zoom G2 Four Editor',
+        _version: 1,
+        timestamp: new Date().toISOString(),
+        patch: patch || g2.currentPatchData
+      }, null, 2);
+    }
+
+    function waitSysex(matchFn, timeoutMs) {
+      return new Promise(resolve => {
+        if (!g2.midiIn) { resolve(null); return; }
+        let done = false;
+        const t = setTimeout(() => { if (!done) { done=true; g2.midiIn.removeEventListener('midimessage', h); resolve(null); } }, timeoutMs);
+        function h(msg) {
+          if (!done && matchFn(msg.data)) {
+            done=true; clearTimeout(t);
+            g2.midiIn.removeEventListener('midimessage', h);
+            resolve(msg.data);
+          }
+        }
+        g2.midiIn.addEventListener('midimessage', h);
+      });
+    }
+
+    function sendPatchToEditBuffer(patch, onDone) {
+      if (!g2.midiOut) return false;
+      const effects = patch.effects || [];
+      let delay = 0;
+      effects.forEach((fx, slot) => {
+        const id = (fx.id||0)>>>0;
+        const b0=id&0x7F,b1=(id>>7)&0x7F,b2=(id>>14)&0x7F,b3=(id>>21)&0x7F,b4=(id>>28)&0x0F;
+        setTimeout(()=>{ if(g2.midiOut) g2.midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x20,0x00,slot,0x01,b0,b1,b2,b3,b4,0xF7]); }, delay); delay+=40;
+        setTimeout(()=>{ if(g2.midiOut) g2.midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x20,0x00,slot,0x00,fx.enabled?1:0,0,0,0,0,0xF7]); }, delay); delay+=30;
+        (fx.parameters||[]).forEach((val,pi)=>{
+          setTimeout(()=>{
+            if(!g2.midiOut) return;
+            const v=Math.min(4095,Math.max(0,val));
+            g2.midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x20,0x00,slot,pi+2,v&0x7F,(v>>7)&0x7F,0,0,0,0xF7]);
+          }, delay); delay+=20;
+        });
+      });
+      setTimeout(()=>{ if(g2.midiOut) g2.midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x13,0x00,0xF7]); if(onDone) onDone(); }, delay+120);
+      return true;
+    }
+
+    async function saveCurrentPresetToPedal(statusElId) {
+      const elId = statusElId || 'fmSaveStatus';
+      if (!g2.midiOut) { fmStatus(elId,'⚠ Conecta MIDI primero','warn'); return; }
+      if (!g2.currentPatchData) { fmStatus(elId,'⚠ No hay preset activo','warn'); return; }
+      fmStatus(elId,'⏳ Guardando en pedalera…','');
+      g2.midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x20,0x00,
+                       0x64,0x0F,0x01,0x00,0x00,0x00,0x00,0xF7]);
+      await sleep(30);
+      const bpm = g2.currentPatchData.tempo || 120;
+      g2.midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x20,0x00,
+                       0x64,0x02,bpm&0x7F,(bpm>>7)&0x7F,0x00,0x00,0x00,0xF7]);
+      await sleep(200);
+      fmStatus(elId, `✅ Guardado: "${g2.currentPatchData.name}"`, 'ok');
+      const topSaveBtn = document.getElementById('topSaveBtn');
+      if (topSaveBtn) {
+        const orig = topSaveBtn.textContent;
+        topSaveBtn.textContent = '✅ Guardado';
+        setTimeout(() => { topSaveBtn.textContent = orig; }, 2000);
+      }
+    }
+
+    document.getElementById('fmSaveToDeviceBtn').addEventListener('click', () => saveCurrentPresetToPedal('fmSaveStatus'));
+    document.getElementById('topSaveBtn').addEventListener('click', () => saveCurrentPresetToPedal('fmSaveStatus'));
+
+    document.getElementById('fmRenameBtn').addEventListener('click', () => {
+      if (!g2.currentPatchData) { fmStatus('fmSaveStatus','⚠ No hay preset activo','warn'); return; }
+      const newName = prompt('Nuevo nombre (máx. 10 caracteres):', g2.currentPatchData.name);
+      if (newName === null) return;
+      const trimmed = newName.slice(0,10).trim();
+      if (!trimmed) { fmStatus('fmSaveStatus','⚠ Nombre vacío, sin cambios','warn'); return; }
+      g2.currentPatchData.name = trimmed;
+      document.getElementById('patchName').innerText = trimmed;
+      fmStatus('fmSaveStatus', `✏️ Renombrado a "${trimmed}" — pulsa 💾 para persistir en pedalera`, 'ok');
+    });
+
+    document.getElementById('fmExportJsonBtn').addEventListener('click', () => {
+      if (!g2.currentPatchData) { fmStatus('fmExportStatus','⚠ No hay preset activo','warn'); return; }
+      downloadBlob(new Blob([patchToJSON()],{type:'application/json'}), safeName(g2.currentPatchData.name)+'.json');
+      fmStatus('fmExportStatus', `✅ Guardado: ${safeName(g2.currentPatchData.name)}.json`, 'ok');
+    });
+
+    document.getElementById('fmExportSysexBtn').addEventListener('click', async () => {
+      if (!g2.midiOut || !g2.midiIn) { fmStatus('fmExportStatus','⚠ Conecta MIDI primero','warn'); return; }
+      fmStatus('fmExportStatus','⏳ Solicitando SysEx a la pedalera…','');
+      g2.midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x13,0x00,0xF7]);
+      const reply = await waitSysex(
+        d => d[0]===0xF0&&d[1]===0x52&&d[2]===0x00&&d[3]===0x6E&&d[4]===0x64&&d[5]===0x12,
+        3000
+      );
+      if (reply) {
+        const name = g2.currentPatchData ? safeName(g2.currentPatchData.name) : 'preset';
+        downloadBlob(new Blob([reply],{type:'application/octet-stream'}), name+'.syx');
+        fmStatus('fmExportStatus', `✅ Exportado: ${name}.syx (${reply.length} bytes)`, 'ok');
+      } else {
+        if (g2.currentPatchData) {
+          downloadBlob(new Blob([patchToJSON()],{type:'application/octet-stream'}), safeName(g2.currentPatchData.name)+'.syx');
+          fmStatus('fmExportStatus','⚠ Sin respuesta SysEx — guardado como JSON con ext .syx','warn');
+        } else {
+          fmStatus('fmExportStatus','❌ Sin respuesta de la pedalera','err');
+        }
+      }
+    });
+
+    let importedPatch = null;
+    let importedRawSyx = null;
+
+    document.getElementById('fmImportBtn').addEventListener('click', () => {
+      document.getElementById('fmFileInput').click();
+    });
+
+    document.getElementById('fmFileInput').addEventListener('change', (e) => {
+      const file = e.target.files[0]; if (!file) return;
+      const ext = file.name.split('.').pop().toLowerCase();
+      const reader = new FileReader();
+      if (ext === 'json') {
+        reader.onload = (ev) => {
+          try {
+            const obj = JSON.parse(ev.target.result);
+            importedPatch = obj.patch || obj;
+            importedRawSyx = null;
+            if (!importedPatch.effects || !importedPatch.name) throw new Error();
+            fmStatus('fmImportStatus', `✅ Listo: "${importedPatch.name}" (${importedPatch.effects.length} efectos) — pulsa Enviar`, 'ok');
+            document.getElementById('fmSendToDeviceBtn').disabled = false;
+          } catch {
+            fmStatus('fmImportStatus','❌ JSON inválido o formato desconocido','err');
+            importedPatch = null;
+            document.getElementById('fmSendToDeviceBtn').disabled = true;
+          }
+        };
+        reader.readAsText(file);
+      } else if (ext === 'syx') {
+        reader.onload = (ev) => {
+          const bytes = new Uint8Array(ev.target.result);
+          try {
+            const obj = JSON.parse(new TextDecoder().decode(bytes));
+            importedPatch = obj.patch || obj;
+            importedRawSyx = null;
+            if (!importedPatch.effects || !importedPatch.name) throw new Error();
+            fmStatus('fmImportStatus', `✅ Listo (JSON): "${importedPatch.name}" — pulsa Enviar`, 'ok');
+            document.getElementById('fmSendToDeviceBtn').disabled = false;
+          } catch {
+            if (bytes[0]===0xF0&&bytes[1]===0x52&&bytes[2]===0x00&&bytes[3]===0x6E) {
+              importedRawSyx = bytes; importedPatch = null;
+              fmStatus('fmImportStatus', `✅ SysEx binario listo — ${bytes.length} bytes — pulsa Enviar`, 'ok');
+              document.getElementById('fmSendToDeviceBtn').disabled = false;
+            } else {
+              fmStatus('fmImportStatus','❌ .syx no reconocido (no es Zoom SysEx)','err');
+              importedPatch = null; importedRawSyx = null;
+              document.getElementById('fmSendToDeviceBtn').disabled = true;
+            }
+          }
+        };
+        reader.readAsArrayBuffer(file);
+      } else {
+        fmStatus('fmImportStatus','❌ Formato no soportado — usa .json o .syx','err');
+      }
+      e.target.value = '';
+    });
+
+    document.getElementById('fmSendToDeviceBtn').addEventListener('click', () => {
+      if (!g2.midiOut) { fmStatus('fmImportStatus','⚠ Conecta MIDI primero','warn'); return; }
+      if (importedRawSyx) {
+        fmStatus('fmImportStatus','⏳ Enviando SysEx al slot activo…','');
+        g2.midiOut.send(importedRawSyx);
+        setTimeout(() => {
+          if(g2.midiOut) g2.midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x13,0x00,0xF7]);
+          fmStatus('fmImportStatus','✅ SysEx enviado y buffer sincronizado','ok');
+        }, 200);
+      } else if (importedPatch) {
+        fmStatus('fmImportStatus','⏳ Cargando preset en slot activo…','');
+        g2.currentPatchData = importedPatch;
+        g2.fullRefresh();
+        sendPatchToEditBuffer(importedPatch, () => {
+          fmStatus('fmImportStatus', `✅ "${importedPatch.name}" enviado al slot activo`, 'ok');
+        });
+      }
+    });
+
+    // ── BACKUP / RESTORE
+    const sessionBackups = [];
+
+    function setBkpProgress(cur, total) {
+      const pct = total > 0 ? Math.round(cur/total*100) : 0;
+      document.getElementById('fmBackupProgressFill').style.width = pct+'%';
+      document.getElementById('fmBackupProgressText').textContent = cur+' / '+total;
+    }
+
+    function renderBackupList() {
+      const list = document.getElementById('fmBackupList');
+      if (!sessionBackups.length) {
+        list.innerHTML = '<div style="color:#2a3d5a;font-size:0.68rem;padding:8px 4px;text-align:center">Sin backups en esta sesión</div>';
+        return;
+      }
+      list.innerHTML = sessionBackups.map((b,i) => `
+        <div class="fm-backup-item">
+          <div class="fm-backup-item-name" title="${b.label}">🗄️ ${b.label}</div>
+          <div class="fm-backup-item-date">${b.time}</div>
+          <button class="fm-backup-item-btn" data-action="download" data-idx="${i}" title="Descargar .json">⬇</button>
+          <button class="fm-backup-item-btn del" data-action="delete" data-idx="${i}" title="Eliminar">✕</button>
+        </div>
+      `).join('');
+      list.querySelectorAll('.fm-backup-item-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const idx = parseInt(btn.dataset.idx);
+          if (btn.dataset.action === 'download') downloadSessionBackup(idx);
+          else { sessionBackups.splice(idx,1); renderBackupList(); }
+        });
+      });
+    }
+
+    function downloadSessionBackup(idx) {
+      const b = sessionBackups[idx]; if (!b) return;
+      downloadBlob(
+        new Blob([JSON.stringify(b.data, null, 2)],{type:'application/json'}),
+        `g2four_backup_${b.time.replace(/:/g,'')}.json`
+      );
+    }
+
+    document.getElementById('fmFullBackupBtn').addEventListener('click', async () => {
+      if (!g2.midiOut || !g2.midiIn) { fmStatus('fmBackupStatus','⚠ Conecta MIDI primero','warn'); return; }
+
+      const progressWrap = document.getElementById('fmBackupProgressWrap');
+      progressWrap.style.display = 'flex';
+      fmStatus('fmBackupStatus','⏳ Iniciando backup…','');
+      setBkpProgress(0, 0);
+
+      const PATCHES_PER_BANK = 50;
+      const NUM_BANKS = 6;
+      const NUM_PATCHES = PATCHES_PER_BANK * NUM_BANKS;
+
+      const allPresets = [];
+      let errors = 0;
+
+      for (let i = 0; i < NUM_PATCHES; i++) {
+        const bank = Math.floor(i / PATCHES_PER_BANK);
+        const prog = i % PATCHES_PER_BANK;
+        setBkpProgress(i, NUM_PATCHES);
+
+        const bankL = bank & 0x7F, bankH = (bank >> 7) & 0x7F;
+        const progL = prog & 0x7F,  progH = (prog >> 7) & 0x7F;
+        g2.midiOut.send([0xF0,0x52,0x00,0x6E,0x46,0x00,0x00, bankL,bankH, progL,progH, 0xF7]);
+
+        const resp = await waitSysex(
+          d => d.length > 10 && d[0]===0xF0 && d[1]===0x52 && d[2]===0x00 && d[3]===0x6E && d[4]===0x45,
+          1000
+        );
+        if (resp) {
+          allPresets.push({ slot: i, bank, prog, syx: Array.from(resp) });
+          errors = 0;
+        } else {
+          errors++;
+          if (errors >= 5) {
+            fmStatus('fmBackupStatus','❌ Sin respuesta — ¿pedalera conectada y en modo editor?','err');
+            progressWrap.style.display = 'none';
+            return;
+          }
+        }
+        await sleep(40);
+      }
+
+      setBkpProgress(NUM_PATCHES, NUM_PATCHES);
+      progressWrap.style.display = 'none';
+
+      if (!allPresets.length) { fmStatus('fmBackupStatus','❌ No se recibió ningún preset','err'); return; }
+
+      const now = new Date();
+      const time = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}`;
+      const backupData = {
+        _editor: 'Zoom G2 Four Editor',
+        _type: 'full_backup',
+        _version: 2,
+        timestamp: now.toISOString(),
+        device: 'G2 Four',
+        numPatches: allPresets.length,
+        patchesPerBank: PATCHES_PER_BANK,
+        presets: allPresets
+      };
+
+      sessionBackups.unshift({ label: `${allPresets.length} presets`, time, date: now.toISOString(), data: backupData });
+      renderBackupList();
+
+      downloadBlob(
+        new Blob([JSON.stringify(backupData, null, 2)],{type:'application/json'}),
+        `g2four_backup_${now.toISOString().slice(0,10)}_${time.replace(/:/g,'')}.json`
+      );
+
+      fmStatus('fmBackupStatus', `✅ Backup completo: ${allPresets.length} presets guardados`, 'ok');
+      document.getElementById('fmFullRestoreBtn').disabled = false;
+    });
+
+    document.getElementById('fmFullRestoreBtn').addEventListener('click', () => {
+      document.getElementById('fmRestoreFileInput').click();
+    });
+
+    document.getElementById('fmRestoreFileInput').addEventListener('change', async (e) => {
+      const file = e.target.files[0]; if (!file) return;
+      e.target.value = '';
+      if (!g2.midiOut) { fmStatus('fmBackupStatus','⚠ Conecta MIDI primero','warn'); return; }
+
+      let backupData;
+      try {
+        const text = await file.text();
+        backupData = JSON.parse(text);
+        if (!backupData.presets || !Array.isArray(backupData.presets)) throw new Error();
+      } catch {
+        fmStatus('fmBackupStatus','❌ Archivo de backup inválido o formato no reconocido','err'); return;
+      }
+
+      const numToRestore = backupData.presets.length;
+      if (!confirm(`¿Restaurar ${numToRestore} presets en la pedalera?\n⚠️ Esto sobreescribirá TODOS los presets actuales.\n\nEsta operación no se puede deshacer.`)) return;
+
+      const progressWrap = document.getElementById('fmBackupProgressWrap');
+      progressWrap.style.display = 'flex';
+      fmStatus('fmBackupStatus','⏳ Restaurando presets…','');
+
+      const presets = backupData.presets;
+      let ok = 0;
+
+      for (let i = 0; i < presets.length; i++) {
+        setBkpProgress(i, presets.length);
+        const p = presets[i];
+        const syx = new Uint8Array(p.syx);
+        g2.midiOut.send(syx);
+        await sleep(100);
+        ok++;
+      }
+
+      setBkpProgress(presets.length, presets.length);
+      progressWrap.style.display = 'none';
+      fmStatus('fmBackupStatus', `✅ Restore completo: ${ok} de ${numToRestore} presets restaurados`, 'ok');
+    });
+
+    renderBackupList();
+  })();
 </script>
 </body>
 </html>
