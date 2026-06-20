@@ -1050,7 +1050,7 @@
 
     <div class="button-group" style="display:flex;gap:10px;align-items:center;">
       <div id="midiStatus" style="font-size:0.7rem; color:#6bc9b0;">⚫ No conectado</div>
-      <button id="topSaveBtn" style="background:#1a3a2c;border:1px solid #2c6e5c;color:#6bc9b0;border-radius:20px;padding:8px 16px;font-size:0.78rem;font-weight:600;cursor:pointer;" disabled title="Guardar cambios del preset actual en la pedalera">💾 Guardar preset</button>
+      <button id="topSaveBtn" style="background:#1a3a2c;border:1px solid #2c6e5c;color:#6bc9b0;border-radius:20px;padding:8px 16px;font-size:0.78rem;font-weight:600;cursor:pointer;" disabled title="Guardar cambios del preset actual en la pedalera">💾 SAVE </button>
     </div>
   </div>
 
@@ -1066,8 +1066,8 @@
       <div class="zone-body">
         <div class="zone-section active" id="zone-presets">
           <div class="presets-toolbar">
-            <button type="button" class="presets-nav-btn" id="presetPrevBtn">◀ Anterior</button>
-            <button type="button" class="presets-nav-btn" id="presetNextBtn">Siguiente ▶</button>
+            <button type="button" class="presets-nav-btn" id="presetPrevBtn">◀ BACK </button>
+            <button type="button" class="presets-nav-btn" id="presetNextBtn">NEXT ▶</button>
             <button type="button" class="presets-scan-btn" id="presetsScanBtn">⟳ Escanear presets</button>
             <span id="presetsStatus">Conecta MIDI y pulsa Escanear</span>
           </div>
@@ -1097,9 +1097,9 @@
               <span id="audioTimeTot">0:00</span>
             </div>
             <div class="audio-btn-row">
-              <button type="button" class="audio-btn" id="audioPrevBtn" title="Anterior">⏮</button>
+              <button type="button" class="audio-btn" id="audioPrevBtn" title="BACK">⏮</button>
               <button type="button" class="audio-btn play-pause" id="audioPlayBtn" title="Play/Pause">▶</button>
-              <button type="button" class="audio-btn" id="audioNextBtn" title="Siguiente">⏭</button>
+              <button type="button" class="audio-btn" id="audioNextBtn" title="NEXT">⏭</button>
             </div>
             <div class="audio-vol-row">
               🔈 <input type="range" id="audioVol" min="0" max="1" step="0.01" value="0.8"> 🔊
