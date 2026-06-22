@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Zoom G2 Four Editor - </title>
+  <title>Zoom G2 Four Editor</title>
   <style>
     * {
       margin: 0;
@@ -2758,21 +2758,13 @@
       if (!g2.currentPatchData) { fmStatus(elId,'⚠ No hay preset activo','warn'); return; }
       fmStatus(elId,'⏳ Guardando en pedalera…','');
 
-      const bpm = g2.currentPatchData.tempo || 120;
-      const bpmFake = bpm < 250 ? bpm + 1 : bpm - 1;
-
       // Paso 1: Activar autosave
       g2.midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x20,0x00,
                        0x64,0x0F,0x01,0x00,0x00,0x00,0x00,0xF7]);
       setAutoSaveLed(true);
-      await sleep(50);
-
-      // Paso 2: BPM+1 como trigger — fuerza un cambio real detectado por la pedalera
-      g2.midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x20,0x00,
-                       0x64,0x02,bpmFake&0x7F,(bpmFake>>7)&0x7F,0x00,0x00,0x00,0xF7]);
       await sleep(40);
 
-      // Paso 3: Ir al preset siguiente y volver — limpia el flag EDITED
+      // Paso 2: Ir al preset siguiente y volver — limpia el flag EDITED
       // y confirma el guardado sin revertir el edit buffer
       const ppb = (typeof window._g2GetPatchesPerBank === 'function') ? window._g2GetPatchesPerBank() : 10;
       const slot = g2.currentPresetSlot;
