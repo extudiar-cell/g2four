@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Zoom G2 Four - Modo Concierto</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      background: #0a0e18;
+      color: #eef2ff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .container {
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .concert-header {
+      background: #141a28;
+      border-radius: 28px;
+      padding: 14px 24px;
+      margin-bottom: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      border: 1px solid #2a3a50;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .preset-number {
+      font-size: 3rem;  /* más grande */
+      font-weight: 700;
+      color: #f0c040;
+      background: #0a0e18;
+      padding: 0 18px;
+      border-radius: 40px;
+      border: 2px solid #2a3a50;
+      line-height: 1.4;
+      min-width: 100px;
+      text-align: center;
+    }
+    .preset-name-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .preset-name {
+      font-size: 2.8rem;  /* más grande */
+      font-weight: 700;
+      background: linear-gradient(135deg, #c0f0e4, #6bc9b0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .preset-name.modified::after {
+      content: '*';
+      color: #f0c040;
+      font-size: 2.5rem;
+      -webkit-text-fill-color: #f0c040;
+      margin-left: 4px;
+    }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .nav-btn {
+      background: #1a2a3c;
+      border: 1px solid #2a3d5a;
+      border-radius: 40px;
+      padding: 6px 18px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #8fa8c8;
+      cursor: pointer;
+      transition: 0.15s;
+      touch-action: manipulation;
+      letter-spacing: 0.5px;
+    }
+    .nav-btn:hover:not(:disabled) {
+      border-color: #6bc9b0;
+      color: #6bc9b0;
+      background: #0f1a2a;
+      box-shadow: 0 0 16px rgba(107,201,176,0.15);
+    }
+    .nav-btn:disabled {
+      opacity: 0.3;
+      cursor: default;
+    }
+    .nav-btn:active:not(:disabled) {
+      transform: scale(0.95);
+    }
+    .save-btn {
+      background: #1a3a2c;
+      border: 1px solid #2c6e5c;
+      color: #6bc9b0;
+    }
+    .save-btn:hover:not(:disabled) {
+      background: #1e4a38;
+      border-color: #6bc9b0;
+      box-shadow: 0 0 16px rgba(107,201,176,0.15);
+    }
+    .goto-input {
+      width: 80px;
+      background: #0a0e18;
+      border: 1px solid #2a3d5a;
+      border-radius: 40px;
+      padding: 6px 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #eef2ff;
+      text-align: center;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .goto-input:focus {
+      border-color: #6bc9b0;
+    }
+    .goto-btn {
+      background: #1a2a3c;
+      border: 1px solid #2a3d5a;
+      border-radius: 40px;
+      padding: 6px 14px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #8fa8c8;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .goto-btn:hover:not(:disabled) {
+      border-color: #6bc9b0;
+      color: #6bc9b0;
+      background: #0f1a2a;
+    }
+    .midi-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      color: #7a8a9a;
+    }
+    .midi-dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #4a5a6a;
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+    .midi-dot.on {
+      background: #2ecc71;
+      box-shadow: 0 0 16px rgba(46,204,113,0.6);
+    }
+    .midi-label {
+      color: #8fa8c8;
+    }
+
+    .pedalboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      background: #0c101e;
+      padding: 24px 20px;
+      border-radius: 32px;
+      border: 1px solid #1a2638;
+      box-shadow: inset 0 0 40px rgba(0,0,0,0.7), 0 12px 40px rgba(0,0,0,0.5);
+      margin-bottom: 24px;
+      min-height: 45vh;
+      align-content: center;
+    }
+
+    .pedal {
+      aspect-ratio: 1 / 1.6;
+      background: #181f2e;
+      border-radius: 16px;
+      padding: 16px 8px 48px 8px; /* más espacio abajo para el número más grande */
+      text-align: center;
+      border: 2px solid #2a3448;
+      box-shadow: 0 6px 0 #060a12, 0 10px 30px rgba(0,0,0,0.6);
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.08s, border-color 0.25s, box-shadow 0.25s, background 0.25s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      touch-action: manipulation;
+    }
+    .pedal:active {
+      transform: scale(0.94);
+    }
+    .pedal .led {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #2a3a4a;
+      margin-bottom: 10px;
+      transition: background 0.2s, box-shadow 0.2s;
+      flex-shrink: 0;
+    }
+    .pedal .name {
+      font-size: 1.5rem;  /* más grande */
+      font-weight: 700;
+      color: #eef2ff;
+      line-height: 1.2;
+      word-break: break-word;
+    }
+    .pedal .category {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #6a7a8a;
+      margin-top: 4px;
+    }
+    .pedal .status {
+      font-size: 0.7rem;
+      font-weight: 600;
+      margin-top: 6px;
+      padding: 2px 14px;
+      border-radius: 20px;
+      background: #060a12;
+      color: #5a6a7a;
+      transition: color 0.2s;
+    }
+
+    .pedal .pedal-number {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #ffffff;
+      color: #000000;
+      font-size: 1.3rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+      pointer-events: none;
+    }
+
+    .pedal.on {
+      border-color: #6bc9b0;
+      box-shadow: 0 6px 0 #060a12, 0 0 30px rgba(107,201,176,0.3);
+    }
+    .pedal.on .led {
+      background: #2ecc71;
+      box-shadow: 0 0 20px rgba(46,204,113,0.6);
+    }
+    .pedal.on .status {
+      color: #6bc9b0;
+    }
+
+    .pedal.cat-dynamics.on    { background: #4a2a7a; border-color: #b873cf; box-shadow: 0 6px 0 #060a12, 0 0 30px rgba(184,115,207,0.4); }
+    .pedal.cat-filter.on      { background: #7a4a1a; border-color: #e9a23b; box-shadow: 0 6px 0 #060a12, 0 0 30px rgba(233,162,59,0.4); }
+    .pedal.cat-drive.on       { background: #8a1a1a; border-color: #ff4a3a; box-shadow: 0 6px 0 #060a12, 0 0 30px rgba(255,74,58,0.5); }
+    .pedal.cat-amp.on         { background: #6a4a1a; border-color: #f5c542; box-shadow: 0 6px 0 #060a12, 0 0 30px rgba(245,197,66,0.4); }
+    .pedal.cat-modulation.on  { background: #1a5a4a; border-color: #47c9b0; box-shadow: 0 6px 0 #060a12, 0 0 30px rgba(71,201,176,0.5); }
+    .pedal.cat-sfx.on         { background: #5a2a2a; border-color: #e6b8b8; box-shadow: 0 6px 0 #060a12, 0 0 30px rgba(230,184,184,0.3); }
+    .pedal.cat-delay.on       { background: #1a2a6a; border-color: #5a9fd4; box-shadow: 0 6px 0 #060a12, 0 0 30px rgba(90,159,212,0.5); }
+    .pedal.cat-reverb.on      { background: #1a4a2a; border-color: #6fbf4c; box-shadow: 0 6px 0 #060a12, 0 0 30px rgba(111,191,76,0.5); }
+    .pedal.cat-pedal.on       { background: #3a3a2a; border-color: #9b8c7c; box-shadow: 0 6px 0 #060a12, 0 0 30px rgba(155,140,124,0.3); }
+
+    .pedal.cat-dynamics { border-left: 6px solid #b873cf; }
+    .pedal.cat-filter   { border-left: 6px solid #e9a23b; }
+    .pedal.cat-drive    { border-left: 6px solid #ff4a3a; }
+    .pedal.cat-amp      { border-left: 6px solid #f5c542; }
+    .pedal.cat-modulation { border-left: 6px solid #47c9b0; }
+    .pedal.cat-sfx      { border-left: 6px solid #e6b8b8; }
+    .pedal.cat-delay    { border-left: 6px solid #5a9fd4; }
+    .pedal.cat-reverb   { border-left: 6px solid #6fbf4c; }
+    .pedal.cat-pedal    { border-left: 6px solid #9b8c7c; }
+    .pedal.cat-empty    { border-left: 6px solid #3a4a5a; }
+
+    .pedal.empty {
+      opacity: 0.4;
+      border-style: dashed;
+      border-color: #1a2a3a;
+      cursor: default;
+      background: #0e121e;
+      box-shadow: none;
+    }
+    .pedal.empty .name {
+      color: #4a5a6a;
+    }
+    .pedal.empty .led {
+      background: #1a2a3a;
+    }
+    .pedal.empty:active {
+      transform: none;
+    }
+
+    .pedal.bpm {
+      background: #1a2a2a;
+      border-color: #f0c040;
+    }
+    .pedal.bpm .led {
+      background: #f0c040;
+      box-shadow: 0 0 15px rgba(240,192,64,0.3);
+    }
+    .pedal.bpm .name {
+      color: #f0c040;
+    }
+    .pedal.bpm.on {
+      border-color: #f0c040;
+      box-shadow: 0 6px 0 #060a12, 0 0 30px rgba(240,192,64,0.4);
+    }
+    .pedal.bpm.on .led {
+      background: #f0c040;
+      box-shadow: 0 0 25px rgba(240,192,64,0.7);
+    }
+    .pedal.bpm .status {
+      color: #f0c040;
+    }
+
+    @keyframes flash-update {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.06); box-shadow: 0 0 40px rgba(107,201,176,0.8); }
+      100% { transform: scale(1); }
+    }
+    .pedal.flash {
+      animation: flash-update 0.3s ease;
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 0.7rem;
+      color: #3a4a5a;
+      margin-top: 10px;
+      letter-spacing: 0.5px;
+    }
+
+    @media (max-width: 1100px) {
+      .pedalboard {
+        gap: 12px;
+        padding: 18px 14px;
+      }
+      .pedal .name { font-size: 1.3rem; }
+      .pedal .led { width: 22px; height: 22px; }
+      .preset-number { font-size: 2.5rem; min-width: 90px; }
+      .preset-name { font-size: 2.3rem; }
+      .pedal .pedal-number {
+        width: 38px;
+        height: 38px;
+        font-size: 1.1rem;
+        bottom: 6px;
+      }
+      .pedal { padding-bottom: 40px; }
+    }
+    @media (max-width: 850px) {
+      .pedalboard {
+        gap: 10px;
+        padding: 14px 10px;
+      }
+      .pedal {
+        aspect-ratio: 1 / 1.4;
+        padding: 12px 6px 34px 6px;
+      }
+      .pedal .name { font-size: 1.1rem; }
+      .pedal .led { width: 20px; height: 20px; margin-bottom: 8px; }
+      .pedal .category { font-size: 0.55rem; }
+      .pedal .status { font-size: 0.6rem; padding: 1px 10px; }
+      .pedal .pedal-number {
+        width: 32px;
+        height: 32px;
+        font-size: 0.95rem;
+        bottom: 5px;
+      }
+      .preset-number { font-size: 2rem; min-width: 80px; padding: 0 12px; }
+      .preset-name { font-size: 1.8rem; }
+      .nav-btn { font-size: 0.75rem; padding: 4px 12px; }
+      .goto-input { width: 70px; font-size: 0.8rem; padding: 4px 8px; }
+      .goto-btn { font-size: 0.7rem; padding: 4px 10px; }
+      .concert-header { padding: 10px 14px; }
+    }
+    @media (max-width: 600px) {
+      .pedalboard {
+        gap: 6px;
+        padding: 10px 6px;
+      }
+      .pedal {
+        aspect-ratio: 1 / 1.2;
+        padding: 8px 4px 28px 4px;
+        border-radius: 12px;
+      }
+      .pedal .name { font-size: 0.85rem; }
+      .pedal .led { width: 16px; height: 16px; margin-bottom: 6px; }
+      .pedal .category { font-size: 0.45rem; }
+      .pedal .status { font-size: 0.5rem; padding: 1px 6px; }
+      .pedal .pedal-number {
+        width: 26px;
+        height: 26px;
+        font-size: 0.7rem;
+        bottom: 4px;
+      }
+      .preset-number { font-size: 1.6rem; min-width: 70px; padding: 0 10px; }
+      .preset-name { font-size: 1.4rem; }
+      .goto-input { width: 60px; font-size: 0.7rem; padding: 3px 6px; }
+      .goto-btn { font-size: 0.65rem; padding: 3px 8px; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Cabecera -->
+  <div class="concert-header">
+    <div class="header-left">
+      <div class="preset-number" id="presetNumber">—</div>
+      <div class="preset-name-wrapper">
+        <div class="preset-name" id="presetName">—</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="nav-btn" id="prevBtn" disabled>◀ PREV</button>
+      <button class="nav-btn" id="nextBtn" disabled>NEXT ▶</button>
+      <input type="number" class="goto-input" id="gotoInput" min="1" max="300" placeholder="Nº" title="Número de preset">
+      <button class="goto-btn" id="gotoBtn">GO</button>
+      <button class="nav-btn save-btn" id="saveBtn">💾 SAVE</button>
+      <div class="midi-indicator">
+        <span class="midi-dot" id="midiDot"></span>
+        <span class="midi-label" id="midiLabel">MIDI</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pedalboard -->
+  <div class="pedalboard" id="pedalboard"></div>
+
+  <div class="footer">Toca un pedal · Teclas 1-7 · Flechas ← → · Nº + Enter · SAVE para guardar</div>
+</div>
+
+<script>
+  // ================================================================
+  // 1. MAPA DE EFECTOS Y CATEGORÍAS
+  // ================================================================
+  const EFFECTS_MAP = new Map([
+    [0x00000000, "Empty"],
+    [0x01000010, "Comp"], [0x01000020, "RackComp"], [0x01000030, "GrayComp"],
+    [0x01000040, "OptComp"], [0x01000050, "BlackOpt"], [0x01000060, "1176 LMT"],
+    [0x01000070, "ZNR"], [0x01000080, "NoiseGate"], [0x01000090, "SlowATTCK"],
+    [0x010000A0, "MuteSW"],
+    [0x02000010, "AutoWah"], [0x02000020, "Reso FLTR"], [0x02000030, "LowPassFL"],
+    [0x02000040, "CryFilter"], [0x02000050, "EG Filter"], [0x02000060, "LFO FLTR"],
+    [0x02000070, "SeqFLTR"], [0x02000080, "RndmFLTR"], [0x02000090, "StepFLTR"],
+    [0x020000A0, "Gt GEQ"], [0x020000B0, "Gt GEQ 7"], [0x020000C0, "St Gt GEQ"],
+    [0x020000D0, "ParaEQ"], [0x020000E0, "Exciter"], [0x020000F0, "Low EQ"],
+    [0x02000100, "High EQ"],
+    [0x03000010, "EP Drive"], [0x03000020, "RC Drive"], [0x03000030, "TS Drive"],
+    [0x03000040, "GoldDrive"], [0x03000050, "SweetDrv"], [0x03000060, "Zen O.DRV"], [0x03000058, "Overdrive"],
+    [0x03000070, "BG GRID"], [0x03000080, "DYN Drive"], [0x03000090, "Plus DIST"],
+    [0x030000A0, "DIST One"], [0x030000B0, "SqueakDST"], [0x030000C0, "RedCrunch"],
+    [0x030000D0, "VioletDST"], [0x030000E0, "TB MK1.5"], [0x030000F0, "OctFuzz"],
+    [0x03000100, "NYC Muff"], [0x03000110, "WaveSHPR"], [0x03000120, "Razor DRV"],
+    [0x03000130, "MetalWRLD"], [0x03000140, "HG THRTTL"], [0x03000150, "TS+Boost"],
+    [0x03000160, "RedCR+BST"], [0x03000170, "SpotBoost"], [0x03000180, "UpOctBSTR"],
+    [0x03000190, "OutputBST"], [0x030001A0, "Aco.Sim"],
+    [0x04000010, "MS 45os"], [0x04000020, "MS 1959"], [0x04000030, "MS 800"],
+    [0x04000040, "FD B-MAN"], [0x04000050, "FD TWIN-R"], [0x04000060, "FD DLX-R"],
+    [0x04000070, "FD MASTER"], [0x04000080, "UK 30A"], [0x04000090, "BG MARK1"],
+    [0x040000A0, "BG MARK3"], [0x040000B0, "RectiDual"], [0x040000C0, "XtasyBlue"],
+    [0x040000D0, "HW 100"], [0x040000E0, "ORG120"], [0x040000F0, "DZ Herb"],
+    [0x04000100, "MATCH30"], [0x04000110, "KRAMPUS"], [0x04000120, "REDLOOM"],
+    [0x04000130, "VELVET"], [0x04000140, "MUDDY"], [0x04000150, "7 HEAVEN"],
+    [0x04000160, "POLLEX"],
+    [0x06000010, "Chorus"], [0x06000020, "CloneCho"], [0x06000030, "ChorusOne"],
+    [0x06000040, "TriChorus"], [0x06000050, "AnalogCho"], [0x06000060, "StereoCho"],
+    [0x06000070, "BendCho"], [0x06000080, "Detune"], [0x06000090, "Tremolo"],
+    [0x060000A0, "Phaser"], [0x060000B0, "StonePha"], [0x060000C0, "WarpPhase"],
+    [0x060000D0, "Duo Phase"], [0x060000E0, "TheVibe"], [0x060000F0, "VinFLNGR"],
+    [0x06000100, "Kick FLNG"], [0x06000110, "Vibrato"], [0x06000120, "SwellVibe"],
+    [0x06000130, "Octaver"], [0x06000140, "PitchSHFT"], [0x06000150, "MonoPitch"],
+    [0x06000160, "HPS"], [0x06000170, "PolyShift"], [0x06000180, "GEMINOS"],
+    [0x06000190, "RingMod"], [0x060001A0, "Slicer"],
+    [0x07000010, "AutoPan"], [0x07000020, "LoopRoll"], [0x07000030, "Sitar Sim"],
+    [0x07000040, "Bomber"], [0x07000FF0, "BPM"],
+    [0x08000010, "Delay"], [0x08000020, "AnalogDly"], [0x08000030, "TapeEcho"],
+    [0x08000040, "TapeEcho3"], [0x08000050, "DualDelay"], [0x08000060, "SoftEcho"],
+    [0x08000070, "SlapBackD"], [0x08000080, "P-P Delay"], [0x08000090, "ReverseDL"],
+    [0x080000A0, "ModDelay"], [0x080000B0, "FilterDly"], [0x080000C0, "Pitch DLY"],
+    [0x080000D0, "PhaseDly"], [0x080000E0, "A-Pan DLY"], [0x080000F0, "SlwAtkDly"],
+    [0x08000100, "ICE Delay"], [0x08000110, "HoldDelay"],
+    [0x09000010, "RoomREV"], [0x09000020, "BrghtRoom"], [0x09000030, "SpringREV"],
+    [0x09000040, "FD Spring"], [0x09000050, "Plate REV"], [0x09000060, "Hall REV"],
+    [0x09000070, "BrghtHall"], [0x09000080, "HD Hall"], [0x09000090, "ChurchREV"],
+    [0x090000A0, "Ambience"], [0x090000B0, "Chamber"], [0x090000C0, "AirReverb"],
+    [0x090000D0, "EarlyRef"], [0x090000E0, "GateRevrb"], [0x090000F0, "HoldRevrb"],
+    [0x09000100, "SpaceHole"], [0x09000110, "ParticleR"],
+    [0x0B000010, "Output VP"], [0x0B000020, "Pedal VOL"], [0x0B000030, "BlackWah"],
+    [0x0B000040, "ChromeWah"], [0x0B000050, "WAH100"], [0x0B000060, "VoiceWah"],
+    [0x0B000070, "PDL Pitch"], [0x0B000080, "PDL MnPit"], [0x0B000090, "PDL Roto"],
+    [0x0B0000A0, "PDL FLNGR"], [0x0B0000B0, "PDL Vibe"], [0x0B0000C0, "PDL Drive"],
+    [0x0B0000D0, "PDL PHSR"], [0x0B0000E0, "PDL Delay"], [0x0B0000F0, "OSC Echo"],
+    [0x0B000100, "PDL Rev"], [0x0B000110, "PDL Reso"], [0x0B000120, "P-BitCRSH"],
+    [0x1E000010, "rhythm"],
+    [0x1F000010, "monolooper"]
+  ]);
+
+  function getEffectName(id) {
+    return EFFECTS_MAP.get(id >>> 0) ?? `0x${(id>>>0).toString(16).toUpperCase()}`;
+  }
+
+  function getCategoryClass(id) {
+    const group = (id >>> 24) & 0xFF;
+    switch(group) {
+      case 0x00: return 'cat-empty';
+      case 0x01: return 'cat-dynamics';
+      case 0x02: return 'cat-filter';
+      case 0x03: return 'cat-drive';
+      case 0x04: return 'cat-amp';
+      case 0x06: return 'cat-modulation';
+      case 0x07: return 'cat-sfx';
+      case 0x08: return 'cat-delay';
+      case 0x09: return 'cat-reverb';
+      case 0x0B: return 'cat-pedal';
+      default: return '';
+    }
+  }
+
+  function getCategoryName(id) {
+    const group = (id >>> 24) & 0xFF;
+    const names = {
+      0x00: 'Empty',
+      0x01: 'Dynamics',
+      0x02: 'Filter',
+      0x03: 'Drive',
+      0x04: 'Amp',
+      0x06: 'Modulation',
+      0x07: 'SFX',
+      0x08: 'Delay',
+      0x09: 'Reverb',
+      0x0B: 'Pedal'
+    };
+    return names[group] || '';
+  }
+
+  // ================================================================
+  // 2. MIDI Y PARSEO
+  // ================================================================
+  let currentPatchData = null;
+  let midiOut = null;
+  let midiIn = null;
+  let currentPresetSlot = -1;
+  let presetList = [];
+  let patchesPerBankPreset = -1;
+  let detectedPresetProtocol = null;
+  let scanPresetInProgress = false;
+  let _g2PCIgnore = false;
+  let isModified = false;
+
+  const tapTimes = [];
+  const MAX_TAPS = 8;
+  const TAP_TIMEOUT = 2500;
+  let tapTimer = null;
+
+  function seven2eight(data, start, end) {
+    if (end === undefined) end = data.length - 1;
+    const len = end - start + 1;
+    const rem = len % 8;
+    const outLen = Math.floor(len / 8) * 7 + (rem < 2 ? 0 : rem - 1);
+    const out = new Uint8Array(outLen);
+    let outIdx = 0, highBits = 0;
+    for (let i = start; i <= end; i++) {
+      const seven = data[i];
+      const bitIdx = 7 - (i - start) % 8;
+      if (bitIdx === 7) highBits = seven;
+      else out[outIdx++] = seven + (((highBits >> bitIdx) & 1) << 7);
+    }
+    return out;
+  }
+
+  function getNumberFromBits(data, startBit, endBit) {
+    const startByte = Math.floor(startBit / 8);
+    const endByte = Math.floor(endBit / 8);
+    const startOff = startBit % 8;
+    const endOff = endBit % 8;
+    const startMask = 0xFF >> startOff;
+    const endMask = (0b1111111100000000 >> (endOff + 1)) & 0xFF;
+    let value = 0;
+    for (let i = endByte; i >= startByte; i--) {
+      let b = data[i];
+      if (i === startByte) b &= startMask;
+      if (i === endByte) b &= endMask;
+      value += b << ((endByte - i) * 8);
+    }
+    return value >> (7 - endOff);
+  }
+
+  function readI32LE(data, off) {
+    return (data[off] | (data[off+1]<<8) | (data[off+2]<<16) | (data[off+3]<<24)) >>> 0;
+  }
+
+  function parsePatchFromSysex(raw) {
+    if (raw.length < 50) return null;
+    if (raw[0] !== 0xF0 || raw[1] !== 0x52 || raw[2] !== 0x00 || raw[3] !== 0x6E || raw[4] !== 0x64 || raw[5] !== 0x12) return null;
+    const dataStart = 9;
+    const dataEnd = raw.length - 1 - 5 - 1;
+    if (dataEnd < dataStart) return null;
+    const eight = seven2eight(raw, dataStart, dataEnd);
+
+    let ptcfOff = -1;
+    for (let i = 0; i < eight.length - 3; i++) {
+      if (eight[i]===0x50 && eight[i+1]===0x54 && eight[i+2]===0x43 && eight[i+3]===0x46) { ptcfOff = i; break; }
+    }
+    if (ptcfOff < 0) return null;
+    const numEffects = readI32LE(eight, ptcfOff+12);
+    const subStart = ptcfOff + 36 + numEffects*4;
+    const subEnd = ptcfOff + 8 + readI32LE(eight, ptcfOff+4);
+
+    const chunks = {};
+    let off = subStart;
+    while (off + 8 <= subEnd && off + 8 <= eight.length) {
+      const id = String.fromCharCode(eight[off], eight[off+1], eight[off+2], eight[off+3]);
+      const len = readI32LE(eight, off+4);
+      if (len < 0 || off+8+len > eight.length) break;
+      chunks[id] = eight.slice(off+8, off+8+len);
+      off += 8+len;
+    }
+    const effects = [];
+    if (chunks['EDTB']) {
+      const edtb = chunks['EDTB'];
+      const count = Math.floor(edtb.length / 24);
+      for (let i = 0; i < count; i++) {
+        const rev = edtb.slice(i*24, i*24+24).reverse();
+        const bitpos = rev.length*8 - 1;
+        const enabled = getNumberFromBits(rev, bitpos, bitpos) === 1;
+        const id = getNumberFromBits(rev, bitpos-29, bitpos-1) >>> 0;
+        const params = [];
+        let bp = bitpos - 30;
+        for (let p = 0; p < 5; p++) { params.push(getNumberFromBits(rev, bp-11, bp)); bp -= 12; }
+        for (let p = 5; p < 8; p++) { params.push(getNumberFromBits(rev, bp-7, bp)); bp -= 8; }
+        for (let p = 8; p < 12; p++) { params.push(getNumberFromBits(rev, bp-11, bp)); bp -= 12; }
+        effects.push({ enabled, id, parameters: params });
+      }
+    }
+    let name = "Sin nombre";
+    if (chunks['NAME']) {
+      let str = '';
+      for (const b of chunks['NAME']) if (b !== 0) str += String.fromCharCode(b);
+      name = str.trim() || name;
+    }
+    let tempo = 120;
+    if (chunks['PRM2']) {
+      const p = chunks['PRM2'];
+      const len = p.length;
+      tempo = ((p[len-2] & 0xF0) >> 4) + ((p[len-1] & 0x0F) << 4);
+    }
+    return { name, effects, tempo };
+  }
+
+  // ================================================================
+  // FUNCIONES DE GUARDADO
+  // ================================================================
+  async function saveCurrentPresetToPedal() {
+    if (!midiOut) { console.warn('MIDI not connected'); return; }
+    if (!currentPatchData) return;
+    midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x20,0x00,
+                  0x64,0x0F,0x01,0x00,0x00,0x00,0x00,0xF7]);
+    await new Promise(r => setTimeout(r, 30));
+    const bpm = currentPatchData.tempo || 120;
+    midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x20,0x00,
+                  0x64,0x02,bpm&0x7F,(bpm>>7)&0x7F,0x00,0x00,0x00,0xF7]);
+    await new Promise(r => setTimeout(r, 200));
+    isModified = false;
+    updateModifiedIndicator();
+    const saveBtn = document.getElementById('saveBtn');
+    if (saveBtn) {
+      const orig = saveBtn.textContent;
+      saveBtn.textContent = '✅ SAVED';
+      setTimeout(() => { saveBtn.textContent = orig; }, 1200);
+    }
+  }
+
+  function updateModifiedIndicator() {
+    const nameEl = document.getElementById('presetName');
+    if (!nameEl) return;
+    if (isModified) {
+      nameEl.classList.add('modified');
+    } else {
+      nameEl.classList.remove('modified');
+    }
+  }
+
+  // ================================================================
+  // FUNCIONES MIDI BÁSICAS
+  // ================================================================
+  function sendTempoToDevice(bpm) {
+    if (!midiOut) return;
+    const lsb = bpm & 0x7F;
+    const msb = (bpm >> 7) & 0x7F;
+    midiOut.send([0xF0, 0x52, 0x00, 0x6E, 0x64, 0x20, 0x00, 0x64, 0x02, lsb, msb, 0x00, 0x00, 0x00, 0xF7]);
+  }
+
+  function handleTapTempo() {
+    const now = performance.now();
+    if (tapTimes.length && (now - tapTimes[tapTimes.length - 1]) > TAP_TIMEOUT) tapTimes.length = 0;
+    tapTimes.push(now);
+    if (tapTimes.length > MAX_TAPS) tapTimes.shift();
+
+    if (tapTimes.length >= 2) {
+      const intervals = [];
+      for (let i = 1; i < tapTimes.length; i++) intervals.push(tapTimes[i] - tapTimes[i - 1]);
+      const avgInterval = intervals.reduce((a, b) => a + b, 0) / intervals.length;
+      const bpm = Math.round(60000 / avgInterval);
+      const clampedBpm = Math.max(20, Math.min(300, bpm));
+      const display = document.getElementById('bpmDisplay');
+      if (display) display.innerText = clampedBpm;
+      if (currentPatchData) currentPatchData.tempo = clampedBpm;
+      sendTempoToDevice(clampedBpm);
+    }
+
+    clearTimeout(tapTimer);
+    tapTimer = setTimeout(() => { tapTimes.length = 0; }, TAP_TIMEOUT);
+  }
+
+  function toggleSlot(slot, enable) {
+    if (!midiOut) return;
+    if (currentPatchData && currentPatchData.effects[slot]) {
+      currentPatchData.effects[slot].enabled = enable;
+      renderPedalboard();
+      isModified = true;
+      updateModifiedIndicator();
+    }
+    const val = enable ? 1 : 0;
+    midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x20,0x00, slot, 0x00, val, 0,0,0,0,0xF7]);
+  }
+
+  function syncCurrentPatch() {
+    if (!midiOut) return;
+    midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x13,0x00,0xF7]);
+  }
+
+  function loadPresetBySlot(absoluteSlot) {
+    if (!midiOut) return;
+    if (absoluteSlot < 0 || absoluteSlot >= presetList.length) return;
+    _g2PCIgnore = true;
+    setTimeout(() => { _g2PCIgnore = false; }, 500);
+    if (detectedPresetProtocol === 'v2' && patchesPerBankPreset > 0) {
+      const bank = Math.floor(absoluteSlot / patchesPerBankPreset);
+      const program = absoluteSlot % patchesPerBankPreset;
+      midiOut.send([0xB0, 0x00, (bank >> 7) & 0x7F]);
+      midiOut.send([0xB0, 0x20,  bank       & 0x7F]);
+      midiOut.send([0xC0, program & 0x7F]);
+    } else {
+      midiOut.send([0xC0, absoluteSlot & 0x7F]);
+    }
+    setTimeout(() => syncCurrentPatch(), 150);
+  }
+
+  // ================================================================
+  // RENDERIZADO
+  // ================================================================
+  function renderPedalboard(flashSlot = null) {
+    const board = document.getElementById('pedalboard');
+    if (!currentPatchData) {
+      board.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#4a5a6a;">Esperando preset...</div>';
+      return;
+    }
+    const effects = currentPatchData.effects;
+    let html = '';
+    const maxSlots = Math.min(7, effects.length);
+    for (let i = 0; i < maxSlots; i++) {
+      const fx = effects[i];
+      const id = fx.id;
+      const name = getEffectName(id);
+      const categoryName = getCategoryName(id);
+      const catClass = getCategoryClass(id);
+      const enabled = fx.enabled;
+      const isEmpty = (id === 0x00000000);
+      const isBpm = (id === 0x07000FF0);
+      const onClass = enabled ? 'on' : '';
+      const emptyClass = isEmpty ? 'empty' : '';
+      const bpmClass = isBpm ? 'bpm' : '';
+      const flashClass = (flashSlot === i) ? 'flash' : '';
+      const slotNumber = i + 1;
+
+      html += `
+        <div class="pedal ${catClass} ${onClass} ${emptyClass} ${bpmClass} ${flashClass}" data-slot="${i}" data-bpm="${isBpm}">
+          <div class="led"></div>
+          <div class="name">${isEmpty ? '—' : name}</div>
+          <div class="category">${isEmpty ? 'Empty' : (isBpm ? 'TAP TEMPO' : categoryName)}</div>
+          <div class="status">${isBpm ? (enabled ? 'TAP' : 'TAP') : (enabled ? 'ON' : 'OFF')}</div>
+          <div class="pedal-number">${slotNumber}</div>
+        </div>
+      `;
+    }
+    board.innerHTML = html;
+
+    board.querySelectorAll('.pedal:not(.empty)').forEach(el => {
+      const isBpm = el.dataset.bpm === 'true';
+      if (isBpm) {
+        el.addEventListener('click', (e) => {
+          handleTapTempo();
+          el.classList.add('flash');
+          setTimeout(() => el.classList.remove('flash'), 300);
+        });
+      } else {
+        el.addEventListener('click', (e) => {
+          const slot = parseInt(el.dataset.slot);
+          const currentState = currentPatchData.effects[slot].enabled;
+          toggleSlot(slot, !currentState);
+        });
+      }
+    });
+  }
+
+  function updateTopBar() {
+    if (!currentPatchData) {
+      document.getElementById('presetName').textContent = '—';
+      document.getElementById('presetNumber').textContent = '—';
+      document.getElementById('prevBtn').disabled = true;
+      document.getElementById('nextBtn').disabled = true;
+      document.getElementById('gotoInput').value = '';
+      return;
+    }
+    document.getElementById('presetName').textContent = currentPatchData.name;
+    if (presetList.length > 0 && currentPresetSlot >= 0) {
+      const num = currentPresetSlot + 1;
+      document.getElementById('presetNumber').textContent = String(num).padStart(3, '0');
+      document.getElementById('gotoInput').value = num;
+    } else {
+      document.getElementById('presetNumber').textContent = '—';
+      document.getElementById('gotoInput').value = '';
+    }
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    if (presetList.length > 0) {
+      prevBtn.disabled = false;
+      nextBtn.disabled = false;
+    } else {
+      prevBtn.disabled = true;
+      nextBtn.disabled = true;
+    }
+    const bpmDisplay = document.getElementById('bpmDisplay');
+    if (bpmDisplay && currentPatchData) {
+      bpmDisplay.innerText = currentPatchData.tempo || 120;
+    }
+    isModified = false;
+    updateModifiedIndicator();
+  }
+
+  function flashPedal(slot) {
+    renderPedalboard(slot);
+    setTimeout(() => {
+      const pedalEl = document.querySelector(`.pedal[data-slot="${slot}"]`);
+      if (pedalEl) pedalEl.classList.remove('flash');
+    }, 350);
+  }
+
+  // ================================================================
+  // CONEXIÓN MIDI Y ESCANEO
+  // ================================================================
+  async function connectMIDI() {
+    try {
+      const access = await navigator.requestMIDIAccess({ sysex: true });
+      let targetOutput = null, targetInput = null;
+      for (const [_, port] of access.outputs) {
+        if (port.name && (port.name.toLowerCase().includes('g2') || port.name.toLowerCase().includes('zoom'))) {
+          targetOutput = port;
+          break;
+        }
+      }
+      for (const [_, port] of access.inputs) {
+        if (port.name && (port.name.toLowerCase().includes('g2') || port.name.toLowerCase().includes('zoom'))) {
+          targetInput = port;
+          break;
+        }
+      }
+      if (!targetOutput) targetOutput = access.outputs.values().next().value;
+      if (!targetInput) targetInput = access.inputs.values().next().value;
+      if (!targetOutput || !targetInput) throw new Error('Dispositivo no encontrado');
+      midiOut = targetOutput;
+      midiIn = targetInput;
+
+      document.getElementById('midiDot').classList.add('on');
+      document.getElementById('midiLabel').textContent = targetOutput.name || 'Zoom G2 Four';
+
+      targetInput.onmidimessage = (msg) => {
+        const data = msg.data;
+        if (data.length >= 3 && (data[0] & 0xF0) === 0xB0) {
+          const controller = data[1];
+          const value = data[2];
+          if (controller === 0)  { window._g2BankMSB = value; }
+          if (controller === 32) { window._g2BankLSB = value; }
+          return;
+        }
+        if (data.length >= 2 && (data[0] & 0xF0) === 0xC0) {
+          const prog = data[1] & 0x7F;
+          const bankMSB = window._g2BankMSB ?? 0;
+          const bankLSB = window._g2BankLSB ?? 0;
+          const bank = (bankMSB << 7) | bankLSB;
+          if (patchesPerBankPreset > 0 && !_g2PCIgnore) {
+            const absSlot = bank * patchesPerBankPreset + prog;
+            if (absSlot !== currentPresetSlot) {
+              currentPresetSlot = absSlot;
+              setTimeout(() => syncCurrentPatch(), 50);
+              updateTopBar();
+            }
+          }
+          return;
+        }
+        if (data[0]===0xF0 && data[1]===0x52 && data[2]===0x00 &&
+            data[3]===0x6E && data[4]===0x64 && data[5]===0x26 && data.length >= 12) {
+          const bank = data[8] + (data[9] << 7);
+          const prog = data[10] + (data[11] << 7);
+          if (patchesPerBankPreset > 0 && !_g2PCIgnore) {
+            const absSlot = bank * patchesPerBankPreset + prog;
+            if (absSlot !== currentPresetSlot) {
+              currentPresetSlot = absSlot;
+              setTimeout(() => syncCurrentPatch(), 50);
+              updateTopBar();
+            }
+          }
+          return;
+        }
+        if (data.length > 200 && data[0]===0xF0 && data[1]===0x52 &&
+            data[4]===0x64 && data[5]===0x12) {
+          const parsed = parsePatchFromSysex(data);
+          if (!parsed) return;
+          currentPatchData = parsed;
+          renderPedalboard();
+          updateTopBar();
+          return;
+        }
+        if (data[0]===0xF0 && data[1]===0x52 && data[2]===0x00 &&
+            data[3]===0x6E && data[4]===0x64 && data[5]===0x20 &&
+            data.length >= 14) {
+          const slot = data[7];
+          const subcmd = data[8];
+          if (subcmd === 0x00) {
+            const val = data[9];
+            if (currentPatchData && currentPatchData.effects && slot < currentPatchData.effects.length) {
+              currentPatchData.effects[slot].enabled = (val === 1);
+              flashPedal(slot);
+              updateTopBar();
+            }
+          }
+          return;
+        }
+      };
+
+      midiOut.send([0xF0, 0x52, 0x00, 0x6E, 0x50, 0xF7]);
+      setTimeout(() => midiOut.send([0xF0, 0x52, 0x00, 0x6E, 0x33, 0xF7]), 100);
+      setTimeout(() => syncCurrentPatch(), 400);
+      setTimeout(() => scanPresets(), 1500);
+    } catch (e) {
+      console.error(e);
+      document.getElementById('midiLabel').textContent = '❌ Error MIDI';
+    }
+  }
+
+  async function scanPresets() {
+    if (scanPresetInProgress || !midiOut || !midiIn) return;
+    scanPresetInProgress = true;
+    try {
+      const r2 = await sendSysExAndWaitReply(
+        [0xF0,0x52,0x00,0x6E,0x44,0xF7],
+        d => d.length>5 && d[0]===0xF0&&d[1]===0x52&&d[2]===0x00&&d[3]===0x6E&&d[4]===0x43,
+        400
+      );
+      if (r2 && r2.length > 13) {
+        patchesPerBankPreset = r2[11] + (r2[12] << 7);
+        detectedPresetProtocol = 'v2';
+      } else {
+        const r1 = await sendSysExAndWaitReply(
+          [0xF0,0x52,0x00,0x6E,0x07,0xF7],
+          d => d.length>5 && d[0]===0xF0&&d[1]===0x52&&d[2]===0x00&&d[3]===0x6E&&d[4]===0x06,
+          400
+        );
+        if (r1 && r1.length >= 10) {
+          patchesPerBankPreset = -1;
+          detectedPresetProtocol = 'v1';
+        } else {
+          patchesPerBankPreset = 50;
+          detectedPresetProtocol = 'v1';
+        }
+      }
+      const total = 300;
+      presetList = [];
+      for (let i = 0; i < total; i++) {
+        const name = await downloadPatchName(i);
+        if (name === null) break;
+        presetList.push({ slot: i, name });
+        if (i % 50 === 0) updateTopBar();
+      }
+      updateTopBar();
+    } catch(e) {
+      console.error(e);
+    } finally {
+      scanPresetInProgress = false;
+    }
+  }
+
+  function sendSysExAndWaitReply(cmd, matchFn, timeout) {
+    return new Promise((resolve) => {
+      if (!midiOut || !midiIn) { resolve(undefined); return; }
+      let resolved = false;
+      const timer = setTimeout(() => { if (!resolved) { resolved = true; midiIn.removeEventListener('midimessage', handler); resolve(undefined); } }, timeout);
+      function handler(msg) {
+        if (!resolved && matchFn(msg.data)) {
+          resolved = true; clearTimeout(timer);
+          midiIn.removeEventListener('midimessage', handler);
+          resolve(msg.data);
+        }
+      }
+      midiIn.addEventListener('midimessage', handler);
+      midiOut.send(cmd);
+    });
+  }
+
+  async function downloadPatchName(slot) {
+    if (detectedPresetProtocol === 'v2' && patchesPerBankPreset > 0) {
+      const bank = Math.floor(slot / patchesPerBankPreset);
+      const program = slot % patchesPerBankPreset;
+      const cmd = [0xF0,0x52,0x00,0x6E, 0x46, 0x00, 0x00,
+                   bank & 0x7F, (bank >> 7) & 0x7F,
+                   program & 0x7F, (program >> 7) & 0x7F, 0xF7];
+      const reply = await sendSysExAndWaitReply(
+        cmd,
+        d => d.length>6 && d[0]===0xF0&&d[1]===0x52&&d[2]===0x00&&d[3]===0x6E&&d[4]===0x45&&d[5]===0x00&&d[6]===0x00,
+        600
+      );
+      return reply ? parsePatchNameV2(reply) : null;
+    } else {
+      const cmd = [0xF0,0x52,0x00,0x6E, 0x09, 0x00, 0x00, slot & 0x7F, 0xF7];
+      const reply = await sendSysExAndWaitReply(
+        cmd,
+        d => d.length>6 && d[0]===0xF0&&d[1]===0x52&&d[2]===0x00&&d[3]===0x6E&&d[4]===0x08&&d[5]===0x00&&d[6]===0x00,
+        600
+      );
+      return reply ? parsePatchNameV1(reply) : null;
+    }
+  }
+
+  function parsePatchNameV2(raw) {
+    if (raw.length < 16 || raw[4]!==0x45||raw[5]!==0x00||raw[6]!==0x00) return null;
+    const dataStart = 13, dataEnd = raw.length - 2;
+    if (dataEnd < dataStart) return null;
+    const eight = seven2eight(raw, dataStart, dataEnd);
+    return extractName(eight);
+  }
+
+  function parsePatchNameV1(raw) {
+    if (raw.length < 12 || raw[4]!==0x08||raw[5]!==0x00||raw[6]!==0x00) return null;
+    const dataStart = 10, dataEnd = raw.length - 2;
+    if (dataEnd < dataStart) return null;
+    const eight = seven2eight(raw, dataStart, dataEnd);
+    return extractName(eight);
+  }
+
+  function extractName(eight) {
+    let ptcfOff = -1;
+    for (let i = 0; i < eight.length - 3; i++) {
+      if (eight[i]===0x50 && eight[i+1]===0x54 && eight[i+2]===0x43 && eight[i+3]===0x46) { ptcfOff = i; break; }
+    }
+    if (ptcfOff < 0) return null;
+    const numEffects = readI32LE(eight, ptcfOff + 12);
+    const subStart = ptcfOff + 36 + numEffects * 4;
+    let off = subStart;
+    while (off + 8 <= eight.length) {
+      const id = String.fromCharCode(eight[off], eight[off+1], eight[off+2], eight[off+3]);
+      const len = readI32LE(eight, off + 4);
+      if (len < 0 || off + 8 + len > eight.length) break;
+      if (id === 'NAME') {
+        let name = '';
+        for (let b = 0; b < len; b++) {
+          if (eight[off+8+b] === 0) break;
+          name += String.fromCharCode(eight[off+8+b]);
+        }
+        return name.trim() || null;
+      }
+      off += 8 + len;
+    }
+    return null;
+  }
+
+  // ================================================================
+  // NAVEGACIÓN
+  // ================================================================
+  function loadPresetByOffset(delta) {
+    if (presetList.length === 0) return;
+    let currentSlot = currentPresetSlot;
+    if (currentSlot === -1) {
+      currentSlot = presetList[0].slot;
+    }
+    let newSlot = currentSlot + delta;
+    if (newSlot < 0) newSlot = presetList.length - 1;
+    if (newSlot >= presetList.length) newSlot = 0;
+    const target = presetList.find(p => p.slot === newSlot);
+    if (target) {
+      currentPresetSlot = newSlot;
+      loadPresetBySlot(newSlot);
+      updateTopBar();
+    }
+  }
+  window.loadPresetByOffset = loadPresetByOffset;
+
+  function gotoPresetNumber(num) {
+    if (presetList.length === 0) return;
+    const slot = num - 1;
+    if (slot < 0 || slot >= presetList.length) {
+      const input = document.getElementById('gotoInput');
+      input.style.borderColor = '#e74c3c';
+      setTimeout(() => { input.style.borderColor = ''; }, 500);
+      return;
+    }
+    const target = presetList.find(p => p.slot === slot);
+    if (target) {
+      currentPresetSlot = slot;
+      loadPresetBySlot(slot);
+      updateTopBar();
+    }
+  }
+
+  // ================================================================
+  // INICIALIZACIÓN
+  // ================================================================
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('prevBtn').addEventListener('click', () => loadPresetByOffset(-1));
+    document.getElementById('nextBtn').addEventListener('click', () => loadPresetByOffset(1));
+    document.getElementById('saveBtn').addEventListener('click', () => saveCurrentPresetToPedal());
+
+    const gotoInput = document.getElementById('gotoInput');
+    gotoInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const val = parseInt(gotoInput.value);
+        if (!isNaN(val) && val > 0) {
+          gotoPresetNumber(val);
+        }
+        e.preventDefault();
+      }
+    });
+    document.getElementById('gotoBtn').addEventListener('click', () => {
+      const val = parseInt(gotoInput.value);
+      if (!isNaN(val) && val > 0) {
+        gotoPresetNumber(val);
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      const key = e.key;
+      if (key >= '1' && key <= '7') {
+        const slotIndex = parseInt(key) - 1;
+        if (currentPatchData && currentPatchData.effects && slotIndex < currentPatchData.effects.length) {
+          const fx = currentPatchData.effects[slotIndex];
+          if (fx.id === 0x07000FF0) {
+            handleTapTempo();
+            return;
+          }
+          const newState = !fx.enabled;
+          toggleSlot(slotIndex, newState);
+          flashPedal(slotIndex);
+          e.preventDefault();
+        }
+      } else if (key === 'ArrowLeft') {
+        loadPresetByOffset(-1);
+        e.preventDefault();
+      } else if (key === 'ArrowRight') {
+        loadPresetByOffset(1);
+        e.preventDefault();
+      }
+    });
+
+    if (navigator.requestMIDIAccess) {
+      connectMIDI().catch(e => console.warn(e));
+    } else {
+      document.getElementById('midiLabel').textContent = '⚠ Web MIDI no soportada';
+    }
+  });
+</script>
+</body>
+</html>
