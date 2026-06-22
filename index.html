@@ -1050,7 +1050,11 @@
 
     <div class="button-group" style="display:flex;gap:10px;align-items:center;">
       <div id="midiStatus" style="font-size:0.7rem; color:#6bc9b0;">⚫ No conectado</div>
-      <button id="topSaveBtn" style="background:#1a3a2c;border:1px solid #2c6e5c;color:#6bc9b0;border-radius:20px;padding:8px 16px;font-size:0.78rem;font-weight:600;cursor:pointer;" disabled title="Guardar cambios del preset actual en la pedalera">💾 SAVE </button>
+      <button id="topSaveBtn" style="background:#1a3a2c;border:1px solid #2c6e5c;color:#6bc9b0;border-radius:20px;padding:8px 16px;font-size:0.78rem;font-weight:600;cursor:pointer;" disabled title="Guardar cambios del preset actual en la pedalera">💾 SAVE</button>
+      <div id="autoSaveWrap" style="display:flex;flex-direction:column;align-items:center;gap:3px;opacity:0.3;" title="Estado del autosave en la pedalera">
+        <div id="autoSaveLed" style="width:10px;height:10px;border-radius:50%;background:#5a6478;box-shadow:none;transition:background 0.2s,box-shadow 0.2s;"></div>
+        <span id="autoSaveLabel" style="font-size:0.55rem;font-weight:700;color:#5a6478;letter-spacing:0.5px;">AUTO</span>
+      </div>
     </div>
   </div>
 
@@ -1059,14 +1063,14 @@
     <div id="paramsPanel" class="params-panel"></div>
     <div class="side-panel" id="sidePanel">
       <div class="zone-tabs">
-        <button type="button" class="zone-tab active" data-zone="presets">📋 Presets</button>
-        <button type="button" class="zone-tab" data-zone="audio">🎵 Backing Tracks</button>
-        <button type="button" class="zone-tab" data-zone="filemanager">📁 Gestión de archivos</button>
+        <button type="button" class="zone-tab active" data-zone="presets">📋 PRESETS</button>
+        <button type="button" class="zone-tab" data-zone="audio">🎵 BACKING TRACKS MP3</button>
+        <button type="button" class="zone-tab" data-zone="filemanager">📁 FILES MANAGER</button>
       </div>
       <div class="zone-body">
         <div class="zone-section active" id="zone-presets">
           <div class="presets-toolbar">
-            <button type="button" class="presets-nav-btn" id="presetPrevBtn">◀ BACK </button>
+            <button type="button" class="presets-nav-btn" id="presetPrevBtn">◀ PREV</button>
             <button type="button" class="presets-nav-btn" id="presetNextBtn">NEXT ▶</button>
             <button type="button" class="presets-scan-btn" id="presetsScanBtn">⟳ SCAN PRESETS</button>
             <span id="presetsStatus">Conecta MIDI y pulsa Escanear</span>
@@ -1097,7 +1101,7 @@
               <span id="audioTimeTot">0:00</span>
             </div>
             <div class="audio-btn-row">
-              <button type="button" class="audio-btn" id="audioPrevBtn" title="BACK">⏮</button>
+              <button type="button" class="audio-btn" id="audioPrevBtn" title="PREV">⏮</button>
               <button type="button" class="audio-btn play-pause" id="audioPlayBtn" title="Play/Pause">▶</button>
               <button type="button" class="audio-btn" id="audioNextBtn" title="NEXT">⏭</button>
             </div>
@@ -2029,6 +2033,9 @@
               if (!window._g2PCIgnore && typeof window._g2SyncPresetHighlight === 'function') {
                 window._g2SyncPresetHighlight(absSlot);
               }
+              if (!window._g2PCIgnore) {
+                setTimeout(() => midiOut && midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x13,0x00,0xF7]), 150);
+              }
             }
           }
           return;
@@ -2047,6 +2054,9 @@
               String(absSlot + 1).padStart(3, '0');
             if (!window._g2PCIgnore && typeof window._g2SyncPresetHighlight === 'function') {
               window._g2SyncPresetHighlight(absSlot);
+            }
+            if (!window._g2PCIgnore) {
+              setTimeout(() => midiOut && midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x13,0x00,0xF7]), 150);
             }
           }
           return;
@@ -2132,7 +2142,7 @@
       setTimeout(() => {
         const scanBtn = document.getElementById('presetsScanBtn');
         if (scanBtn && !scanBtn.disabled) scanBtn.click();
-      }, 3000);
+      }, 1000);
     } catch (e) {
       console.error(e);
       document.getElementById('midiStatus').innerHTML = '❌ Error de conexión MIDI';
@@ -2733,26 +2743,74 @@
       return true;
     }
 
+    function setAutoSaveLed(enabled) {
+      const led  = document.getElementById('autoSaveLed');
+      const lbl  = document.getElementById('autoSaveLabel');
+      const wrap = document.getElementById('autoSaveWrap');
+      if (led)  { led.style.background = enabled ? '#4cff80' : '#ff4444'; led.style.boxShadow = enabled ? '0 0 6px #4cff80' : '0 0 6px #ff4444'; }
+      if (lbl)  { lbl.style.color = enabled ? '#4cff80' : '#ff4444'; }
+      if (wrap) { wrap.style.opacity = '1'; }
+    }
+
     async function saveCurrentPresetToPedal(statusElId) {
       const elId = statusElId || 'fmSaveStatus';
       if (!g2.midiOut) { fmStatus(elId,'⚠ Conecta MIDI primero','warn'); return; }
       if (!g2.currentPatchData) { fmStatus(elId,'⚠ No hay preset activo','warn'); return; }
       fmStatus(elId,'⏳ Guardando en pedalera…','');
+
+      const bpm = g2.currentPatchData.tempo || 120;
+      const bpmFake = bpm < 250 ? bpm + 1 : bpm - 1;
+
+      // Paso 1: Activar autosave
       g2.midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x20,0x00,
                        0x64,0x0F,0x01,0x00,0x00,0x00,0x00,0xF7]);
-      await sleep(30);
-      const bpm = g2.currentPatchData.tempo || 120;
+      setAutoSaveLed(true);
+      await sleep(50);
+
+      // Paso 2: BPM+1 como trigger — fuerza un cambio real detectado por la pedalera
       g2.midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x20,0x00,
-                       0x64,0x02,bpm&0x7F,(bpm>>7)&0x7F,0x00,0x00,0x00,0xF7]);
-      await sleep(200);
-      fmStatus(elId, `✅ Guardado: "${g2.currentPatchData.name}"`, 'ok');
-      const topSaveBtn = document.getElementById('topSaveBtn');
-      if (topSaveBtn) {
-        const orig = topSaveBtn.textContent;
-        topSaveBtn.textContent = '✅ Guardado';
-        setTimeout(() => { topSaveBtn.textContent = orig; }, 2000);
+                       0x64,0x02,bpmFake&0x7F,(bpmFake>>7)&0x7F,0x00,0x00,0x00,0xF7]);
+      await sleep(40);
+
+      // Paso 3: Ir al preset siguiente y volver — limpia el flag EDITED
+      // y confirma el guardado sin revertir el edit buffer
+      const ppb = (typeof window._g2GetPatchesPerBank === 'function') ? window._g2GetPatchesPerBank() : 10;
+      const slot = g2.currentPresetSlot;
+      const nextSlot = slot + 1;
+      const nextBank = Math.floor(nextSlot / ppb);
+      const nextProg = nextSlot % ppb;
+      const curBank  = Math.floor(slot / ppb);
+      const curProg  = slot % ppb;
+
+      window._g2PCIgnore = true;
+
+      // Ir al siguiente preset
+      if (ppb > 10) {
+        g2.midiOut.send([0xB0, 0x00, (nextBank >> 7) & 0x7F]);
+        g2.midiOut.send([0xB0, 0x20,  nextBank       & 0x7F]);
       }
+      g2.midiOut.send([0xC0, nextProg & 0x7F]);
+      await sleep(40);
+
+      // Volver al preset original
+      if (ppb > 10) {
+        g2.midiOut.send([0xB0, 0x00, (curBank >> 7) & 0x7F]);
+        g2.midiOut.send([0xB0, 0x20,  curBank       & 0x7F]);
+      }
+      g2.midiOut.send([0xC0, curProg & 0x7F]);
+      await sleep(40);
+
+      window._g2PCIgnore = false;
+
+      // Paso 4: Desactivar autosave
+      g2.midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x20,0x00,
+                       0x64,0x0F,0x00,0x00,0x00,0x00,0x00,0xF7]);
+      setAutoSaveLed(false);
+
+      fmStatus(elId, `✅ Guardado: "${g2.currentPatchData.name}"`, 'ok');
+
     }
+
 
     document.getElementById('fmSaveToDeviceBtn').addEventListener('click', () => saveCurrentPresetToPedal('fmSaveStatus'));
     document.getElementById('topSaveBtn').addEventListener('click', () => saveCurrentPresetToPedal('fmSaveStatus'));
