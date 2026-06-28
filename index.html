@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Zoom G2 Four Editor</title>
+  <title>Zoom G2 Four - Visor/Editor</title>
   <style>
     * {
       margin: 0;
@@ -12,376 +12,507 @@
     }
     body {
       font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
-      background: #0a0c15;
+      background: #0a0e18;
       color: #eef2ff;
-      padding: 24px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px;
     }
     .container {
-      max-width: 1400px;
+      max-width: 1600px;
+      width: 100%;
       margin: 0 auto;
     }
-    .top-bar {
-      background: #11141f;
-      border-radius: 32px;
+
+    /* ============================================================
+       HEADER (idéntico en espíritu al visor)
+       ============================================================ */
+    .concert-header {
+      background: #141a28;
+      border-radius: 28px;
       padding: 14px 24px;
-      margin-bottom: 30px;
+      margin-bottom: 22px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
       gap: 12px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-      border: 1px solid #2a3448;
+      border: 1px solid #2a3a50;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.6);
     }
-    .patch-info {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-    .preset-nav-bar {
+    .header-left {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 16px;
+      flex-wrap: wrap;
     }
-    .preset-nav-btn {
-      background: #1a2a3c;
-      border: 1px solid #2a3d5a;
-      border-radius: 50%;
-      width: 34px;
-      height: 34px;
-      font-size: 1rem;
-      color: #8fa8c8;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: 0.15s;
-      flex-shrink: 0;
-    }
-    .preset-nav-btn:hover:not(:disabled) {
-      border-color: #6bc9b0;
-      color: #6bc9b0;
-    }
-    .preset-nav-btn:disabled { opacity: 0.3; cursor: default; }
-    .preset-slot-badge {
-      font-size: 1.6rem;
+    .preset-number {
+      font-size: 2.4rem;
       font-weight: 700;
       color: #f0c040;
-      line-height: 1.1;
-      min-width: 3ch;
+      background: #0a0e18;
+      padding: 0 16px;
+      border-radius: 40px;
+      border: 2px solid #2a3a50;
+      line-height: 1.4;
+      min-width: 84px;
       text-align: center;
     }
-    .patch-name {
-      font-size: 1.6rem;
+    .preset-name-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .preset-name {
+      font-size: 2.1rem;
       font-weight: 700;
       background: linear-gradient(135deg, #c0f0e4, #6bc9b0);
       -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
       background-clip: text;
-      color: transparent;
-      line-height: 1.1;
+      cursor: text;
     }
-    .patch-details {
-      font-size: 0.82rem;
-      color: #8f9bb5;
+    .preset-name.modified::after {
+      content: '*';
+      color: #f0c040;
+      font-size: 1.9rem;
+      -webkit-text-fill-color: #f0c040;
+      margin-left: 4px;
     }
-    button {
-      background: #1e293b;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 40px;
-      font-weight: 600;
-      font-size: 0.9rem;
-      color: #e2e8f0;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    button.primary {
-      background: #2c6e5c;
-      color: white;
-      box-shadow: 0 2px 8px rgba(44,110,92,0.4);
-    }
-    button.primary:hover {
-      background: #3f8b76;
-      transform: translateY(-1px);
-    }
-    .effects-strip {
+    .header-right {
       display: flex;
-      flex-wrap: nowrap;
+      align-items: center;
       gap: 10px;
-      justify-content: center;
-      margin-bottom: 40px;
-      overflow-x: auto;
-      padding-bottom: 4px;
+      flex-wrap: wrap;
     }
-    .effect-card {
-      background: #131826;
-      border-radius: 22px;
-      padding: 12px 10px;
+    .nav-btn {
+      background: #1a2a3c;
+      border: 1px solid #2a3d5a;
+      border-radius: 40px;
+      padding: 6px 16px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #8fa8c8;
+      cursor: pointer;
+      transition: 0.15s;
+      touch-action: manipulation;
+      letter-spacing: 0.5px;
+    }
+    .nav-btn:hover:not(:disabled) {
+      border-color: #6bc9b0;
+      color: #6bc9b0;
+      background: #0f1a2a;
+      box-shadow: 0 0 16px rgba(107,201,176,0.15);
+    }
+    .nav-btn:disabled { opacity: 0.3; cursor: default; }
+    .nav-btn:active:not(:disabled) { transform: scale(0.95); }
+    .save-btn { background: #1a3a2c; border: 1px solid #2c6e5c; color: #6bc9b0; }
+    .save-btn:hover:not(:disabled) { background: #1e4a38; border-color: #6bc9b0; box-shadow: 0 0 16px rgba(107,201,176,0.15); }
+    .goto-input {
+      width: 70px;
+      background: #0a0e18;
+      border: 1px solid #2a3d5a;
+      border-radius: 40px;
+      padding: 6px 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #eef2ff;
+      text-align: center;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .goto-input:focus { border-color: #6bc9b0; }
+    .goto-btn {
+      background: #1a2a3c;
+      border: 1px solid #2a3d5a;
+      border-radius: 40px;
+      padding: 6px 14px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #8fa8c8;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .goto-btn:hover:not(:disabled) { border-color: #6bc9b0; color: #6bc9b0; background: #0f1a2a; }
+    .midi-indicator { display: flex; align-items: center; gap: 6px; font-size: 0.78rem; color: #7a8a9a; }
+    .midi-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #4a5a6a; transition: background 0.3s, box-shadow 0.3s; }
+    .midi-dot.on { background: #2ecc71; box-shadow: 0 0 16px rgba(46,204,113,0.6); }
+    .midi-label { color: #8fa8c8; }
+
+    .bpm-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #0a0e18;
+      border: 1px solid #2a3a50;
+      border-radius: 24px;
+      padding: 5px 12px;
+    }
+    .tap-group { display: flex; flex-direction: column; align-items: center; gap: 0; line-height: 1.1; }
+    .tap-bpm-display { font-size: 1rem; font-weight: 700; color: #6bc9b0; font-family: monospace; letter-spacing: 1px; }
+    .tap-bpm-label { font-size: 0.55rem; color: #6a7a8a; text-transform: uppercase; letter-spacing: 1px; }
+    button.tap-tempo, button.tuner-btn {
+      background: #1a2a3c;
+      border: 1px solid #2a3d5a;
+      color: #8fa8c8;
+      font-size: 0.74rem;
+      font-weight: 600;
+      padding: 7px 12px;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: 0.15s;
+      user-select: none;
+      white-space: nowrap;
+    }
+    button.tap-tempo:hover, button.tuner-btn:hover { border-color: #6bc9b0; color: #6bc9b0; }
+    button.tap-tempo.flash { background: #1e4a38; border-color: #6bc9b0; color: #6bc9b0; box-shadow: 0 0 10px rgba(107,201,176,0.4); }
+
+    /* ============================================================
+       PEDALBOARD — pedales RECTANGULARES, anchura variable
+       ============================================================ */
+    .pedalboard {
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      gap: 10px;
+      background: #0c101e;
+      padding: 22px 16px;
+      border-radius: 32px;
+      border: 1px solid #1a2638;
+      box-shadow: inset 0 0 40px rgba(0,0,0,0.7), 0 12px 40px rgba(0,0,0,0.5);
+      margin-bottom: 20px;
+      min-height: 30vh;
+      width: 100%;
+    }
+
+    .pedal {
+      background: #181f2e;
+      border-radius: 16px;
+      padding: 14px 10px 10px 10px;
+      text-align: center;
+      border: 2px solid #2a3448;
+      box-shadow: 0 6px 0 #060a12, 0 10px 30px rgba(0,0,0,0.6);
+      user-select: none;
+      transition: transform 0.08s, border-color 0.25s, box-shadow 0.25s, background 0.25s;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
+      position: relative;
+      touch-action: manipulation;
       flex: 1 1 0;
       min-width: 0;
-      text-align: center;
-      transition: all 0.2s;
-      border: 1px solid #2a3448;
-      border-left-width: 4px;
-      border-left-style: solid;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
     }
-    .effect-card.selected {
-      border-left-width: 10px;
-      transform: translateY(-3px);
-      background: #1c2338;
-      box-shadow: 0 12px 24px rgba(0,0,0,0.4);
+    .pedal-top {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      flex-shrink: 0;
     }
-    .effect-card.off {
-      opacity: 0.55;
-      filter: grayscale(0.2);
-      background: #0e111c;
+    .pedal .led {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #2a3a4a;
+      margin-bottom: 8px;
+      transition: background 0.2s, box-shadow 0.2s;
+      flex-shrink: 0;
     }
-    .effect-card:not(.off) {
-      background: white;
-      color: black;
-    }
-    .effect-card:not(.off) .effect-name,
-    .effect-card:not(.off) .effect-group {
-      color: black;
-    }
-    .effect-card.selected:not(.off) {
-      background: white;
-    }
-    .effect-name {
+    .pedal .name {
+      font-size: 1.12rem;
       font-weight: 700;
-      font-size: 0.9rem;
-      margin-bottom: 3px;
+      color: #eef2ff;
+      line-height: 1.15;
+      word-break: break-word;
+      cursor: pointer;
+    }
+    .pedal .category {
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 1.3px;
+      color: #6a7a8a;
+      margin-top: 3px;
+    }
+    .pedal .status {
+      font-size: 0.65rem;
+      font-weight: 600;
+      margin-top: 5px;
+      padding: 2px 12px;
+      border-radius: 20px;
+      background: #060a12;
+      color: #5a6a7a;
+      transition: color 0.2s;
+      display: inline-block;
+    }
+
+    .pedal-body-spacer { flex: 1; min-height: 6px; }
+
+    .pedal .pedal-number {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #ffffff;
+      color: #000000;
+      font-size: 0.78rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .pedal .change-btn {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #1a2a3c;
+      border: 1px solid #2a3d5a;
+      color: #8fa8c8;
+      font-size: 0.68rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: 0.15s;
+      z-index: 2;
+    }
+    .pedal .change-btn:hover { border-color: #6bc9b0; color: #6bc9b0; background: #0f1a2a; }
+
+    .pedal.on { border-color: #6bc9b0; box-shadow: 0 6px 0 #060a12, 0 0 30px rgba(107,201,176,0.3); }
+    .pedal.on .led { background: #2ecc71; box-shadow: 0 0 20px rgba(46,204,113,0.6); }
+    .pedal.on .status { color: #6bc9b0; }
+
+    .pedal.cat-dynamics.on    { background: #4a2a7a; border-color: #b873cf; box-shadow: 0 6px 0 #060a12, 0 0 30px rgba(184,115,207,0.4); }
+    .pedal.cat-filter.on      { background: #7a4a1a; border-color: #e9a23b; box-shadow: 0 6px 0 #060a12, 0 0 30px rgba(233,162,59,0.4); }
+    .pedal.cat-drive.on       { background: #8a1a1a; border-color: #ff4a3a; box-shadow: 0 6px 0 #060a12, 0 0 30px rgba(255,74,58,0.5); }
+    .pedal.cat-amp.on         { background: #6a4a1a; border-color: #f5c542; box-shadow: 0 6px 0 #060a12, 0 0 30px rgba(245,197,66,0.4); }
+    .pedal.cat-modulation.on  { background: #1a5a4a; border-color: #47c9b0; box-shadow: 0 6px 0 #060a12, 0 0 30px rgba(71,201,176,0.5); }
+    .pedal.cat-sfx.on         { background: #5a2a2a; border-color: #e6b8b8; box-shadow: 0 6px 0 #060a12, 0 0 30px rgba(230,184,184,0.3); }
+    .pedal.cat-delay.on       { background: #1a2a6a; border-color: #5a9fd4; box-shadow: 0 6px 0 #060a12, 0 0 30px rgba(90,159,212,0.5); }
+    .pedal.cat-reverb.on      { background: #1a4a2a; border-color: #6fbf4c; box-shadow: 0 6px 0 #060a12, 0 0 30px rgba(111,191,76,0.5); }
+    .pedal.cat-pedal.on       { background: #3a3a2a; border-color: #9b8c7c; box-shadow: 0 6px 0 #060a12, 0 0 30px rgba(155,140,124,0.3); }
+
+    .pedal.cat-dynamics { border-left: 6px solid #b873cf; }
+    .pedal.cat-filter   { border-left: 6px solid #e9a23b; }
+    .pedal.cat-drive    { border-left: 6px solid #ff4a3a; }
+    .pedal.cat-amp      { border-left: 6px solid #f5c542; }
+    .pedal.cat-modulation { border-left: 6px solid #47c9b0; }
+    .pedal.cat-sfx      { border-left: 6px solid #e6b8b8; }
+    .pedal.cat-delay    { border-left: 6px solid #5a9fd4; }
+    .pedal.cat-reverb   { border-left: 6px solid #6fbf4c; }
+    .pedal.cat-pedal    { border-left: 6px solid #9b8c7c; }
+    .pedal.cat-empty    { border-left: 6px solid #3a4a5a; }
+
+    .pedal.empty {
+      opacity: 0.45;
+      border-style: dashed;
+      border-color: #1a2a3a;
+      background: #0e121e;
+      box-shadow: none;
+    }
+    .pedal.empty .name { color: #4a5a6a; }
+    .pedal.empty .led { background: #1a2a3a; }
+    .pedal.empty .pedal-top { cursor: default; }
+
+    .pedal.bpm { background: #1a2a2a; border-color: #f0c040; }
+    .pedal.bpm .led { background: #f0c040; box-shadow: 0 0 15px rgba(240,192,64,0.3); }
+    .pedal.bpm .name { color: #f0c040; }
+    .pedal.bpm.on { border-color: #f0c040; box-shadow: 0 6px 0 #060a12, 0 0 30px rgba(240,192,64,0.4); }
+    .pedal.bpm.on .led { background: #f0c040; box-shadow: 0 0 25px rgba(240,192,64,0.7); }
+    .pedal.bpm .status { color: #f0c040; }
+
+    @keyframes flash-update {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.03); box-shadow: 0 0 40px rgba(107,201,176,0.8); }
+      100% { transform: scale(1); }
+    }
+    .pedal.flash { animation: flash-update 0.3s ease; }
+
+    /* ------------------------------------------------------------
+       Sliders VERTICALES de parámetros (estilo ecualizador pedal Boss),
+       en la parte inferior del pedal, sutiles y compactos.
+       ------------------------------------------------------------ */
+    .pedal-params {
+      display: flex;
+      flex-direction: row;
+      gap: 4px;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      flex-shrink: 0;
+      justify-content: center;
+    }
+    .pparam-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      flex: 1;
+      min-width: 0;
+    }
+    .pparam-label {
+      font-size: 0.5rem;
+      font-weight: 600;
+      color: #5a6a80;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      max-width: 100%;
+      order: 3;
     }
-    .effect-group {
-      font-size: 0.62rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      opacity: 0.7;
+    .pparam-value {
+      font-family: monospace;
+      font-size: 0.5rem;
+      color: #4a7d70;
+      line-height: 1;
+      order: 1;
     }
-    .card-buttons {
+    .pedal.on .pparam-value { color: #6bc9b0; }
+    .pedal.on .pparam-label { color: #8fa8c8; }
+
+    .pparam-slider-wrap {
+      height: 64px;
       display: flex;
-      gap: 6px;
-      justify-content: center;
-      margin-top: 10px;
-    }
-    .card-btn {
-      background: #2a3b4c;
-      padding: 5px 9px;
-      border-radius: 60px;
-      font-size: 0.62rem;
-      font-weight: 600;
-      border: none;
-      color: white;
-      cursor: pointer;
-      transition: 0.1s;
-    }
-    .card-btn.on {
-      background: #2ecc71;
-      color: #000;
-    }
-    .card-btn.off {
-      background: #e74c3c;
-    }
-    .card-btn.change {
-      background: #3a6b9b;
-    }
-    .bottom-layout {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      align-items: stretch;
-    }
-    .params-panel {
-      background: #0f121e;
-      border-radius: 32px;
-      padding: 22px 24px 28px;
-      border: 1px solid #2a3448;
-      box-shadow: 0 12px 28px rgba(0,0,0,0.5);
-      display: flex;
-      flex-direction: column;
-    }
-    .panel-header {
-      display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    .current-effect-title {
-      font-size: 1.5rem;
-      font-weight: 600;
-      background: linear-gradient(120deg, #fff, #b0c4de);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-    .param-nav-buttons {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-    .param-nav-btn {
-      background: #2a3b4c;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 40px;
-      font-size: 1rem;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.1s;
-      color: #e2e8f0;
-    }
-    .param-nav-btn:hover {
-      background: #3a6b9b;
-      transform: scale(1.02);
-    }
-    .params-grid {
-      display: flex;
-      flex-direction: row;
-      gap: 12px;
-      align-items: flex-start;
       justify-content: center;
-      flex: 1;
+      order: 2;
+    }
+    input[type="range"].pparam-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      writing-mode: vertical-lr;
+      direction: rtl;
+      width: 14px;
+      height: 64px;
+      background: transparent;
+      outline: none;
+      cursor: pointer;
+      margin: 0;
       padding: 0;
     }
-    .param-col {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      flex: 1;
-      max-width: 80px;
+    input[type="range"].pparam-slider::-webkit-slider-runnable-track {
+      width: 3px;
+      background: #2a3448;
+      border-radius: 4px;
     }
-    .param-value {
-      font-family: monospace;
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: #6bc9b0;
-      background: #00000050;
-      padding: 3px 8px;
-      border-radius: 16px;
-      min-width: 36px;
-      text-align: center;
+    .pedal.on input[type="range"].pparam-slider::-webkit-slider-runnable-track { background: rgba(107,201,176,0.25); }
+    input[type="range"].pparam-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 11px;
+      height: 9px;
+      border-radius: 3px;
+      background: #6a7a8a;
+      cursor: pointer;
+      transition: background 0.15s;
+      margin-left: -4px;
     }
-    .param-label {
-      font-size: 0.7rem;
-      font-weight: 600;
-      color: #8f9bb5;
-      text-align: center;
-      letter-spacing: 0.5px;
+    .pedal.on input[type="range"].pparam-slider::-webkit-slider-thumb {
+      background: #6bc9b0;
+      box-shadow: 0 0 4px rgba(107,201,176,0.7);
     }
-    .vertical-slider-wrap {
-      height: 140px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-top: 0;
+    input[type="range"].pparam-slider::-moz-range-track {
+      width: 3px;
+      background: #2a3448;
+      border-radius: 4px;
     }
-    /* Toggle visual para parámetros booleanos (DETCT, Boost, Tail) */
-    .param-value.bool-value.on  { color: #6bc9b0; }
-    .param-value.bool-value.off { color: #5a6478; }
-    .bool-toggle-wrap {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .bool-toggle-btn {
-      width: 46px;
-      height: 26px;
-      border-radius: 14px;
+    .pedal.on input[type="range"].pparam-slider::-moz-range-track { background: rgba(107,201,176,0.25); }
+    input[type="range"].pparam-slider::-moz-range-thumb {
+      width: 11px;
+      height: 9px;
+      border-radius: 3px;
+      background: #6a7a8a;
       border: none;
+      cursor: pointer;
+    }
+    .pedal.on input[type="range"].pparam-slider::-moz-range-thumb { background: #6bc9b0; }
+
+    /* Toggle booleano mini vertical (DETCT, Boost, Tail) — misma altura que los sliders */
+    .pparam-bool-wrap {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      order: 2;
+    }
+    .pparam-bool-btn {
+      width: 14px;
+      height: 28px;
+      border-radius: 8px;
+      border: none;
+      background: #2a3448;
       cursor: pointer;
       position: relative;
       padding: 0;
-      transition: background 0.15s;
-      background: #2a3448;
-    }
-    .bool-toggle-btn.on {
-      background: #1e5a4a;
-      box-shadow: 0 0 8px rgba(107,201,176,0.4);
-    }
-    .bool-toggle-knob {
-      position: absolute;
-      top: 3px;
-      left: 3px;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: #5a6478;
-      transition: left 0.15s, background 0.15s;
-    }
-    .bool-toggle-btn.on .bool-toggle-knob {
-      left: 23px;
-      background: #6bc9b0;
-      box-shadow: 0 0 6px rgba(107,201,176,0.8);
-    }
-    input[type="range"].vertical {
-      -webkit-appearance: slider-vertical;
-      appearance: slider-vertical;
-      writing-mode: vertical-lr;
-      direction: rtl;
-      width: 28px;
-      height: 150px;
-      background: transparent;
-      cursor: pointer;
-      padding: 0;
       margin: 0;
+      transition: background 0.15s;
     }
-    input[type="range"].vertical::-webkit-slider-runnable-track {
-      width: 6px;
-      background: #2a3448;
-      border-radius: 10px;
-    }
-    input[type="range"].vertical::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 20px;
-      height: 20px;
+    .pparam-bool-btn.on { background: #1e5a4a; }
+    .pparam-bool-knob {
+      position: absolute;
+      bottom: 2px;
+      left: 2px;
+      width: 10px;
+      height: 10px;
       border-radius: 50%;
+      background: #6a7a8a;
+      transition: bottom 0.15s, background 0.15s;
+    }
+    .pparam-bool-btn.on .pparam-bool-knob {
+      bottom: 16px;
       background: #6bc9b0;
-      cursor: pointer;
-      box-shadow: 0 0 8px rgba(107,201,176,0.6);
-      margin-left: -7px;
     }
-    input[type="range"].vertical::-moz-range-track {
-      width: 6px;
-      background: #2a3448;
-      border-radius: 10px;
+
+    .pedal-empty-fill {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #3a4a5a;
+      font-size: 0.7rem;
     }
-    input[type="range"].vertical::-moz-range-thumb {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: #6bc9b0;
-      cursor: pointer;
-      box-shadow: 0 0 8px rgba(107,201,176,0.6);
-      border: none;
-    }
-    .no-selection {
+
+    .footer {
       text-align: center;
-      padding: 48px;
-      color: #6f7c91;
+      font-size: 0.7rem;
+      color: #3a4a5a;
+      margin-top: 8px;
+      letter-spacing: 0.5px;
     }
+
+    /* ============================================================
+       PANEL LATERAL (presets / backing tracks / file manager)
+       reutilizado del editor, estética ajustada al visor
+       ============================================================ */
     .side-panel {
-      background: #0d1020;
-      border-radius: 32px;
-      border: 1px solid #1e2a3a;
-      box-shadow: 0 12px 28px rgba(0,0,0,0.4);
+      background: #141a28;
+      border-radius: 28px;
+      border: 1px solid #2a3a50;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.6);
       display: flex;
       flex-direction: column;
-      min-height: 260px;
+      min-height: 220px;
       overflow: hidden;
+      margin-bottom: 20px;
     }
     .zone-tabs {
       display: flex;
       gap: 0;
-      border-bottom: 1px solid #1e2a3a;
-      background: #080c16;
-      border-radius: 32px 32px 0 0;
+      border-bottom: 1px solid #2a3a50;
+      background: #0c101e;
+      border-radius: 28px 28px 0 0;
       overflow: hidden;
     }
     .zone-tab {
@@ -391,777 +522,352 @@
       font-weight: 700;
       letter-spacing: 0.5px;
       text-transform: uppercase;
-      color: #4a5a72;
+      color: #5a6a80;
       background: transparent;
       border: none;
       cursor: pointer;
       transition: all 0.15s;
       border-bottom: 2px solid transparent;
     }
-    .zone-tab:hover { color: #8fa8c8; background: #0f1528; }
-    .zone-tab.active {
-      color: #6bc9b0;
-      border-bottom-color: #6bc9b0;
-      background: #0d1020;
-    }
-    .zone-body {
-      flex: 1;
-      padding: 18px 20px;
-      overflow-y: auto;
-    }
-    .zone-section { display: none; height: 100%; }
+    .zone-tab:hover { color: #8fa8c8; background: #11182a; }
+    .zone-tab.active { color: #6bc9b0; border-bottom-color: #6bc9b0; background: #141a28; }
+    .zone-body { flex: 1; padding: 16px 20px; overflow-y: auto; max-height: 320px; }
+    .zone-section { display: none; }
     .zone-section.active { display: flex; flex-direction: column; gap: 12px; }
 
-    .presets-toolbar {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-    .presets-toolbar span {
-      font-size: 0.7rem;
-      color: #4a6080;
-      flex: 1;
-    }
+    .presets-toolbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .presets-toolbar span { font-size: 0.7rem; color: #4a6080; flex: 1; }
     .presets-scan-btn, .presets-nav-btn {
-      background: #1a2a3c;
-      border: 1px solid #2a3d5a;
-      border-radius: 20px;
-      padding: 6px 14px;
-      font-size: 0.72rem;
-      font-weight: 600;
-      color: #8fa8c8;
-      cursor: pointer;
-      transition: 0.1s;
-      white-space: nowrap;
+      background: #1a2a3c; border: 1px solid #2a3d5a; border-radius: 20px;
+      padding: 6px 14px; font-size: 0.72rem; font-weight: 600; color: #8fa8c8;
+      cursor: pointer; transition: 0.1s; white-space: nowrap;
     }
-    .presets-scan-btn:hover:not(:disabled), .presets-nav-btn:hover {
-      border-color: #6bc9b0;
-      color: #6bc9b0;
-    }
+    .presets-scan-btn:hover:not(:disabled), .presets-nav-btn:hover { border-color: #6bc9b0; color: #6bc9b0; }
     .presets-scan-btn:disabled { opacity: 0.4; cursor: default; }
-    .presets-progress-wrap {
-      display: none;
-      align-items: center;
-      gap: 8px;
-      width: 100%;
-    }
+    .presets-progress-wrap { display: none; align-items: center; gap: 8px; width: 100%; }
     .presets-progress-wrap.visible { display: flex; }
-    .presets-progress-track {
-      flex: 1;
-      height: 4px;
-      background: #1e2a3a;
-      border-radius: 10px;
-      overflow: hidden;
-    }
-    .presets-progress-fill {
-      height: 100%;
-      background: #6bc9b0;
-      border-radius: 10px;
-      width: 0%;
-      transition: width 0.15s;
-    }
-    .presets-progress-text {
-      font-size: 0.65rem;
-      font-family: monospace;
-      color: #4a6080;
-      white-space: nowrap;
-    }
+    .presets-progress-track { flex: 1; height: 4px; background: #1e2a3a; border-radius: 10px; overflow: hidden; }
+    .presets-progress-fill { height: 100%; background: #6bc9b0; border-radius: 10px; width: 0%; transition: width 0.15s; }
+    .presets-progress-text { font-size: 0.65rem; font-family: monospace; color: #4a6080; white-space: nowrap; }
     .presets-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 3px;
-      max-height: 230px;
-      overflow-y: auto;
-      padding-right: 4px;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px;
+      max-height: 230px; overflow-y: auto; padding-right: 4px;
     }
     .presets-grid::-webkit-scrollbar { width: 4px; }
     .presets-grid::-webkit-scrollbar-track { background: #0d1020; }
     .presets-grid::-webkit-scrollbar-thumb { background: #2a3d5a; border-radius: 4px; }
     .preset-item {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      padding: 6px 8px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: 0.1s;
-      border: 1px solid transparent;
-      min-width: 0;
+      display: flex; align-items: center; gap: 5px; padding: 6px 8px; border-radius: 8px;
+      cursor: pointer; transition: 0.1s; border: 1px solid transparent; min-width: 0;
     }
     .preset-item:hover { background: #111828; border-color: #2a3d5a; }
     .preset-item.selected { background: #0d1f30; border-color: #6bc9b0; }
-    .preset-num {
-      font-family: monospace;
-      font-size: 0.68rem;
-      color: #f0c040;
-      min-width: 24px;
-      flex-shrink: 0;
-    }
-    .preset-name {
-      font-size: 0.82rem;
-      color: #c8daf0;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .presets-empty {
-      text-align: center;
-      padding: 32px;
-      color: #2a3d5a;
-      font-size: 0.75rem;
-      grid-column: 1/-1;
-    }
+    .preset-num { font-family: monospace; font-size: 0.68rem; color: #f0c040; min-width: 24px; flex-shrink: 0; }
+    .preset-name-text { font-size: 0.82rem; color: #c8daf0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .presets-empty { text-align: center; padding: 32px; color: #2a3d5a; font-size: 0.75rem; grid-column: 1/-1; }
 
     .audio-drop-zone {
-      border: 2px dashed #2a3d5a;
-      border-radius: 20px;
-      padding: 20px;
-      text-align: center;
-      color: #3a5070;
-      font-size: 0.78rem;
-      cursor: pointer;
-      transition: 0.15s;
-      position: relative;
+      border: 2px dashed #2a3d5a; border-radius: 20px; padding: 20px; text-align: center;
+      color: #3a5070; font-size: 0.78rem; cursor: pointer; transition: 0.15s; position: relative;
     }
-    .audio-drop-zone:hover, .audio-drop-zone.drag-over {
-      border-color: #6bc9b0;
-      color: #6bc9b0;
-      background: #0a1520;
-    }
-    .audio-drop-zone input[type="file"] {
-      position: absolute;
-      inset: 0;
-      opacity: 0;
-      cursor: pointer;
-    }
-    .audio-controls {
-      background: #080c16;
-      border-radius: 20px;
-      padding: 14px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .audio-now-playing {
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: #e2e8f0;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      text-align: center;
-    }
-    .audio-progress-wrap {
-      position: relative;
-      height: 4px;
-      background: #1e2a3a;
-      border-radius: 10px;
-      cursor: pointer;
-    }
-    .audio-progress-bar {
-      height: 100%;
-      background: #6bc9b0;
-      border-radius: 10px;
-      width: 0%;
-      transition: width 0.3s linear;
-      pointer-events: none;
-    }
-    .audio-time-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.65rem;
-      color: #4a6080;
-      font-family: monospace;
-    }
-    .audio-btn-row {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 12px;
-    }
+    .audio-drop-zone:hover, .audio-drop-zone.drag-over { border-color: #6bc9b0; color: #6bc9b0; background: #0a1520; }
+    .audio-drop-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .audio-controls { background: #0c101e; border-radius: 20px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+    .audio-now-playing { font-size: 0.82rem; font-weight: 600; color: #e2e8f0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; }
+    .audio-progress-wrap { position: relative; height: 4px; background: #1e2a3a; border-radius: 10px; cursor: pointer; }
+    .audio-progress-bar { height: 100%; background: #6bc9b0; border-radius: 10px; width: 0%; transition: width 0.3s linear; pointer-events: none; }
+    .audio-time-row { display: flex; justify-content: space-between; font-size: 0.65rem; color: #4a6080; font-family: monospace; }
+    .audio-btn-row { display: flex; justify-content: center; align-items: center; gap: 12px; }
     .audio-btn {
-      background: #1a2a3c;
-      border: 1px solid #2a3d5a;
-      border-radius: 50%;
-      width: 36px;
-      height: 36px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: 0.1s;
-      color: #e2e8f0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      background: #1a2a3c; border: 1px solid #2a3d5a; border-radius: 50%; width: 36px; height: 36px;
+      font-size: 1rem; cursor: pointer; transition: 0.1s; color: #e2e8f0; display: flex; align-items: center; justify-content: center;
     }
     .audio-btn:hover { background: #243550; border-color: #6bc9b0; }
     .audio-btn.play-pause { width: 44px; height: 44px; font-size: 1.2rem; background: #6bc9b0; border-color: #6bc9b0; color: #060910; }
     .audio-btn.play-pause:hover { background: #4da98e; }
-    .audio-vol-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.7rem;
-      color: #4a6080;
-    }
-    .audio-vol-row input[type="range"] {
-      flex: 1;
-      height: 4px;
-      -webkit-appearance: none;
-      background: #1e2a3a;
-      border-radius: 10px;
-      outline: none;
-    }
-    .audio-vol-row input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 12px; height: 12px;
-      border-radius: 50%;
-      background: #6bc9b0;
-      cursor: pointer;
-    }
-    .audio-playlist {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      max-height: 130px;
-      overflow-y: auto;
-    }
-    .audio-track {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 10px;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: 0.1s;
-      font-size: 0.75rem;
-      color: #8fa8c8;
-    }
+    .audio-vol-row { display: flex; align-items: center; gap: 8px; font-size: 0.7rem; color: #4a6080; }
+    .audio-vol-row input[type="range"] { flex: 1; height: 4px; -webkit-appearance: none; background: #1e2a3a; border-radius: 10px; outline: none; }
+    .audio-vol-row input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: #6bc9b0; cursor: pointer; }
+    .audio-playlist { display: flex; flex-direction: column; gap: 4px; max-height: 130px; overflow-y: auto; }
+    .audio-track { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 12px; cursor: pointer; transition: 0.1s; font-size: 0.75rem; color: #8fa8c8; }
     .audio-track:hover { background: #111828; color: #e2e8f0; }
     .audio-track.playing { background: #0d1f30; color: #6bc9b0; font-weight: 600; }
     .audio-track-num { width: 18px; text-align: right; color: #3a5070; font-size: 0.65rem; font-family: monospace; }
     .audio-track-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .audio-track-dur { color: #3a5070; font-size: 0.65rem; font-family: monospace; }
 
-    .empty-zone {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      color: #4a6080;
-      font-size: 0.85rem;
-      text-align: center;
-      padding: 32px;
-    }
-    .fm-section {
-      background: #080c16;
-      border-radius: 16px;
-      padding: 14px 16px;
-      border: 1px solid #1a2a3a;
-    }
-    .fm-section-title {
-      font-size: 0.65rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      color: #3a5a7a;
-      margin-bottom: 10px;
-    }
-    .fm-btn-row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
+    .fm-section { background: #0c101e; border-radius: 16px; padding: 14px 16px; border: 1px solid #1a2a3a; }
+    .fm-section-title { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #3a5a7a; margin-bottom: 10px; }
+    .fm-btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
     .fm-btn {
-      background: #1a2a3c;
+      background: #1a2a3c; border: 1px solid #2a3d5a; border-radius: 20px; padding: 7px 14px;
+      font-size: 0.72rem; font-weight: 600; color: #8fa8c8; cursor: pointer; transition: 0.15s;
+      white-space: nowrap; display: flex; align-items: center; gap: 5px;
+    }
+    .fm-btn:hover:not(:disabled) { border-color: #6bc9b0; color: #6bc9b0; background: #0d1a2a; }
+    .fm-btn:disabled { opacity: 0.35; cursor: default; }
+    .fm-btn.primary-action { background: #1a3a2c; border-color: #2c6e5c; color: #6bc9b0; }
+    .fm-btn.primary-action:hover:not(:disabled) { background: #1e4a38; border-color: #6bc9b0; }
+    .fm-status-bar { font-size: 0.68rem; color: #4a6080; margin-top: 8px; min-height: 16px; font-family: monospace; padding: 0 2px; }
+    .fm-status-bar.ok { color: #6bc9b0; }
+    .fm-status-bar.err { color: #e74c3c; }
+    .fm-status-bar.warn { color: #e9a23b; }
+    .fm-backup-list { display: flex; flex-direction: column; gap: 4px; max-height: 110px; overflow-y: auto; margin-top: 8px; }
+    .fm-backup-item { display: flex; align-items: center; gap: 8px; padding: 5px 10px; border-radius: 10px; background: #0d1828; border: 1px solid #1a2a3a; font-size: 0.68rem; }
+    .fm-backup-item-name { flex: 1; color: #c8daf0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .fm-backup-item-date { color: #3a5070; font-family: monospace; font-size: 0.62rem; white-space: nowrap; }
+    .fm-backup-item-btn { background: #1a2a3c; border: 1px solid #2a3d5a; border-radius: 12px; padding: 2px 8px; font-size: 0.6rem; font-weight: 600; color: #8fa8c8; cursor: pointer; transition: 0.1s; }
+    .fm-backup-item-btn:hover { border-color: #6bc9b0; color: #6bc9b0; }
+    .fm-backup-item-btn.del:hover { border-color: #e74c3c; color: #e74c3c; }
+    .fm-progress-wrap { display: flex; align-items: center; gap: 8px; }
+    .fm-progress-track { background: #0d1828; border-radius: 6px; height: 6px; overflow: hidden; flex: 1; }
+    .fm-progress-fill { height: 100%; background: linear-gradient(90deg, #2c6e5c, #6bc9b0); border-radius: 6px; width: 0%; transition: width 0.2s; }
+    .fm-progress-text { font-size: 0.62rem; font-family: monospace; color: #4a7090; white-space: nowrap; }
+    .fm-slot-input {
+      width: 90px;
+      background: #0d1828;
       border: 1px solid #2a3d5a;
       border-radius: 20px;
       padding: 7px 14px;
-      font-size: 0.72rem;
+      font-size: 0.82rem;
       font-weight: 600;
-      color: #8fa8c8;
-      cursor: pointer;
-      transition: 0.15s;
-      white-space: nowrap;
-      display: flex;
-      align-items: center;
-      gap: 5px;
+      color: #eef2ff;
+      text-align: center;
+      outline: none;
+      transition: border-color 0.15s;
     }
-    .fm-btn:hover:not(:disabled) {
-      border-color: #6bc9b0;
-      color: #6bc9b0;
-      background: #0d1a2a;
-    }
-    .fm-btn:disabled { opacity: 0.35; cursor: default; }
-    .fm-btn.danger:hover:not(:disabled) {
-      border-color: #e74c3c;
-      color: #e74c3c;
-    }
-    .fm-btn.primary-action {
-      background: #1a3a2c;
-      border-color: #2c6e5c;
-      color: #6bc9b0;
-    }
-    .fm-btn.primary-action:hover:not(:disabled) {
-      background: #1e4a38;
-      border-color: #6bc9b0;
-    }
-    .fm-status-bar {
-      font-size: 0.68rem;
-      color: #4a6080;
+    .fm-slot-input:focus { border-color: #6bc9b0; }
+    .fm-debug-log {
       margin-top: 8px;
-      min-height: 16px;
-      font-family: monospace;
-      padding: 0 2px;
-    }
-    .fm-status-bar.ok   { color: #6bc9b0; }
-    .fm-status-bar.err  { color: #e74c3c; }
-    .fm-status-bar.warn { color: #e9a23b; }
-    .fm-backup-list {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      max-height: 110px;
+      max-height: 130px;
       overflow-y: auto;
-      margin-top: 8px;
-    }
-    .fm-backup-list::-webkit-scrollbar { width: 4px; }
-    .fm-backup-list::-webkit-scrollbar-track { background: #0d1020; }
-    .fm-backup-list::-webkit-scrollbar-thumb { background: #2a3d5a; border-radius: 4px; }
-    .fm-backup-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 5px 10px;
-      border-radius: 10px;
-      background: #0d1828;
+      background: #060a12;
       border: 1px solid #1a2a3a;
-      font-size: 0.68rem;
-    }
-    .fm-backup-item-name {
-      flex: 1;
-      color: #c8daf0;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .fm-backup-item-date {
-      color: #3a5070;
-      font-family: monospace;
-      font-size: 0.62rem;
-      white-space: nowrap;
-    }
-    .fm-backup-item-btn {
-      background: #1a2a3c;
-      border: 1px solid #2a3d5a;
-      border-radius: 12px;
-      padding: 2px 8px;
-      font-size: 0.6rem;
-      font-weight: 600;
-      color: #8fa8c8;
-      cursor: pointer;
-      transition: 0.1s;
-    }
-    .fm-backup-item-btn:hover { border-color: #6bc9b0; color: #6bc9b0; }
-    .fm-backup-item-btn.del:hover { border-color: #e74c3c; color: #e74c3c; }
-    .fm-separator {
-      height: 1px;
-      background: #1a2a3a;
-      margin: 2px 0;
-    }
-    .fm-progress-track {
-      background: #0d1828;
-      border-radius: 6px;
-      height: 6px;
-      overflow: hidden;
-      flex: 1;
-    }
-    .fm-progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #2c6e5c, #6bc9b0);
-      border-radius: 6px;
-      width: 0%;
-      transition: width 0.2s;
-    }
-    .fm-progress-wrap {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .fm-progress-text {
-      font-size: 0.62rem;
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 0.65rem;
       font-family: monospace;
       color: #4a7090;
-      white-space: nowrap;
+      line-height: 1.5;
     }
+    .fm-debug-log div { white-space: pre-wrap; word-break: break-word; }
 
+    /* ============================================================
+       MODALES
+       ============================================================ */
     .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.8);
-      backdrop-filter: blur(8px);
-      z-index: 1000;
-      justify-content: center;
-      align-items: center;
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 1000;
+      justify-content: center; align-items: center;
     }
     .modal-content {
-      background: #0f121e;
-      border-radius: 32px;
-      width: 90%;
-      max-width: 900px;
-      max-height: 80vh;
-      overflow-y: auto;
-      padding: 24px;
-      border: 1px solid #3a4a6a;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      background: #141a28; border-radius: 28px; width: 90%; max-width: 900px; max-height: 80vh;
+      overflow-y: auto; padding: 24px; border: 1px solid #2a3a50; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
     }
-    .modal-header {
-      font-size: 1.6rem;
-      font-weight: bold;
-      margin-bottom: 24px;
-      text-align: center;
-    }
-    .effect-group-list {
-      margin-bottom: 28px;
-    }
-    .group-title {
-      font-size: 1.2rem;
-      font-weight: 600;
-      margin: 16px 0 12px 0;
-      padding-bottom: 6px;
-      border-bottom: 2px solid currentColor;
-      display: inline-block;
-    }
-    .effect-items {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
+    .modal-header { font-size: 1.5rem; font-weight: bold; margin-bottom: 22px; text-align: center; color: #eef2ff; }
+    .effect-group-list { margin-bottom: 24px; }
+    .group-title { font-size: 1.1rem; font-weight: 600; margin: 14px 0 10px 0; padding-bottom: 6px; border-bottom: 2px solid currentColor; display: inline-block; }
+    .effect-items { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
     .effect-item {
-      background: #1a1f2e;
-      padding: 8px 16px;
-      border-radius: 40px;
-      cursor: pointer;
-      transition: 0.1s;
-      font-size: 0.9rem;
-      border: 1px solid #3a4a6a;
+      background: #1a1f2e; padding: 8px 16px; border-radius: 40px; cursor: pointer;
+      transition: 0.1s; font-size: 0.88rem; border: 1px solid #2a3a50; color: #eef2ff;
     }
-    .effect-item:hover {
-      transform: scale(1.02);
-      filter: brightness(1.2);
-    }
-    button.tap-tempo {
-      background: #1e293b;
-      border: 2px solid #3a4a6a;
-      color: #e2e8f0;
-      font-size: 0.78rem;
-      padding: 8px 14px;
-      transition: all 0.1s;
-      user-select: none;
-      min-width: 90px;
-    }
-    button.tap-tempo:active {
-      background: #2a4060;
-      transform: scale(0.96);
-    }
-    button.tap-tempo.flash {
-      background: #2c6e5c;
-      border-color: #6bc9b0;
-      box-shadow: 0 0 10px rgba(107,201,176,0.4);
-    }
-    .tap-bpm-display {
-      font-size: 1.1rem;
+    .effect-item:hover { transform: scale(1.02); filter: brightness(1.2); }
+    .effect-item-cost {
+      font-size: 0.7rem;
       font-weight: 700;
-      color: #6bc9b0;
-      font-family: monospace;
-      letter-spacing: 1px;
+      opacity: 0.75;
+      margin-left: 4px;
     }
-    .tap-bpm-label {
-      font-size: 0.62rem;
-      color: #8f9bb5;
-      text-transform: uppercase;
-      letter-spacing: 1px;
+    .effect-item-disabled {
+      opacity: 0.32;
+      cursor: not-allowed;
+      filter: grayscale(0.6);
     }
-    .tap-group {
+    .effect-item-disabled:hover { transform: none; filter: grayscale(0.6); }
+    .dsp-budget-bar {
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2px;
+      justify-content: space-between;
+      gap: 16px;
+      background: #0c101e;
+      border: 1px solid #2a3a50;
+      border-radius: 16px;
+      padding: 10px 16px;
+      margin-bottom: 18px;
+      font-size: 0.82rem;
+      color: #8fa8c8;
+      flex-wrap: wrap;
     }
-    .bpm-wrapper {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: #11141f;
-      border: 1px solid #2a3448;
-      border-radius: 24px;
-      padding: 8px 14px;
-    }
-    button.tuner-btn {
-      background: #1e293b;
-      border: 2px solid #3a4a6a;
-      color: #e2e8f0;
-      font-size: 0.78rem;
-      padding: 8px 14px;
-      transition: all 0.15s;
-      user-select: none;
-    }
-    button.tuner-btn:hover {
-      border-color: #6bc9b0;
-      background: #1a2a3a;
-    }
+    .dsp-budget-bar strong { color: #6bc9b0; }
+    .close-modal { background: #1a2a3c; border: 1px solid #2a3d5a; color: #8fa8c8; margin-top: 16px; width: 100%; padding: 10px; border-radius: 40px; font-size: 0.9rem; cursor: pointer; }
+    .close-modal:hover { border-color: #6bc9b0; color: #6bc9b0; }
+
     .tuner-modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.85);
-      backdrop-filter: blur(10px);
-      z-index: 2000;
-      justify-content: center;
-      align-items: center;
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
+      z-index: 2000; justify-content: center; align-items: center;
     }
     .tuner-content {
-      background: #0d1020;
-      border-radius: 32px;
-      border: 1px solid #2a3d5a;
-      padding: 36px 48px;
-      text-align: center;
-      min-width: 340px;
-      box-shadow: 0 24px 60px rgba(0,0,0,0.7);
+      background: #141a28; border-radius: 28px; border: 1px solid #2a3a50; padding: 32px 44px;
+      text-align: center; min-width: 320px; box-shadow: 0 24px 60px rgba(0,0,0,0.7);
     }
-    .tuner-title {
-      font-size: 1rem;
-      font-weight: 600;
-      color: #8f9bb5;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      margin-bottom: 28px;
-    }
-    .tuner-note {
-      font-size: 5rem;
-      font-weight: 800;
-      color: #fff;
-      line-height: 1;
-      margin-bottom: 6px;
-      font-family: monospace;
-    }
-    .tuner-octave {
-      font-size: 1.2rem;
-      color: #6bc9b0;
-      margin-bottom: 24px;
-    }
-    .tuner-cents {
-      font-size: 1rem;
-      color: #8f9bb5;
-      margin-bottom: 16px;
-      font-family: monospace;
-    }
-    .tuner-bar-wrap {
-      position: relative;
-      height: 12px;
-      background: #1a2338;
-      border-radius: 10px;
-      margin: 0 auto 24px;
-      width: 100%;
-      overflow: visible;
-    }
-    .tuner-bar-center {
-      position: absolute;
-      left: 50%;
-      top: -4px;
-      width: 2px;
-      height: 20px;
-      background: #3a4a6a;
-      transform: translateX(-50%);
-    }
+    .tuner-title { font-size: 0.95rem; font-weight: 600; color: #8f9bb5; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 24px; }
+    .tuner-note { font-size: 4.5rem; font-weight: 800; color: #fff; line-height: 1; margin-bottom: 6px; font-family: monospace; }
+    .tuner-octave { font-size: 1.1rem; color: #6bc9b0; margin-bottom: 22px; }
+    .tuner-cents { font-size: 0.95rem; color: #8f9bb5; margin-bottom: 14px; font-family: monospace; }
+    .tuner-bar-wrap { position: relative; height: 12px; background: #1a2338; border-radius: 10px; margin: 0 auto 22px; width: 100%; overflow: visible; }
+    .tuner-bar-center { position: absolute; left: 50%; top: -4px; width: 2px; height: 20px; background: #3a4a6a; transform: translateX(-50%); }
     .tuner-needle {
-      position: absolute;
-      top: 50%;
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: #6bc9b0;
-      transform: translate(-50%, -50%);
-      left: 50%;
-      box-shadow: 0 0 10px rgba(107,201,176,0.7);
-      transition: left 0.12s ease, background 0.2s;
+      position: absolute; top: 50%; width: 16px; height: 16px; border-radius: 50%; background: #6bc9b0;
+      transform: translate(-50%, -50%); left: 50%; box-shadow: 0 0 10px rgba(107,201,176,0.7); transition: left 0.12s ease, background 0.2s;
     }
-    .tuner-needle.in-tune {
-      background: #2ecc71;
-      box-shadow: 0 0 18px rgba(46,204,113,0.8);
+    .tuner-needle.in-tune { background: #2ecc71; box-shadow: 0 0 18px rgba(46,204,113,0.8); }
+    .tuner-needle.out-of-tune { background: #e74c3c; box-shadow: 0 0 10px rgba(231,76,60,0.6); }
+    .tuner-freq { font-size: 0.78rem; color: #4c5670; margin-bottom: 22px; font-family: monospace; }
+    .tuner-close { background: #1a2a3c; border: 1px solid #2a3d5a; color: #8fa8c8; padding: 9px 26px; border-radius: 40px; font-size: 0.88rem; cursor: pointer; }
+    .tuner-close:hover { border-color: #6bc9b0; color: #6bc9b0; }
+
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+    @media (max-width: 1100px) {
+      .pedalboard { gap: 8px; padding: 16px 10px; flex-wrap: wrap; }
+      .pedal { flex: 1 1 30%; min-width: 140px; }
+      .pedal .name { font-size: 1rem; }
+      .preset-number { font-size: 2rem; min-width: 70px; }
+      .preset-name { font-size: 1.8rem; }
     }
-    .tuner-needle.out-of-tune {
-      background: #e74c3c;
-      box-shadow: 0 0 10px rgba(231,76,60,0.6);
-    }
-    .tuner-freq {
-      font-size: 0.8rem;
-      color: #4c5670;
-      margin-bottom: 24px;
-      font-family: monospace;
-    }
-    .tuner-close {
-      background: #2a3b4c;
-      border: none;
-      color: #e2e8f0;
-      padding: 10px 28px;
-      border-radius: 40px;
-      font-size: 0.9rem;
-      cursor: pointer;
-    }
-    .close-modal {
-      background: #3a4a6a;
-      margin-top: 20px;
-      width: 100%;
-    }
-    footer {
-      margin-top: 40px;
-      text-align: center;
-      font-size: 0.7rem;
-      color: #4c5670;
+    @media (max-width: 700px) {
+      .pedalboard { padding: 12px 8px; }
+      .pedal { flex: 1 1 45%; }
+      .concert-header { padding: 10px 14px; }
+      .preset-number { font-size: 1.6rem; min-width: 60px; }
+      .preset-name { font-size: 1.4rem; }
     }
   </style>
 </head>
 <body>
 <div class="container">
-  <div class="top-bar">
-    <div class="preset-nav-bar">
-      <button class="preset-nav-btn" id="topPrevBtn" title="Preset anterior" disabled>◀</button>
-      <button class="preset-nav-btn" id="topNextBtn" title="Preset siguiente" disabled>▶</button>
-      <div class="preset-slot-badge" id="topPresetSlot">—</div>
-      <div class="patch-info">
-        <div class="patch-name" id="patchName">—</div>
+
+  <!-- Cabecera -->
+  <div class="concert-header">
+    <div class="header-left">
+      <button class="nav-btn" id="prevBtn" disabled>◀ PREV</button>
+      <button class="nav-btn" id="nextBtn" disabled>NEXT ▶</button>
+      <div class="preset-number" id="presetNumber">—</div>
+      <div class="preset-name-wrapper">
+        <div class="preset-name" id="presetName" title="Click para renombrar">—</div>
       </div>
     </div>
-
-    <div class="bpm-wrapper">
-      <div class="tap-group">
-        <div class="tap-bpm-display" id="bpmDisplay">120</div>
-        <div class="tap-bpm-label">BPM</div>
+    <div class="header-right">
+      <input type="number" class="goto-input" id="gotoInput" min="1" max="300" placeholder="Nº" title="Número de preset">
+      <button class="goto-btn" id="gotoBtn">GO</button>
+      <div class="bpm-wrapper">
+        <div class="tap-group">
+          <div class="tap-bpm-display" id="bpmDisplay">120</div>
+          <div class="tap-bpm-label">BPM</div>
+        </div>
+        <button id="tapTempoBtn" type="button" class="tap-tempo">🥁 TAP</button>
+        <button id="tunerBtn" type="button" class="tuner-btn">🎸 Afinador</button>
       </div>
-      <button id="tapTempoBtn" type="button" class="tap-tempo">🥁 TAP</button>
-      <button id="tunerBtn" type="button" class="tuner-btn">🎸 Afinador</button>
-    </div>
-
-    <div class="button-group" style="display:flex;gap:10px;align-items:center;">
-      <div id="midiStatus" style="font-size:0.7rem; color:#6bc9b0;">⚫ No conectado</div>
-      <button id="topSaveBtn" style="background:#1a3a2c;border:1px solid #2c6e5c;color:#6bc9b0;border-radius:20px;padding:8px 16px;font-size:0.78rem;font-weight:600;cursor:pointer;" disabled title="Guardar cambios del preset actual en la pedalera">💾 SAVE</button>
-      <div id="autoSaveWrap" style="display:flex;flex-direction:column;align-items:center;gap:3px;opacity:0.3;" title="Estado del autosave en la pedalera">
-        <div id="autoSaveLed" style="width:10px;height:10px;border-radius:50%;background:#5a6478;box-shadow:none;transition:background 0.2s,box-shadow 0.2s;"></div>
-        <span id="autoSaveLabel" style="font-size:0.55rem;font-weight:700;color:#5a6478;letter-spacing:0.5px;">AUTO</span>
+      <button class="nav-btn save-btn" id="saveBtn">💾 SAVE</button>
+      <div class="midi-indicator">
+        <span class="midi-dot" id="midiDot"></span>
+        <span class="midi-label" id="midiLabel">MIDI</span>
       </div>
     </div>
   </div>
 
-  <div id="effectsStrip" class="effects-strip"></div>
-  <div class="bottom-layout">
-    <div id="paramsPanel" class="params-panel"></div>
-    <div class="side-panel" id="sidePanel">
-      <div class="zone-tabs">
-        <button type="button" class="zone-tab active" data-zone="presets">📋 PRESETS</button>
-        <button type="button" class="zone-tab" data-zone="audio">🎵 BACKING TRACKS MP3</button>
-        <button type="button" class="zone-tab" data-zone="filemanager">📁 FILES MANAGER</button>
+  <!-- Pedalboard -->
+  <div class="pedalboard" id="pedalboard"></div>
+
+  <!-- Panel lateral: presets / backing tracks / file manager -->
+  <div class="side-panel" id="sidePanel">
+    <div class="zone-tabs">
+      <button type="button" class="zone-tab active" data-zone="presets">📋 PRESETS</button>
+      <button type="button" class="zone-tab" data-zone="audio">🎵 BACKING TRACKS MP3</button>
+      <button type="button" class="zone-tab" data-zone="filemanager">📁 FILES MANAGER</button>
+    </div>
+    <div class="zone-body">
+      <div class="zone-section active" id="zone-presets">
+        <div class="presets-toolbar">
+          <button type="button" class="presets-nav-btn" id="presetPrevBtn">◀ PREV</button>
+          <button type="button" class="presets-nav-btn" id="presetNextBtn">NEXT ▶</button>
+          <button type="button" class="presets-scan-btn" id="presetsScanBtn">⟳ SCAN PRESETS</button>
+          <span id="presetsStatus">Conecta MIDI y pulsa Escanear</span>
+        </div>
+        <div class="presets-progress-wrap" id="presetsProgressWrap">
+          <div class="presets-progress-track"><div class="presets-progress-fill" id="presetsProgressFill"></div></div>
+          <span class="presets-progress-text" id="presetsProgressText">0 / 0</span>
+        </div>
+        <div class="presets-grid" id="presetsGrid">
+          <div class="presets-empty">Sin presets cargados aún</div>
+        </div>
       </div>
-      <div class="zone-body">
-        <div class="zone-section active" id="zone-presets">
-          <div class="presets-toolbar">
-            <button type="button" class="presets-nav-btn" id="presetPrevBtn">◀ PREV</button>
-            <button type="button" class="presets-nav-btn" id="presetNextBtn">NEXT ▶</button>
-            <button type="button" class="presets-scan-btn" id="presetsScanBtn">⟳ SCAN PRESETS</button>
-            <span id="presetsStatus">Conecta MIDI y pulsa Escanear</span>
+
+      <div class="zone-section" id="zone-audio">
+        <div class="audio-drop-zone" id="audioDropZone">
+          <input type="file" id="audioFileInput" accept="audio/*" multiple>
+          🎵 Arrastra MP3/WAV aquí o haz click para seleccionar
+        </div>
+        <div class="audio-controls" id="audioControls" style="display:none">
+          <div class="audio-now-playing" id="audioNowPlaying">—</div>
+          <div class="audio-progress-wrap" id="audioProgressWrap">
+            <div class="audio-progress-bar" id="audioProgressBar"></div>
           </div>
-          <div class="presets-progress-wrap" id="presetsProgressWrap">
-            <div class="presets-progress-track">
-              <div class="presets-progress-fill" id="presetsProgressFill"></div>
-            </div>
-            <span class="presets-progress-text" id="presetsProgressText">0 / 0</span>
+          <div class="audio-time-row">
+            <span id="audioTimeCur">0:00</span>
+            <span id="audioTimeTot">0:00</span>
           </div>
-          <div class="presets-grid" id="presetsGrid">
-            <div class="presets-empty">Sin presets cargados aún</div>
+          <div class="audio-btn-row">
+            <button type="button" class="audio-btn" id="audioPrevBtn" title="PREV">⏮</button>
+            <button type="button" class="audio-btn play-pause" id="audioPlayBtn" title="Play/Pause">▶</button>
+            <button type="button" class="audio-btn" id="audioNextBtn" title="NEXT">⏭</button>
+          </div>
+          <div class="audio-vol-row">
+            🔈 <input type="range" id="audioVol" min="0" max="1" step="0.01" value="0.8"> 🔊
           </div>
         </div>
+        <div class="audio-playlist" id="audioPlaylist"></div>
+      </div>
 
-        <div class="zone-section" id="zone-audio">
-          <div class="audio-drop-zone" id="audioDropZone">
-            <input type="file" id="audioFileInput" accept="audio/*" multiple>
-            🎵 Arrastra MP3/WAV aquí o haz click para seleccionar
+      <div class="zone-section" id="zone-filemanager">
+        <div class="fm-section">
+          <div class="fm-section-title">📤 Guardar preset actual a archivo</div>
+          <div class="fm-btn-row">
+            <button type="button" class="fm-btn primary-action" id="fmSaveAsZptcBtn">💾 SAVE AS ZPTC</button>
           </div>
-          <div class="audio-controls" id="audioControls" style="display:none">
-            <div class="audio-now-playing" id="audioNowPlaying">—</div>
-            <div class="audio-progress-wrap" id="audioProgressWrap">
-              <div class="audio-progress-bar" id="audioProgressBar"></div>
-            </div>
-            <div class="audio-time-row">
-              <span id="audioTimeCur">0:00</span>
-              <span id="audioTimeTot">0:00</span>
-            </div>
-            <div class="audio-btn-row">
-              <button type="button" class="audio-btn" id="audioPrevBtn" title="PREV">⏮</button>
-              <button type="button" class="audio-btn play-pause" id="audioPlayBtn" title="Play/Pause">▶</button>
-              <button type="button" class="audio-btn" id="audioNextBtn" title="NEXT">⏭</button>
-            </div>
-            <div class="audio-vol-row">
-              🔈 <input type="range" id="audioVol" min="0" max="1" step="0.01" value="0.8"> 🔊
-            </div>
-          </div>
-          <div class="audio-playlist" id="audioPlaylist"></div>
+          <div class="fm-status-bar" id="fmSaveAsStatus">Descarga el preset activo de la pedalera como archivo .zptc</div>
         </div>
 
-        <div class="zone-section" id="zone-filemanager">
-          <div class="fm-section">
-            <div class="fm-section-title">💾 Guardar cambios en pedalera</div>
-            <div class="fm-btn-row">
-              <button type="button" class="fm-btn primary-action" id="fmSaveToDeviceBtn">💾 Guardar en slot activo</button>
-              <button type="button" class="fm-btn" id="fmRenameBtn">✏️ Renombrar</button>
-            </div>
-            <div class="fm-status-bar" id="fmSaveStatus">Persiste el buffer de edición en el slot actual de la pedalera</div>
+        <div class="fm-section">
+          <div class="fm-section-title">📥 Cargar un .zptc en un slot de la pedalera</div>
+          <div class="fm-btn-row">
+            <button type="button" class="fm-btn primary-action" id="fmPickZptcBtn">📂 LOAD ZPTC</button>
+            <input type="number" class="fm-slot-input" id="fmSlotInput" min="1" max="300" placeholder="Slot 1-300">
+            <button type="button" class="fm-btn" id="fmUploadZptcBtn" disabled>⬆️ UPLOAD</button>
           </div>
+          <input type="file" id="fmZptcFileInput" accept=".zptc" style="display:none">
+          <div class="fm-status-bar" id="fmUploadStatus">Elige un .zptc, indica el slot destino (1-300) y pulsa Upload</div>
+          <div class="fm-debug-log" id="fmUploadDebugLog" style="display:none"></div>
+        </div>
 
-          <div class="fm-section">
-            <div class="fm-section-title">📤 Guardar preset a archivo (Save)</div>
-            <div class="fm-btn-row">
-              <button type="button" class="fm-btn primary-action" id="fmExportJsonBtn">📄 Guardar .json</button>
-              <button type="button" class="fm-btn" id="fmExportSysexBtn">🔌 Guardar .syx</button>
-            </div>
-            <div class="fm-status-bar" id="fmExportStatus">Guarda el preset activo del editor en un archivo local</div>
+        <div class="fm-section">
+          <div class="fm-section-title">🗄️ Copia de seguridad completa de la pedalera</div>
+          <div class="fm-btn-row">
+            <button type="button" class="fm-btn primary-action" id="fmBackupAllBtn">📦 BACKUP ALL ZPTC FILES</button>
           </div>
-
-          <div class="fm-section">
-            <div class="fm-section-title">📥 Cargar preset desde archivo (Load)</div>
-            <div class="fm-btn-row">
-              <button type="button" class="fm-btn primary-action" id="fmImportBtn">📂 Abrir archivo…</button>
-              <button type="button" class="fm-btn" id="fmSendToDeviceBtn" disabled>⬆️ Enviar al slot activo</button>
-            </div>
-            <input type="file" id="fmFileInput" accept=".json,.syx" style="display:none">
-            <div class="fm-status-bar" id="fmImportStatus">Carga .json o .syx y lo envía al slot seleccionado en la pedalera</div>
+          <div class="fm-progress-wrap" id="fmBackupProgressWrap" style="display:none;margin-top:6px;">
+            <div class="fm-progress-track"><div class="fm-progress-fill" id="fmBackupProgressFill"></div></div>
+            <div class="fm-progress-text" id="fmBackupProgressText">0 / 0</div>
           </div>
-
-          <div class="fm-section">
-            <div class="fm-section-title">🗄️ Copia de seguridad completa (Backup / Restore)</div>
-            <div class="fm-btn-row">
-              <button type="button" class="fm-btn primary-action" id="fmFullBackupBtn">📦 Backup todos los presets</button>
-              <button type="button" class="fm-btn" id="fmFullRestoreBtn" disabled>🔄 Restore desde backup</button>
-            </div>
-            <input type="file" id="fmRestoreFileInput" accept=".json" style="display:none">
-            <div class="fm-progress-wrap" id="fmBackupProgressWrap" style="display:none;margin-top:6px;">
-              <div class="fm-progress-track"><div class="fm-progress-fill" id="fmBackupProgressFill"></div></div>
-              <div class="fm-progress-text" id="fmBackupProgressText">0 / 0</div>
-            </div>
-            <div class="fm-status-bar" id="fmBackupStatus">Vuelca y restaura TODOS los presets de la pedalera</div>
-            <div class="fm-backup-list" id="fmBackupList">
-              <div style="color:#2a3d5a;font-size:0.68rem;padding:8px 4px;text-align:center">Sin backups en esta sesión</div>
-            </div>
-          </div>
+          <div class="fm-status-bar" id="fmBackupStatus">Descarga los 300 presets como archivos .zptc sueltos (elige carpeta una sola vez)</div>
+          <div class="fm-debug-log" id="fmBackupDebugLog" style="display:none"></div>
         </div>
       </div>
     </div>
   </div>
-  <footer>✅ Botones ON/OFF + CHANGE | Sliders verticales | Zona lateral reservada | Tap Tempo | Afinador | Valores por defecto al cambiar efecto</footer>
+
+  <div class="footer">Toca el LED para ON/OFF · Toca el nombre o ⇄ para cambiar de efecto · Sliders inferiores = parámetros · Teclas 1-7 · Flechas ← → · Nº + Enter</div>
 </div>
 
 <div id="tunerModal" class="tuner-modal">
@@ -1188,11 +894,11 @@
 </div>
 
 <script>
-  // --------------------------------------------------------------
-  // MAPA DE EFECTOS
-  // --------------------------------------------------------------
+  // ================================================================
+  // 1. MAPA DE EFECTOS Y CATEGORÍAS
+  // ================================================================
   const EFFECTS_MAP = new Map([
-    [0x00000000, "Empty (THRU)"],
+    [0x00000000, "Empty"],
     [0x01000010, "Comp"], [0x01000020, "RackComp"], [0x01000030, "GrayComp"],
     [0x01000040, "OptComp"], [0x01000050, "BlackOpt"], [0x01000060, "1176 LMT"],
     [0x01000070, "ZNR"], [0x01000080, "NoiseGate"], [0x01000090, "SlowATTCK"],
@@ -1204,7 +910,8 @@
     [0x020000D0, "ParaEQ"], [0x020000E0, "Exciter"], [0x020000F0, "Low EQ"],
     [0x02000100, "High EQ"],
     [0x03000010, "EP Drive"], [0x03000020, "RC Drive"], [0x03000030, "TS Drive"],
-    [0x03000040, "GoldDrive"], [0x03000050, "SweetDrv"], [0x03000060, "Zen O.DRV"], [0x03000058, "Overdrive"],     [0x03000070, "BG GRID"], [0x03000080, "DYN Drive"], [0x03000090, "Plus DIST"],
+    [0x03000040, "GoldDrive"], [0x03000050, "SweetDrv"], [0x03000060, "Zen O.DRV"], [0x03000058, "Over Drive"],
+    [0x03000070, "BG GRID"], [0x03000080, "DYN Drive"], [0x03000090, "Plus DIST"],
     [0x030000A0, "DIST One"], [0x030000B0, "SqueakDST"], [0x030000C0, "RedCrunch"],
     [0x030000D0, "VioletDST"], [0x030000E0, "TB MK1.5"], [0x030000F0, "OctFuzz"],
     [0x03000100, "NYC Muff"], [0x03000110, "WaveSHPR"], [0x03000120, "Razor DRV"],
@@ -1252,12 +959,35 @@
     [0x1F000010, "monolooper"]
   ]);
 
-  const SORTED_EFFECT_IDS = Array.from(EFFECTS_MAP.keys()).sort((a,b) => a - b);
-
   function getEffectName(id) {
     return EFFECTS_MAP.get(id >>> 0) ?? `0x${(id>>>0).toString(16).toUpperCase()}`;
   }
 
+  function getCategoryClass(id) {
+    const group = (id >>> 24) & 0xFF;
+    switch(group) {
+      case 0x00: return 'cat-empty';
+      case 0x01: return 'cat-dynamics';
+      case 0x02: return 'cat-filter';
+      case 0x03: return 'cat-drive';
+      case 0x04: return 'cat-amp';
+      case 0x06: return 'cat-modulation';
+      case 0x07: return 'cat-sfx';
+      case 0x08: return 'cat-delay';
+      case 0x09: return 'cat-reverb';
+      case 0x0B: return 'cat-pedal';
+      default: return '';
+    }
+  }
+
+  function getCategoryName(id) {
+    const group = (id >>> 24) & 0xFF;
+    const names = {
+      0x00: 'Empty', 0x01: 'Dynamics', 0x02: 'Filter', 0x03: 'Drive', 0x04: 'Amp',
+      0x06: 'Modulation', 0x07: 'SFX', 0x08: 'Delay', 0x09: 'Reverb', 0x0B: 'Pedal'
+    };
+    return names[group] || '';
+  }
   function getGroupColor(effectId) {
     const group = (effectId >>> 24) & 0xFF;
     switch(group) {
@@ -1274,15 +1004,190 @@
       default: return "#8f9bb5";
     }
   }
+  const SORTED_EFFECT_IDS = Array.from(EFFECTS_MAP.keys()).sort((a,b) => a - b);
 
-  function getGroupName(effectId) {
-    const group = (effectId >>> 24) & 0xFF;
-    const names = {
-      0x00: "Empty",
-      0x01: "Dynamics", 0x02: "Filter", 0x03: "Drive", 0x04: "Amp",
-      0x06: "Modulation", 0x07: "SFX", 0x08: "Delay", 0x09: "Reverb", 0x0B: "Pedal"
-    };
-    return names[group] || "Effect";
+  // --------------------------------------------------------------
+  // COSTE DE DSP/MEMORIA POR EFECTO (% del total, medido a mano con
+  // una app externa, efecto solo en un patch con el resto de slots
+  // vacíos). Por rellenar — todo a 0 hasta tener los datos reales.
+  // El G2 Four tiene un límite total de 100%.
+  // --------------------------------------------------------------
+  const DSP_LIMIT = 100;
+  const EFFECT_DSP_COST = new Map([
+    [0x01000010, 4], // Comp
+    [0x01000020, 6], // RackComp
+    [0x01000030, 16], // GrayComp
+    [0x01000040, 10], // OptComp
+    [0x01000050, 12], // BlackOpt
+    [0x01000060, 11], // 1176 LMT
+    [0x01000070, 4], // ZNR
+    [0x01000080, 5], // NoiseGate
+    [0x01000090, 4], // SlowATTCK
+    [0x010000A0, 6], // MuteSW
+    [0x02000010, 6], // AutoWah
+    [0x02000020, 6], // Reso FLTR
+    [0x02000030, 7], // LowPassFL
+    [0x02000040, 5], // CryFilter
+    [0x02000050, 9], // EG Filter
+    [0x02000060, 7], // LFO FLTR
+    [0x02000070, 7], // SeqFLTR
+    [0x02000080, 7], // RndmFLTR
+    [0x02000090, 6], // StepFLTR
+    [0x020000A0, 5], // Gt GEQ
+    [0x020000B0, 5], // Gt GEQ 7
+    [0x020000C0, 9], // St Gt GEQ
+    [0x020000D0, 4], // ParaEQ
+    [0x020000E0, 7], // Exciter
+    [0x020000F0, 4], // Low EQ
+    [0x02000100, 3], // High EQ
+    [0x03000010, 10], // EP Drive
+    [0x03000020, 12], // RC Drive
+    [0x03000030, 13], // TS Drive
+    [0x03000040, 17], // GoldDrive
+    [0x03000050, 23], // SweetDrv
+    [0x03000058, 8], // Over Drive
+    [0x03000060, 15], // Zen O.DRV
+    [0x03000070, 8], // BG GRID
+    [0x03000080, 17], // DYN Drive
+    [0x03000090, 10], // Plus DIST
+    [0x030000A0, 12], // DIST One
+    [0x030000B0, 10], // SqueakDST
+    [0x030000C0, 14], // RedCrunch
+    [0x030000D0, 11], // VioletDST
+    [0x030000E0, 16], // TB MK1.5
+    [0x030000F0, 25], // OctFuzz
+    [0x03000100, 11], // NYC Muff
+    [0x03000110, 22], // WaveSHPR
+    [0x03000120, 17], // Razor DRV
+    [0x03000130, 10], // MetalWRLD
+    [0x03000140, 22], // HG THRTTL
+    [0x03000150, 10], // TS+Boost
+    [0x03000160, 10], // RedCR+BST
+    [0x03000170, 10], // SpotBoost
+    [0x03000180, 6], // UpOctBSTR
+    [0x03000190, 4], // OutputBST
+    [0x030001A0, 10], // Aco.Sim
+    [0x04000010, 44], // MS 45os
+    [0x04000020, 44], // MS 1959
+    [0x04000030, 44], // MS 800
+    [0x04000040, 43], // FD B-MAN
+    [0x04000050, 43], // FD TWIN-R
+    [0x04000060, 43], // FD DLX-R
+    [0x04000070, 43], // FD MASTER
+    [0x04000080, 46], // UK 30A
+    [0x04000090, 47], // BG MARK1
+    [0x040000A0, 47], // BG MARK3
+    [0x040000B0, 44], // RectiDual
+    [0x040000C0, 46], // XtasyBlue
+    [0x040000D0, 41], // HW 100
+    [0x040000E0, 46], // ORG120
+    [0x040000F0, 41], // DZ Herb
+    [0x04000100, 47], // MATCH30
+    [0x04000110, 58], // KRAMPUS
+    [0x04000120, 56], // REDLOOM
+    [0x04000130, 63], // VELVET
+    [0x04000140, 71], // MUDDY
+    [0x04000150, 63], // 7 HEAVEN
+    [0x04000160, 69], // POLLEX
+    [0x06000010, 5], // Chorus
+    [0x06000020, 8], // CloneCho
+    [0x06000030, 7], // ChorusOne
+    [0x06000040, 16], // TriChorus
+    [0x06000050, 8], // AnalogCho
+    [0x06000060, 6], // StereoCho
+    [0x06000070, 7], // BendCho
+    [0x06000080, 5], // Detune
+    [0x06000090, 7], // Tremolo
+    [0x060000A0, 6], // Phaser
+    [0x060000B0, 6], // StonePha
+    [0x060000C0, 7], // WarpPhase
+    [0x060000D0, 8], // Duo Phase
+    [0x060000E0, 8], // TheVibe
+    [0x060000F0, 5], // VinFLNGR
+    [0x06000100, 6], // Kick FLNG
+    [0x06000110, 6], // Vibrato
+    [0x06000120, 8], // SwellVibe
+    [0x06000130, 5], // Octaver
+    [0x06000140, 6], // PitchSHFT
+    [0x06000150, 5], // MonoPitch
+    [0x06000160, 5], // HPS
+    [0x06000170, 36], // PolyShift
+    [0x06000180, 8], // GEMINOS
+    [0x06000190, 4], // RingMod
+    [0x060001A0, 7], // Slicer
+    [0x07000010, 3], // AutoPan
+    [0x07000020, 4], // LoopRoll
+    [0x07000030, 11], // Sitar Sim
+    [0x07000040, 7], // Bomber
+    [0x08000010, 4], // Delay
+    [0x08000020, 4], // AnalogDly
+    [0x08000030, 6], // TapeEcho
+    [0x08000040, 14], // TapeEcho3
+    [0x08000050, 13], // DualDelay
+    [0x08000060, 20], // SoftEcho
+    [0x08000070, 10], // SlapBackD
+    [0x08000080, 5], // P-P Delay
+    [0x08000090, 5], // ReverseDL
+    [0x080000A0, 6], // ModDelay
+    [0x080000B0, 7], // FilterDly
+    [0x080000C0, 7], // Pitch DLY
+    [0x080000D0, 10], // PhaseDly
+    [0x080000E0, 8], // A-Pan DLY
+    [0x080000F0, 10], // SlwAtkDly
+    [0x08000100, 21], // ICE Delay
+    [0x08000110, 5], // HoldDelay
+    [0x09000010, 10], // RoomREV
+    [0x09000020, 10], // BrghtRoom
+    [0x09000030, 10], // SpringREV
+    [0x09000040, 26], // FD Spring
+    [0x09000050, 22], // Plate REV
+    [0x09000060, 11], // Hall REV
+    [0x09000070, 11], // BrghtHall
+    [0x09000080, 27], // HD Hall
+    [0x09000090, 31], // ChurchREV
+    [0x090000A0, 30], // Ambience
+    [0x090000B0, 24], // Chamber
+    [0x090000C0, 7], // AirReverb
+    [0x090000D0, 10], // EarlyRef
+    [0x090000E0, 21], // GateRevrb
+    [0x090000F0, 23], // HoldRevrb
+    [0x09000100, 31], // SpaceHole
+    [0x09000110, 40], // ParticleR
+    [0x0B000010, 0], // Output VP
+    [0x0B000020, 3], // Pedal VOL
+    [0x0B000030, 6], // BlackWah
+    [0x0B000040, 6], // ChromeWah
+    [0x0B000050, 5], // WAH100
+    [0x0B000060, 10], // VoiceWah
+    [0x0B000070, 6], // PDL Pitch
+    [0x0B000080, 6], // PDL MnPit
+    [0x0B000090, 10], // PDL Roto
+    [0x0B0000A0, 5], // PDL FLNGR
+    [0x0B0000B0, 8], // PDL Vibe
+    [0x0B0000C0, 14], // PDL Drive
+    [0x0B0000D0, 5], // PDL PHSR
+    [0x0B0000E0, 5], // PDL Delay
+    [0x0B0000F0, 14], // OSC Echo
+    [0x0B000100, 9], // PDL Rev
+    [0x0B000110, 5], // PDL Reso
+    [0x0B000120, 4], // P-BitCRSH
+  ]);
+
+  function getEffectDspCost(effectId) {
+    return EFFECT_DSP_COST.get(effectId >>> 0) ?? 0;
+  }
+
+  // Suma el % de DSP usado por los efectos ACTIVOS del patch actual,
+  // excluyendo el slot que se está editando (porque ese va a cambiar).
+  function getUsedDSP(excludeSlot) {
+    if (!currentPatchData || !currentPatchData.effects) return 0;
+    let total = 0;
+    currentPatchData.effects.forEach((fx, i) => {
+      if (i === excludeSlot) return;
+      if (!fx.enabled) return; // los efectos en OFF no consumen DSP
+      total += getEffectDspCost(fx.id);
+    });
+    return total;
   }
 
   // --------------------------------------------------------------
@@ -1452,13 +1357,11 @@
   function getParamNames(effectId) {
     return PARAM_NAMES.get(effectId >>> 0) ?? null;
   }
-  function getParamMax(effectId, paramIndex) { return 100; }
 
   // --------------------------------------------------------------
   // VALORES POR DEFECTO
   // --------------------------------------------------------------
   const DEFAULT_PARAMS_MAP = new Map();
-
   DEFAULT_PARAMS_MAP.set(0x01000010, [0x02, 0x00, 0x02, 0x0a, 0x64]);
   DEFAULT_PARAMS_MAP.set(0x01000020, [0x0a, 0x02, 0x02, 0x64]);
   DEFAULT_PARAMS_MAP.set(0x01000030, [0x02, 0x00, 0x02, 0x64]);
@@ -1494,14 +1397,50 @@
   DEFAULT_PARAMS_MAP.set(0x06000090, [0x00, 0x19, 0x46, 0x50]);
   DEFAULT_PARAMS_MAP.set(0x020000B0, [0x0c, 0x0c, 0x0e, 0x0f, 0x0c, 0x0b, 0x0c, 0x64]);
 
+  function isBassTrebleDrive(effectId, paramIndex) {
+    if (effectId !== 0x03000010) return false;
+    const names = getParamNames(effectId);
+    if (!names || paramIndex >= names.length) return false;
+    const name = names[paramIndex].toLowerCase();
+    return name === "bass" || name === "treble";
+  }
+  function isBooleanParam(effectId, paramIndex) {
+    const names = getParamNames(effectId);
+    if (!names || paramIndex >= names.length) return false;
+    const name = names[paramIndex].toLowerCase();
+    return name === "detct" || name === "boost" || name === "tail";
+  }
+
+  // --------------------------------------------------------------
+  // RANGOS REALES DE PARÁMETROS (min/max según la pedalera física)
+  // Solo se listan aquí los efectos cuyo rango real difiere del genérico
+  // 0–100. Lo que no aparece sigue usando el rango genérico de siempre.
+  // Formato: effectId -> { paramIndex: [min, max, displayOffset?] }
+  // displayOffset (opcional) se SUMA solo al número que se muestra en pantalla;
+  // el valor real que se envía por MIDI y que controla el sonido no se toca.
+  // --------------------------------------------------------------
+  const PARAM_RANGES = new Map([
+    // Comp — Sense 0-10, ATTCK Slow/Fast (0-1), Tone 0-10, VOL se deja 0-100
+    [0x01000010, { 0: [0, 10], 1: [0, 1], 2: [0, 10] }],
+    // RackComp — THRSH 0-50, Ratio raw 0-9 (se muestra 1-10), ATTCK raw 0-9 (se muestra 1-10), VOL se deja 0-100
+    [0x01000020, { 0: [0, 50], 1: [0, 9, 1], 2: [0, 9, 1] }],
+  ]);
+
+  function getParamRange(effectId, paramIndex) {
+    const fxRanges = PARAM_RANGES.get(effectId >>> 0);
+    if (!fxRanges) return null;
+    return fxRanges[paramIndex] ?? null;
+  }
+
   // --------------------------------------------------------------
   // MIDI y parseo
   // --------------------------------------------------------------
   let currentPatchData = null;
   let midiOut = null;
-  let selectedSlot = 0;
   let midiIn = null;
   let currentPresetSlot = -1;
+  let presetList = [];
+  let isModified = false;
 
   window._g2 = {
     get currentPatchData() { return currentPatchData; },
@@ -1620,8 +1559,9 @@
     if (!midiOut) return;
     if (currentPatchData && currentPatchData.effects[slot]) {
       currentPatchData.effects[slot].enabled = enable;
-      renderStrip();
-      if (selectedSlot === slot) renderParamsPanel();
+      renderPedalboard();
+      isModified = true;
+      updateModifiedIndicator();
     }
     const val = enable ? 1 : 0;
     midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x20,0x00, slot, 0x00, val, 0,0,0,0,0xF7]);
@@ -1630,21 +1570,19 @@
   function applyDefaultParameters(slot, newEffectId) {
     if (!currentPatchData || !currentPatchData.effects[slot]) return;
     const defaults = DEFAULT_PARAMS_MAP.get(newEffectId >>> 0);
-    if (!defaults) return;
     const fx = currentPatchData.effects[slot];
     fx.id = newEffectId;
     const paramNames = getParamNames(newEffectId);
     const numParams = paramNames ? paramNames.length : fx.parameters.length;
-    for (let i = 0; i < numParams && i < defaults.length; i++) {
-      fx.parameters[i] = defaults[i];
+    if (defaults) {
+      for (let i = 0; i < numParams && i < defaults.length; i++) fx.parameters[i] = defaults[i];
+      for (let i = defaults.length; i < numParams; i++) { if (fx.parameters[i] === undefined) fx.parameters[i] = 0; }
+    } else {
+      for (let i = 0; i < numParams; i++) { if (fx.parameters[i] === undefined) fx.parameters[i] = 0; }
     }
-    for (let i = defaults.length; i < numParams; i++) {
-      if (fx.parameters[i] === undefined) fx.parameters[i] = 0;
-    }
-    if (selectedSlot === slot) renderParamsPanel();
-    renderStrip();
-    for (let i = 0; i < numParams && i < defaults.length; i++) {
-      setParameterRaw(slot, i + 2, defaults[i]);
+    renderPedalboard();
+    if (defaults) {
+      for (let i = 0; i < numParams && i < defaults.length; i++) setParameterRaw(slot, i + 2, defaults[i]);
     }
   }
 
@@ -1662,27 +1600,13 @@
       if (currentPatchData && currentPatchData.effects[slot]) {
         currentPatchData.effects[slot].id = id;
         applyDefaultParameters(slot, id);
+        isModified = true;
+        updateModifiedIndicator();
         setTimeout(() => syncCurrentPatch(), 100);
       }
     }, 150);
   }
 
-  function changeToAdjacentEffect(delta) {
-    if (!currentPatchData) return;
-    const currentId = currentPatchData.effects[selectedSlot].id;
-    const currentIndex = SORTED_EFFECT_IDS.indexOf(currentId);
-    if (currentIndex === -1) return;
-    let newIndex = currentIndex + delta;
-    if (newIndex < 0) newIndex = SORTED_EFFECT_IDS.length - 1;
-    if (newIndex >= SORTED_EFFECT_IDS.length) newIndex = 0;
-    const newEffectId = SORTED_EFFECT_IDS[newIndex];
-    changeEffectType(selectedSlot, newEffectId);
-  }
-
-  function nextEffect() { changeToAdjacentEffect(1); }
-  function prevEffect() { changeToAdjacentEffect(-1); }
-
-  let _syncIntervalId = null;
   let _lastSyncedName = null;
   Object.defineProperty(window, '_g2LastSyncedName', { get: () => _lastSyncedName, configurable: true });
 
@@ -1692,70 +1616,226 @@
   }
 
   // --------------------------------------------------------------
-  // UI: strip de efectos
+  // FUNCIONES DE GUARDADO RÁPIDO (header)
   // --------------------------------------------------------------
-  function renderStrip() {
+  function updateModifiedIndicator() {
+    const nameEl = document.getElementById('presetName');
+    if (!nameEl) return;
+    nameEl.classList.toggle('modified', !!isModified);
+  }
+
+  // --------------------------------------------------------------
+  // RENDERIZADO DEL PEDALBOARD (rectangular, ancho variable, sliders abajo)
+  // --------------------------------------------------------------
+  function renderPedalboard(flashSlot = null) {
+    const board = document.getElementById('pedalboard');
     if (!currentPatchData) {
-      document.getElementById('effectsStrip').innerHTML = '<div style="padding:20px">Esperando patch...</div>';
+      board.innerHTML = '<div style="padding:40px;color:#4a5a6a;text-align:center;width:100%;">Esperando preset...</div>';
       return;
     }
     const effects = currentPatchData.effects;
     let html = '';
     const maxSlots = Math.min(7, effects.length);
+
     for (let i = 0; i < maxSlots; i++) {
       const fx = effects[i];
-      const name = getEffectName(fx.id);
-      const group = getGroupName(fx.id);
-      const color = getGroupColor(fx.id);
-      const isSelected = (selectedSlot === i);
-      const isOn = fx.enabled;
-      const cardClass = isOn ? '' : 'off';
+      const id = fx.id;
+      const name = getEffectName(id);
+      const categoryName = getCategoryName(id);
+      const catClass = getCategoryClass(id);
+      const enabled = fx.enabled;
+      const isEmpty = (id === 0x00000000);
+      const isBpm = (id === 0x07000FF0);
+      const onClass = enabled ? 'on' : '';
+      const emptyClass = isEmpty ? 'empty' : '';
+      const bpmClass = isBpm ? 'bpm' : '';
+      const flashClass = (flashSlot === i) ? 'flash' : '';
+      const slotNumber = i + 1;
+
+      const paramNames = getParamNames(id);
+      const paramsRaw = fx.parameters || [];
+      let numParams = 0;
+      if (!isEmpty && !isBpm && paramNames) {
+        numParams = Math.min(paramNames.length, paramsRaw.length);
+      }
+      // Anchura proporcional: base 1 + 0.32 por cada parámetro (mínimo 1, así un pedal
+      // de 8 parámetros pesa notablemente más que uno de 4 dentro del flex total).
+      const flexGrow = (1 + numParams * 0.32).toFixed(2);
+
+      let paramsHtml = '';
+      if (numParams > 0) {
+        for (let p = 0; p < numParams; p++) {
+          const pname = paramNames[p];
+          const rawVal = paramsRaw[p] ?? 0;
+          const isSpecial = isBassTrebleDrive(id, p);
+          const isBool = isBooleanParam(id, p);
+          const realRange = getParamRange(id, p);
+          const isRealRangeBinary = realRange && realRange[1] - realRange[0] === 1;
+          let displayVal, sliderMin = 0, sliderMax = 100, sliderVal, offsetMin = 0, displayOffset = 0;
+          if (isSpecial) {
+            // Raw real 0–20, pero se muestra como -10..+10 (display = raw - 10).
+            // El slider interno usa min=0 igual que el raw (offsetMin=0 para el dato),
+            // solo cambia la etiqueta numérica.
+            displayVal = Math.round(rawVal - 10);
+            sliderMin = 0; sliderMax = 20; sliderVal = rawVal;
+          } else if (isBool) {
+            displayVal = rawVal >= 1 ? 'ON' : 'OFF';
+            sliderVal = rawVal >= 1 ? 1 : 0;
+          } else if (isRealRangeBinary) {
+            // Parámetro binario con etiqueta propia detectada por nombre (ej. ATTCK = Slow/Fast)
+            const lname = pname.toLowerCase();
+            const onLabel = (lname === 'attck' || lname === 'attack') ? 'FAST' : 'ON';
+            const offLabel = (lname === 'attck' || lname === 'attack') ? 'SLOW' : 'OFF';
+            displayVal = rawVal >= 1 ? onLabel : offLabel;
+            sliderVal = rawVal >= 1 ? 1 : 0;
+          } else if (realRange) {
+            // El slider HTML siempre usa min=0 internamente (evita el bug de sliders
+            // verticales con min≠0 en algunos navegadores); el offset real se aplica en JS.
+            offsetMin = realRange[0];
+            displayOffset = realRange[2] || 0;
+            sliderMin = 0; sliderMax = realRange[1] - realRange[0];
+            displayVal = rawVal + displayOffset; sliderVal = rawVal - offsetMin;
+          } else {
+            displayVal = rawVal; sliderVal = rawVal;
+          }
+          const renderAsToggle = isBool || isRealRangeBinary;
+          if (renderAsToggle) {
+            paramsHtml += `
+              <div class="pparam-col">
+                <div class="pparam-value" id="pv-${i}-${p}">${displayVal}</div>
+                <div class="pparam-bool-wrap">
+                  <button type="button" class="pparam-bool-btn ${sliderVal ? 'on' : 'off'}"
+                    data-slot="${i}" data-paramindex="${p}" data-paramnum="${p+2}" data-boolval="${sliderVal}" data-isbool="true" data-pname="${pname}"
+                    title="${pname}: ${displayVal}"><span class="pparam-bool-knob"></span></button>
+                </div>
+                <div class="pparam-label">${pname}</div>
+              </div>`;
+          } else {
+            paramsHtml += `
+              <div class="pparam-col">
+                <div class="pparam-value" id="pv-${i}-${p}">${displayVal}</div>
+                <div class="pparam-slider-wrap">
+                  <input type="range" class="pparam-slider" min="${sliderMin}" max="${sliderMax}" value="${sliderVal}" step="1"
+                    data-slot="${i}" data-paramindex="${p}" data-paramnum="${p+2}" data-isspecial="${isSpecial}" data-offsetmin="${offsetMin}" data-displayoffset="${displayOffset}" title="${pname}: ${displayVal}">
+                </div>
+                <div class="pparam-label">${pname}</div>
+              </div>`;
+          }
+        }
+      }
+
       html += `
-        <div class="effect-card ${cardClass} ${isSelected ? 'selected' : ''}" style="border-left-color: ${color};">
-          <div class="effect-name">${name}</div>
-          <div class="effect-group">${group}</div>
-          <div class="card-buttons">
-            <button class="card-btn ${isOn ? 'on' : 'off'}" data-slot="${i}" data-action="toggle">${isOn ? 'ON' : 'OFF'}</button>
-            <button class="card-btn change" data-slot="${i}" data-action="change">CHANGE</button>
+        <div class="pedal ${catClass} ${onClass} ${emptyClass} ${bpmClass} ${flashClass}" data-slot="${i}" data-bpm="${isBpm}" style="flex-grow:${flexGrow};">
+          ${isEmpty ? '' : `<button type="button" class="change-btn" data-slot="${i}" title="Cambiar efecto">⇄</button>`}
+          <div class="pedal-number">${slotNumber}</div>
+          <div class="pedal-top" data-slot="${i}" data-toggle="${!isEmpty}">
+            <div class="led"></div>
+            <div class="name">${isEmpty ? '—' : name}</div>
+            <div class="category">${isEmpty ? 'Empty' : (isBpm ? 'TAP TEMPO' : categoryName)}</div>
+            <div class="status">${isBpm ? 'TAP' : (enabled ? 'ON' : 'OFF')}</div>
           </div>
+          ${isEmpty ? '<div class="pedal-empty-fill">vacío</div>' : '<div class="pedal-body-spacer"></div>'}
+          ${paramsHtml ? `<div class="pedal-params">${paramsHtml}</div>` : ''}
         </div>
       `;
     }
-    const strip = document.getElementById('effectsStrip');
-    strip.innerHTML = html;
-    strip.querySelectorAll('.card-btn').forEach(btn => {
-      const slot = parseInt(btn.dataset.slot);
-      const action = btn.dataset.action;
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (action === 'toggle') {
-          const newState = !currentPatchData.effects[slot].enabled;
-          toggleSlot(slot, newState);
-        } else if (action === 'change') {
-          selectedSlot = slot;
-          renderStrip();
-          renderParamsPanel();
-          openEffectModal(slot);
+    board.innerHTML = html;
+
+    // Click en LED/nombre = toggle ON/OFF (o tap tempo si es BPM)
+    board.querySelectorAll('.pedal-top[data-toggle="true"]').forEach(el => {
+      const slot = parseInt(el.dataset.slot);
+      const pedalEl = el.closest('.pedal');
+      const isBpm = pedalEl.dataset.bpm === 'true';
+      el.addEventListener('click', (e) => {
+        if (isBpm) {
+          handleTapTempo();
+          pedalEl.classList.add('flash');
+          setTimeout(() => pedalEl.classList.remove('flash'), 300);
+        } else {
+          const currentState = currentPatchData.effects[slot].enabled;
+          toggleSlot(slot, !currentState);
         }
       });
     });
-    strip.querySelectorAll('.effect-card').forEach(card => {
-      const slotBtn = card.querySelector('.card-btn[data-action="toggle"]');
-      if (slotBtn) {
-        const slot = parseInt(slotBtn.dataset.slot);
-        card.addEventListener('click', (e) => {
-          if (e.target.classList.contains('card-btn')) return;
-          selectedSlot = slot;
-          renderStrip();
-          renderParamsPanel();
-        });
-      }
+
+    // Botón CHANGE → abre modal de selección de efecto
+    board.querySelectorAll('.change-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const slot = parseInt(btn.dataset.slot);
+        openEffectModal(slot);
+      });
+    });
+
+    // Sliders de parámetros
+    board.querySelectorAll('.pparam-slider').forEach(slider => {
+      slider.addEventListener('input', (e) => {
+        const sliderVal = parseFloat(e.target.value);
+        const slot = parseInt(e.target.dataset.slot);
+        const paramIdx = parseInt(e.target.dataset.paramindex);
+        const paramNum = parseInt(e.target.dataset.paramnum);
+        const isSpecial = e.target.dataset.isspecial === 'true';
+        const offsetMin = parseFloat(e.target.dataset.offsetmin || '0');
+        const displayOffset = parseFloat(e.target.dataset.displayoffset || '0');
+        const rawVal = Math.round(sliderVal) + offsetMin;
+        if (currentPatchData && currentPatchData.effects[slot]) {
+          currentPatchData.effects[slot].parameters[paramIdx] = rawVal;
+        }
+        const display = document.getElementById(`pv-${slot}-${paramIdx}`);
+        if (display) display.innerText = isSpecial ? Math.round(rawVal - 10) : (rawVal + displayOffset);
+        isModified = true;
+        updateModifiedIndicator();
+        setParameterRaw(slot, paramNum, rawVal);
+      });
+    });
+
+    // Toggles booleanos (DETCT, Boost, Tail)
+    board.querySelectorAll('.pparam-bool-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const target = e.currentTarget;
+        const slot = parseInt(target.dataset.slot);
+        const paramIdx = parseInt(target.dataset.paramindex);
+        const paramNum = parseInt(target.dataset.paramnum);
+        const pname = (target.dataset.pname || '').toLowerCase();
+        const currentVal = parseInt(target.dataset.boolval);
+        const newVal = currentVal ? 0 : 1;
+        target.dataset.boolval = newVal;
+        target.classList.toggle('on', !!newVal);
+        target.classList.toggle('off', !newVal);
+        if (currentPatchData && currentPatchData.effects[slot]) {
+          currentPatchData.effects[slot].parameters[paramIdx] = newVal;
+        }
+        const display = document.getElementById(`pv-${slot}-${paramIdx}`);
+        const isAttack = (pname === 'attck' || pname === 'attack');
+        if (display) display.innerText = newVal ? (isAttack ? 'FAST' : 'ON') : (isAttack ? 'SLOW' : 'OFF');
+        isModified = true;
+        updateModifiedIndicator();
+        setParameterRaw(slot, paramNum, newVal);
+      });
     });
   }
 
+  function flashPedal(slot) {
+    renderPedalboard(slot);
+    setTimeout(() => {
+      const pedalEl = document.querySelector(`.pedal[data-slot="${slot}"]`);
+      if (pedalEl) pedalEl.classList.remove('flash');
+    }, 350);
+  }
+
   // --------------------------------------------------------------
-  // Modal de selección de efectos
+  // Modal de selección de efectos (botón ⇄ CHANGE en cada pedal)
   // --------------------------------------------------------------
+  function getGroupName(effectId) {
+    const group = (effectId >>> 24) & 0xFF;
+    const names = {
+      0x00: "Empty", 0x01: "Dynamics", 0x02: "Filter", 0x03: "Drive", 0x04: "Amp",
+      0x06: "Modulation", 0x07: "SFX", 0x08: "Delay", 0x09: "Reverb", 0x0B: "Pedal"
+    };
+    return names[group] || "Effect";
+  }
+
   function openEffectModal(slot) {
     const modal = document.getElementById('effectModal');
     const container = document.getElementById('modalEffectList');
@@ -1771,20 +1851,34 @@
       if (b[0] === 0x00) return 1;
       return a[0] - b[0];
     });
-    let html = '';
+
+    const usedDSP = getUsedDSP(slot);
+    const remainingDSP = Math.max(0, DSP_LIMIT - usedDSP);
+
+    let html = `<div class="dsp-budget-bar">
+      <span>DSP usado por el resto del patch: <strong>${usedDSP}%</strong></span>
+      <span>Disponible para este slot: <strong>${remainingDSP}%</strong></span>
+    </div>`;
+
     for (let [groupId, group] of sortedGroups) {
       const color = getGroupColor(groupId << 24);
       html += `<div class="effect-group-list">
         <div class="group-title" style="color:${color}">${group.name}</div>
         <div class="effect-items">`;
       for (let eff of group.effects) {
-        html += `<div class="effect-item" style="border-left: 4px solid ${eff.color};" data-effect-id="${eff.id}">${eff.name}</div>`;
+        const cost = getEffectDspCost(eff.id);
+        const wouldExceed = (usedDSP + cost) > DSP_LIMIT;
+        const disabledClass = wouldExceed ? ' effect-item-disabled' : '';
+        const disabledAttr = wouldExceed ? ' data-disabled="true"' : '';
+        const costLabel = cost > 0 ? ` <span class="effect-item-cost">${cost}%</span>` : '';
+        html += `<div class="effect-item${disabledClass}" style="border-left: 4px solid ${eff.color};" data-effect-id="${eff.id}"${disabledAttr} title="${wouldExceed ? 'No cabe: superaría el 100% de DSP' : ''}">${eff.name}${costLabel}</div>`;
       }
       html += `</div></div>`;
     }
     container.innerHTML = html;
     modal.style.display = 'flex';
     container.querySelectorAll('.effect-item').forEach(item => {
+      if (item.dataset.disabled === 'true') return; // no clicable
       item.addEventListener('click', () => {
         const newId = parseInt(item.dataset.effectId);
         changeEffectType(slot, newId);
@@ -1792,414 +1886,105 @@
       });
     });
   }
+  document.getElementById('closeModalBtn').addEventListener('click', () => {
+    document.getElementById('effectModal').style.display = 'none';
+  });
+  window.addEventListener('click', (e) => {
+    if (e.target === document.getElementById('effectModal')) {
+      document.getElementById('effectModal').style.display = 'none';
+    }
+  });
 
   // --------------------------------------------------------------
-  // Panel de parámetros con sliders verticales
+  // TOP BAR
   // --------------------------------------------------------------
-  function isBassTrebleDrive(effectId, paramIndex) {
-    // Solo EP Drive (0x03000010) usa Bass/Treble en escala bipolar -10..+10.
-    // El resto de drives (RC Drive, TS Drive, etc.) usan escala normal 0-100.
-    if (effectId !== 0x03000010) return false;
-    const names = getParamNames(effectId);
-    if (!names || paramIndex >= names.length) return false;
-    const name = names[paramIndex].toLowerCase();
-    return name === "bass" || name === "treble";
-  }
-
-  // Parámetros que solo toman valores 0/1 (interruptor on/off), no un rango continuo.
-  // Ejemplos: DETCT (ZNR, NoiseGate), Boost (TS Drive y otros drives con boost), Tail (delays/reverbs)
-  function isBooleanParam(effectId, paramIndex) {
-    const names = getParamNames(effectId);
-    if (!names || paramIndex >= names.length) return false;
-    const name = names[paramIndex].toLowerCase();
-    return name === "detct" || name === "boost" || name === "tail";
-  }
-
-  function renderParamsPanel() {
-    const panel = document.getElementById('paramsPanel');
-    if (!currentPatchData || !currentPatchData.effects[selectedSlot]) {
-      panel.innerHTML = '<div class="no-selection">Selecciona un efecto</div>';
+  function updateTopBar() {
+    if (!currentPatchData) {
+      document.getElementById('presetName').textContent = '—';
+      document.getElementById('presetNumber').textContent = '—';
+      document.getElementById('prevBtn').disabled = true;
+      document.getElementById('nextBtn').disabled = true;
+      document.getElementById('gotoInput').value = '';
       return;
     }
-    const fx = currentPatchData.effects[selectedSlot];
-    const effectId = fx.id;
-    const paramsRaw = fx.parameters || [];
-    const effectName = getEffectName(effectId);
-    const names = getParamNames(effectId);
-    let paramList = [];
-    if (names !== null) {
-      for (let i = 0; i < names.length; i++) {
-        if (i < paramsRaw.length) paramList.push({ name: names[i], index: i });
-      }
+    document.getElementById('presetName').textContent = currentPatchData.name;
+    if (presetList.length > 0 && currentPresetSlot >= 0) {
+      const num = currentPresetSlot + 1;
+      document.getElementById('presetNumber').textContent = String(num).padStart(3, '0');
+      document.getElementById('gotoInput').value = num;
     } else {
-      for (let i = 0; i < Math.min(6, paramsRaw.length); i++) paramList.push({ name: `P${i}`, index: i });
+      document.getElementById('presetNumber').textContent = '—';
+      document.getElementById('gotoInput').value = '';
     }
-    let columnsHtml = '';
-    for (let p of paramList) {
-      const rawVal = paramsRaw[p.index] ?? 0;
-      const isSpecial = isBassTrebleDrive(effectId, p.index);
-      const isBool = isBooleanParam(effectId, p.index);
-      let displayVal = rawVal;
-      let sliderMin = 0, sliderMax = 100, sliderVal = rawVal;
-      if (isSpecial) {
-        displayVal = Math.round(rawVal - 10);
-        sliderMin = -10;
-        sliderMax = 10;
-        sliderVal = displayVal;
-      } else if (isBool) {
-        displayVal = rawVal >= 1 ? 'ON' : 'OFF';
-        sliderMin = 0;
-        sliderMax = 1;
-        sliderVal = rawVal >= 1 ? 1 : 0;
-      } else {
-        displayVal = rawVal;
-        sliderMin = 0;
-        sliderMax = 100;
-        sliderVal = rawVal;
-      }
-
-      if (isBool) {
-        // Toggle visual tipo switch en vez de slider continuo — el parámetro solo admite 0/1
-        columnsHtml += `
-          <div class="param-col">
-            <div class="param-value bool-value ${sliderVal ? 'on' : 'off'}" id="pval-${p.index}">${displayVal}</div>
-            <div class="vertical-slider-wrap bool-toggle-wrap">
-              <button type="button" class="bool-toggle-btn ${sliderVal ? 'on' : 'off'}"
-                data-paramindex="${p.index}" data-slot="${selectedSlot}" data-paramnum="${p.index + 2}"
-                data-boolval="${sliderVal}" data-isbool="true" title="Click para alternar ON/OFF">
-                <span class="bool-toggle-knob"></span>
-              </button>
-            </div>
-            <div class="param-label">${p.name}</div>
-          </div>
-        `;
-      } else {
-        columnsHtml += `
-          <div class="param-col">
-            <div class="param-value" id="pval-${p.index}">${displayVal}</div>
-            <div class="vertical-slider-wrap">
-              <input type="range" class="vertical" min="${sliderMin}" max="${sliderMax}" value="${sliderVal}" step="1"
-                data-paramindex="${p.index}" data-slot="${selectedSlot}" data-paramnum="${p.index + 2}" data-isspecial="${isSpecial}">
-            </div>
-            <div class="param-label">${p.name}</div>
-          </div>
-        `;
-      }
-    }
-    panel.innerHTML = `
-      <div class="panel-header">
-        <div class="param-nav-buttons">
-          <button class="param-nav-btn" id="prevEffectBtn" title="Efecto anterior">◀</button>
-          <button class="param-nav-btn" id="nextEffectBtn" title="Efecto siguiente">▶</button>
-          <div class="current-effect-title">${effectName}</div>
-        </div>
-        <button class="card-btn ${fx.enabled ? 'on' : 'off'}" id="panelToggleBtn">${fx.enabled ? 'ON' : 'OFF'}</button>
-      </div>
-      <div class="params-grid" id="paramsGrid">
-        ${columnsHtml || '<div class="no-selection">Sin parámetros editables</div>'}
-      </div>
-    `;
-    document.getElementById('panelToggleBtn')?.addEventListener('click', () => {
-      toggleSlot(selectedSlot, !fx.enabled);
-    });
-    document.getElementById('prevEffectBtn')?.addEventListener('click', prevEffect);
-    document.getElementById('nextEffectBtn')?.addEventListener('click', nextEffect);
-    document.querySelectorAll('#paramsGrid input[type="range"]').forEach(slider => {
-      slider.addEventListener('input', (e) => {
-        const sliderVal = parseFloat(e.target.value);
-        const paramIdx = parseInt(e.target.dataset.paramindex);
-        const slot = parseInt(e.target.dataset.slot);
-        const paramNum = parseInt(e.target.dataset.paramnum);
-        const isSpecial = e.target.dataset.isspecial === 'true';
-        let rawVal;
-        if (isSpecial) {
-          rawVal = Math.round(sliderVal + 10);
-          rawVal = Math.min(20, Math.max(0, rawVal));
-        } else {
-          rawVal = Math.round(sliderVal);
-        }
-        if (currentPatchData && currentPatchData.effects[slot]) {
-          currentPatchData.effects[slot].parameters[paramIdx] = rawVal;
-        }
-        const display = document.getElementById(`pval-${paramIdx}`);
-        if (display) {
-          let displayVal = rawVal;
-          if (isSpecial) {
-            displayVal = sliderVal;
-          }
-          display.innerText = displayVal;
-        }
-        setParameterRaw(slot, paramNum, rawVal);
-      });
-    });
-
-    // Listener para los toggles booleanos (DETCT, Boost, Tail) — alternan entre 0 y 1
-    document.querySelectorAll('#paramsGrid .bool-toggle-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const target = e.currentTarget;
-        const paramIdx = parseInt(target.dataset.paramindex);
-        const slot = parseInt(target.dataset.slot);
-        const paramNum = parseInt(target.dataset.paramnum);
-        const currentVal = parseInt(target.dataset.boolval);
-        const newVal = currentVal ? 0 : 1;
-
-        target.dataset.boolval = newVal;
-        target.classList.toggle('on', !!newVal);
-        target.classList.toggle('off', !newVal);
-
-        if (currentPatchData && currentPatchData.effects[slot]) {
-          currentPatchData.effects[slot].parameters[paramIdx] = newVal;
-        }
-
-        const display = document.getElementById(`pval-${paramIdx}`);
-        if (display) {
-          display.innerText = newVal ? 'ON' : 'OFF';
-          display.classList.toggle('on', !!newVal);
-          display.classList.toggle('off', !newVal);
-        }
-
-        setParameterRaw(slot, paramNum, newVal);
-      });
-    });
-  }
-
-  function updateTopBar() {
-    if (!currentPatchData) return;
-    document.getElementById('patchName').innerText = currentPatchData.name;
-    document.getElementById('bpmDisplay').innerText = currentPatchData.tempo || 120;
-    if (typeof currentPresetSlot !== 'undefined' && currentPresetSlot >= 0) {
-      document.getElementById('topPresetSlot').textContent = String(currentPresetSlot + 1).padStart(3, '0');
-    }
-    const topSaveBtn = document.getElementById('topSaveBtn');
-    if (topSaveBtn) topSaveBtn.disabled = false;
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    if (presetList.length > 0) { prevBtn.disabled = false; nextBtn.disabled = false; }
+    else { prevBtn.disabled = true; nextBtn.disabled = true; }
+    const bpmDisplay = document.getElementById('bpmDisplay');
+    if (bpmDisplay && currentPatchData) bpmDisplay.innerText = currentPatchData.tempo || 120;
+    isModified = false;
+    updateModifiedIndicator();
   }
 
   function fullRefresh() {
-    renderStrip();
-    renderParamsPanel();
+    renderPedalboard();
     updateTopBar();
-  }
-
-  // --------------------------------------------------------------
-  // Conexión MIDI
-  // --------------------------------------------------------------
-  async function connectMIDI() {
-    try {
-      const access = await navigator.requestMIDIAccess({ sysex: true });
-      let targetOutput = null, targetInput = null;
-      for (const [_, port] of access.outputs) {
-        if (port.name && (port.name.toLowerCase().includes('g2') || port.name.toLowerCase().includes('zoom'))) {
-          targetOutput = port;
-          break;
-        }
-      }
-      for (const [_, port] of access.inputs) {
-        if (port.name && (port.name.toLowerCase().includes('g2') || port.name.toLowerCase().includes('zoom'))) {
-          targetInput = port;
-          break;
-        }
-      }
-      if (!targetOutput) targetOutput = access.outputs.values().next().value;
-      if (!targetInput) targetInput = access.inputs.values().next().value;
-      if (!targetOutput || !targetInput) throw new Error('Dispositivo no encontrado');
-      midiOut = targetOutput;
-      midiIn = targetInput;
-      targetInput.onmidimessage = (msg) => {
-        const data = msg.data;
-
-        if (data.length >= 3 && (data[0] & 0xF0) === 0xB0) {
-          const controller = data[1];
-          const value = data[2];
-          if (controller === 0)  { window._g2BankMSB = value; }
-          if (controller === 32) { window._g2BankLSB = value; }
-          return;
-        }
-        if (data.length >= 2 && (data[0] & 0xF0) === 0xC0) {
-          const prog = data[1] & 0x7F;
-          const bankMSB = window._g2BankMSB ?? 0;
-          const bankLSB = window._g2BankLSB ?? 0;
-          const bank = (bankMSB << 7) | bankLSB;
-          const ppb = (typeof window._g2GetPatchesPerBank === 'function')
-            ? window._g2GetPatchesPerBank() : -1;
-          if (ppb > 0) {
-            // Solo calculamos y mostramos el slot absoluto si ya conocemos
-            // el tamaño real de banco (tras el escaneo). Antes de eso, mejor
-            // dejar el guion que mostrar un número provisional incorrecto.
-            const absSlot = bank * ppb + prog;
-            if (absSlot !== currentPresetSlot) {
-              currentPresetSlot = absSlot;
-              document.getElementById('topPresetSlot').textContent =
-                String(absSlot + 1).padStart(3, '0');
-              if (!window._g2PCIgnore && typeof window._g2SyncPresetHighlight === 'function') {
-                window._g2SyncPresetHighlight(absSlot);
-              }
-              if (!window._g2PCIgnore) {
-                setTimeout(() => midiOut && midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x13,0x00,0xF7]), 150);
-              }
-            }
-          }
-          return;
-        }
-
-        if (data[0]===0xF0 && data[1]===0x52 && data[2]===0x00 &&
-            data[3]===0x6E && data[4]===0x64 && data[5]===0x26 && data.length >= 12) {
-          const bank = data[8] + (data[9] << 7);
-          const prog = data[10] + (data[11] << 7);
-          const ppb = (typeof window._g2GetPatchesPerBank === 'function')
-            ? window._g2GetPatchesPerBank() : -1;
-          if (ppb > 0) {
-            const absSlot = bank * ppb + prog;
-            currentPresetSlot = absSlot;
-            document.getElementById('topPresetSlot').textContent =
-              String(absSlot + 1).padStart(3, '0');
-            if (!window._g2PCIgnore && typeof window._g2SyncPresetHighlight === 'function') {
-              window._g2SyncPresetHighlight(absSlot);
-            }
-            if (!window._g2PCIgnore) {
-              setTimeout(() => midiOut && midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x13,0x00,0xF7]), 150);
-            }
-          }
-          return;
-        }
-
-        if (data.length > 200 && data[0]===0xF0 && data[1]===0x52 &&
-            data[4]===0x64 && data[5]===0x12) {
-          const parsed = parsePatchFromSysex(data);
-          if (!parsed) return;
-          _lastSyncedName = parsed.name;
-          currentPatchData = parsed;
-          fullRefresh();
-          if (currentPresetSlot < 0 && typeof window._g2SyncPresetHighlight === 'function') {
-            window._g2SyncPresetHighlight(parsed.name);
-          }
-          if (currentPresetSlot < 0) {
-            setTimeout(() => midiOut && midiOut.send([0xF0,0x52,0x00,0x6E,0x33,0xF7]), 50);
-          }
-          return;
-        }
-
-        if (data[0]===0xF0 && data[1]===0x52 && data[2]===0x00 &&
-            data[3]===0x6E && data[4]===0x64 && data[5]===0x20 &&
-            data.length >= 14) {
-          const slot = data[7];
-          const paramNum = data[8];
-          const lsb = data[9];
-          const msb = data[10];
-          const value = (msb << 7) | lsb;
-          if (currentPatchData && currentPatchData.effects && slot < currentPatchData.effects.length) {
-            const paramIndex = paramNum - 2;
-            if (paramIndex >= 0 && paramIndex < currentPatchData.effects[slot].parameters.length) {
-              currentPatchData.effects[slot].parameters[paramIndex] = value;
-              if (selectedSlot === slot) {
-                const effectId = currentPatchData.effects[slot].id;
-                const isBool = isBooleanParam(effectId, paramIndex);
-                const display = document.getElementById(`pval-${paramIndex}`);
-
-                if (isBool) {
-                  // Actualizar el switch booleano (botón), no un slider
-                  const boolOn = value >= 1;
-                  if (display) {
-                    display.innerText = boolOn ? 'ON' : 'OFF';
-                    display.classList.toggle('on', boolOn);
-                    display.classList.toggle('off', !boolOn);
-                  }
-                  const toggleBtn = document.querySelector(
-                    `.bool-toggle-btn[data-paramindex="${paramIndex}"][data-slot="${slot}"]`
-                  );
-                  if (toggleBtn) {
-                    toggleBtn.dataset.boolval = boolOn ? 1 : 0;
-                    toggleBtn.classList.toggle('on', boolOn);
-                    toggleBtn.classList.toggle('off', !boolOn);
-                  }
-                } else {
-                  let displayVal = value;
-                  if (isBassTrebleDrive(effectId, paramIndex)) {
-                    displayVal = Math.round(value - 10);
-                  }
-                  if (display) display.innerText = displayVal;
-                  const slider = document.querySelector(`input[data-paramindex="${paramIndex}"][data-slot="${slot}"]`);
-                  if (slider) {
-                    if (isBassTrebleDrive(effectId, paramIndex)) {
-                      slider.value = Math.round(value - 10);
-                    } else {
-                      slider.value = value;
-                    }
-                  }
-                }
-              }
-            }
-          }
-          return;
-        }
-      };
-      document.getElementById('midiStatus').innerHTML =
-        `✅ ${targetOutput.name || 'Zoom G2 Four'}`;
-      document.getElementById('topSaveBtn').disabled = false;
-      midiOut.send([0xF0, 0x52, 0x00, 0x6E, 0x50, 0xF7]);
-
-      setTimeout(() => midiOut.send([0xF0, 0x52, 0x00, 0x6E, 0x33, 0xF7]), 100);
-      setTimeout(() => syncCurrentPatch(), 400);
-      setTimeout(() => {
-        const scanBtn = document.getElementById('presetsScanBtn');
-        if (scanBtn && !scanBtn.disabled) scanBtn.click();
-      }, 1000);
-    } catch (e) {
-      console.error(e);
-      document.getElementById('midiStatus').innerHTML = '❌ Error de conexión MIDI';
-    }
   }
 
   // --------------------------------------------------------------
   // TAP TEMPO
   // --------------------------------------------------------------
-  (function() {
-    const tapTimes = [];
-    const MAX_TAPS = 8;
-    const TAP_TIMEOUT = 2500;
-    let tapTimer = null;
-    let flashTimer = null;
-    const btn = document.getElementById('tapTempoBtn');
-    const display = document.getElementById('bpmDisplay');
-    function flashBtn() {
-      btn.classList.add('flash');
-      clearTimeout(flashTimer);
-      flashTimer = setTimeout(() => btn.classList.remove('flash'), 120);
+  const tapTimes = [];
+  const MAX_TAPS = 8;
+  const TAP_TIMEOUT = 2500;
+  let tapTimer = null;
+
+  function sendTempoToDevice(bpm) {
+    if (!midiOut) return;
+    const lsb = bpm & 0x7F;
+    const msb = (bpm >> 7) & 0x7F;
+    midiOut.send([0xF0, 0x52, 0x00, 0x6E, 0x64, 0x20, 0x00, 0x64, 0x02, lsb, msb, 0x00, 0x00, 0x00, 0xF7]);
+  }
+
+  function handleTapTempo() {
+    const now = performance.now();
+    if (tapTimes.length && (now - tapTimes[tapTimes.length - 1]) > TAP_TIMEOUT) tapTimes.length = 0;
+    tapTimes.push(now);
+    if (tapTimes.length > MAX_TAPS) tapTimes.shift();
+    flashTapBtn();
+    if (tapTimes.length >= 2) {
+      const intervals = [];
+      for (let i = 1; i < tapTimes.length; i++) intervals.push(tapTimes[i] - tapTimes[i - 1]);
+      const avgInterval = intervals.reduce((a, b) => a + b, 0) / intervals.length;
+      const bpm = Math.round(60000 / avgInterval);
+      const clampedBpm = Math.max(20, Math.min(300, bpm));
+      const display = document.getElementById('bpmDisplay');
+      if (display) display.innerText = clampedBpm;
+      if (currentPatchData) currentPatchData.tempo = clampedBpm;
+      sendTempoToDevice(clampedBpm);
     }
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const now = performance.now();
-      if (tapTimes.length && (now - tapTimes[tapTimes.length - 1]) > TAP_TIMEOUT) tapTimes.length = 0;
-      tapTimes.push(now);
-      if (tapTimes.length > MAX_TAPS) tapTimes.shift();
-      flashBtn();
-      if (tapTimes.length >= 2) {
-        const intervals = [];
-        for (let i = 1; i < tapTimes.length; i++) intervals.push(tapTimes[i] - tapTimes[i - 1]);
-        const avgInterval = intervals.reduce((a, b) => a + b, 0) / intervals.length;
-        const bpm = Math.round(60000 / avgInterval);
-        const clampedBpm = Math.max(20, Math.min(300, bpm));
-        display.innerText = clampedBpm;
-        if (currentPatchData) currentPatchData.tempo = clampedBpm;
-        if (midiOut) {
-          const lsb = clampedBpm & 0x7F;
-          const msb = (clampedBpm >> 7) & 0x7F;
-          midiOut.send([0xF0, 0x52, 0x00, 0x6E, 0x64, 0x20, 0x00, 0x64, 0x02, lsb, msb, 0x00, 0x00, 0x00, 0xF7]);
-        }
-      }
-      clearTimeout(tapTimer);
-      tapTimer = setTimeout(() => { tapTimes.length = 0; }, TAP_TIMEOUT);
-    });
-  })();
+    clearTimeout(tapTimer);
+    tapTimer = setTimeout(() => { tapTimes.length = 0; }, TAP_TIMEOUT);
+  }
+
+  let flashTimer = null;
+  function flashTapBtn() {
+    const btn = document.getElementById('tapTempoBtn');
+    btn.classList.add('flash');
+    clearTimeout(flashTimer);
+    flashTimer = setTimeout(() => btn.classList.remove('flash'), 120);
+  }
+  document.getElementById('tapTempoBtn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    handleTapTempo();
+  });
 
   // --------------------------------------------------------------
   // AFINADOR
   // --------------------------------------------------------------
   (function() {
     const NOTE_NAMES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
-    let audioCtx = null;
-    let analyser = null;
-    let mediaStream = null;
-    let animFrameId = null;
+    let audioCtx = null, analyser = null, mediaStream = null, animFrameId = null;
     function freqToNote(freq) {
       if (!freq || freq < 20) return null;
       const semitones = 12 * Math.log2(freq / 440);
@@ -2239,12 +2024,8 @@
       const freqEl = document.getElementById('tunerFreq');
       const needle = document.getElementById('tunerNeedle');
       if (!freq || freq < 0) {
-        noteEl.textContent = '—';
-        octaveEl.textContent = '';
-        centsEl.textContent = '—';
-        freqEl.textContent = '— Hz';
-        needle.style.left = '50%';
-        needle.className = 'tuner-needle';
+        noteEl.textContent = '—'; octaveEl.textContent = ''; centsEl.textContent = '—';
+        freqEl.textContent = '— Hz'; needle.style.left = '50%'; needle.className = 'tuner-needle';
         return;
       }
       const info = freqToNote(freq);
@@ -2305,19 +2086,230 @@
     });
   })();
 
-  document.getElementById('closeModalBtn').addEventListener('click', () => {
-    document.getElementById('effectModal').style.display = 'none';
+  // --------------------------------------------------------------
+  // RENOMBRAR (click en el nombre del preset)
+  // --------------------------------------------------------------
+  document.getElementById('presetName').addEventListener('click', () => {
+    if (!currentPatchData) return;
+    const newName = prompt('Nuevo nombre (máx. 10 caracteres):', currentPatchData.name);
+    if (newName === null) return;
+    const trimmed = newName.slice(0,10).trim();
+    if (!trimmed) return;
+    currentPatchData.name = trimmed;
+    document.getElementById('presetName').textContent = trimmed;
+    isModified = true;
+    updateModifiedIndicator();
   });
-  window.addEventListener('click', (e) => {
-    if (e.target === document.getElementById('effectModal')) {
-      document.getElementById('effectModal').style.display = 'none';
-    }
-  });
-
-  if (navigator.requestMIDIAccess) connectMIDI().catch(e=>console.warn);
 
   // ================================================================
-  // Tabs
+  // CONEXIÓN MIDI Y ESCANEO
+  // ================================================================
+  async function connectMIDI() {
+    try {
+      const access = await navigator.requestMIDIAccess({ sysex: true });
+      let targetOutput = null, targetInput = null;
+      for (const [_, port] of access.outputs) {
+        if (port.name && (port.name.toLowerCase().includes('g2') || port.name.toLowerCase().includes('zoom'))) { targetOutput = port; break; }
+      }
+      for (const [_, port] of access.inputs) {
+        if (port.name && (port.name.toLowerCase().includes('g2') || port.name.toLowerCase().includes('zoom'))) { targetInput = port; break; }
+      }
+      if (!targetOutput) targetOutput = access.outputs.values().next().value;
+      if (!targetInput) targetInput = access.inputs.values().next().value;
+      if (!targetOutput || !targetInput) throw new Error('Dispositivo no encontrado');
+      midiOut = targetOutput;
+      midiIn = targetInput;
+
+      document.getElementById('midiDot').classList.add('on');
+      document.getElementById('midiLabel').textContent = targetOutput.name || 'Zoom G2 Four';
+
+      targetInput.onmidimessage = (msg) => {
+        const data = msg.data;
+        if (data.length >= 3 && (data[0] & 0xF0) === 0xB0) {
+          const controller = data[1], value = data[2];
+          if (controller === 0)  { window._g2BankMSB = value; }
+          if (controller === 32) { window._g2BankLSB = value; }
+          return;
+        }
+        if (data.length >= 2 && (data[0] & 0xF0) === 0xC0) {
+          const prog = data[1] & 0x7F;
+          const bankMSB = window._g2BankMSB ?? 0;
+          const bankLSB = window._g2BankLSB ?? 0;
+          const bank = (bankMSB << 7) | bankLSB;
+          const ppb = (typeof window._g2GetPatchesPerBank === 'function') ? window._g2GetPatchesPerBank() : -1;
+          if (ppb > 0 && !window._g2PCIgnore) {
+            const absSlot = bank * ppb + prog;
+            if (absSlot !== currentPresetSlot) {
+              currentPresetSlot = absSlot;
+              setTimeout(() => syncCurrentPatch(), 50);
+              updateTopBar();
+              if (typeof window._g2SyncPresetHighlight === 'function') window._g2SyncPresetHighlight(absSlot);
+            }
+          }
+          return;
+        }
+        if (data[0]===0xF0 && data[1]===0x52 && data[2]===0x00 &&
+            data[3]===0x6E && data[4]===0x64 && data[5]===0x26 && data.length >= 12) {
+          const bank = data[8] + (data[9] << 7);
+          const prog = data[10] + (data[11] << 7);
+          const ppb = (typeof window._g2GetPatchesPerBank === 'function') ? window._g2GetPatchesPerBank() : -1;
+          if (ppb > 0) {
+            const absSlot = bank * ppb + prog;
+            if (!window._g2PCIgnore && absSlot !== currentPresetSlot) {
+              currentPresetSlot = absSlot;
+              setTimeout(() => syncCurrentPatch(), 50);
+              updateTopBar();
+              if (typeof window._g2SyncPresetHighlight === 'function') window._g2SyncPresetHighlight(absSlot);
+            }
+          }
+          return;
+        }
+        if (data.length > 200 && data[0]===0xF0 && data[1]===0x52 &&
+            data[4]===0x64 && data[5]===0x12) {
+          const parsed = parsePatchFromSysex(data);
+          if (!parsed) return;
+          _lastSyncedName = parsed.name;
+          currentPatchData = parsed;
+          fullRefresh();
+          if (currentPresetSlot < 0 && typeof window._g2SyncPresetHighlight === 'function') {
+            window._g2SyncPresetHighlight(parsed.name);
+          }
+          return;
+        }
+        if (data[0]===0xF0 && data[1]===0x52 && data[2]===0x00 &&
+            data[3]===0x6E && data[4]===0x64 && data[5]===0x20 &&
+            data.length >= 14) {
+          const slot = data[7];
+          const subcmd = data[8];
+          if (subcmd === 0x00) {
+            const val = data[9];
+            if (currentPatchData && currentPatchData.effects && slot < currentPatchData.effects.length) {
+              currentPatchData.effects[slot].enabled = (val === 1);
+              flashPedal(slot);
+              updateTopBar();
+            }
+          } else if (subcmd >= 2) {
+            const paramNum = subcmd;
+            const lsb = data[9], msb = data[10];
+            const value = (msb << 7) | lsb;
+            const paramIndex = paramNum - 2;
+            if (currentPatchData && currentPatchData.effects && slot < currentPatchData.effects.length) {
+              const fx = currentPatchData.effects[slot];
+              if (paramIndex >= 0 && paramIndex < fx.parameters.length) {
+                fx.parameters[paramIndex] = value;
+                const isBool = isBooleanParam(fx.id, paramIndex);
+                const isSpecial = isBassTrebleDrive(fx.id, paramIndex);
+                const realRange = getParamRange(fx.id, paramIndex);
+                const isRealRangeBinary = realRange && realRange[1] - realRange[0] === 1;
+                const pNamesArr = getParamNames(fx.id);
+                const pname = (pNamesArr && pNamesArr[paramIndex] || '').toLowerCase();
+                const isAttack = (pname === 'attck' || pname === 'attack');
+                const display = document.getElementById(`pv-${slot}-${paramIndex}`);
+                const displayOffset = (realRange && realRange[2]) || 0;
+                if (display) {
+                  if (isBool) display.innerText = value >= 1 ? 'ON' : 'OFF';
+                  else if (isRealRangeBinary) display.innerText = value >= 1 ? (isAttack ? 'FAST' : 'ON') : (isAttack ? 'SLOW' : 'OFF');
+                  else if (isSpecial) display.innerText = Math.round(value - 10);
+                  else display.innerText = value + displayOffset;
+                }
+                const slider = document.querySelector(`input.pparam-slider[data-slot="${slot}"][data-paramindex="${paramIndex}"]`);
+                if (slider) {
+                  const offsetMin = parseFloat(slider.dataset.offsetmin || '0');
+                  slider.value = isSpecial ? value : (value - offsetMin);
+                }
+                const boolBtn = document.querySelector(`.pparam-bool-btn[data-slot="${slot}"][data-paramindex="${paramIndex}"]`);
+                if (boolBtn) {
+                  const boolOn = value >= 1;
+                  boolBtn.dataset.boolval = boolOn ? 1 : 0;
+                  boolBtn.classList.toggle('on', boolOn);
+                  boolBtn.classList.toggle('off', !boolOn);
+                }
+              }
+            }
+          }
+          return;
+        }
+      };
+
+      midiOut.send([0xF0, 0x52, 0x00, 0x6E, 0x50, 0xF7]);
+      setTimeout(() => midiOut.send([0xF0, 0x52, 0x00, 0x6E, 0x33, 0xF7]), 100);
+      setTimeout(() => syncCurrentPatch(), 400);
+      setTimeout(() => {
+        const scanBtn = document.getElementById('presetsScanBtn');
+        if (scanBtn && !scanBtn.disabled) scanBtn.click();
+      }, 1000);
+    } catch (e) {
+      console.error(e);
+      document.getElementById('midiLabel').textContent = '❌ Error MIDI';
+    }
+  }
+
+  // ================================================================
+  // NAVEGACIÓN ENTRE PRESETS (header)
+  // ================================================================
+  function loadPresetByOffset(delta) {
+    if (presetList.length === 0) return;
+    let currentSlot = currentPresetSlot;
+    if (currentSlot === -1) currentSlot = presetList[0].slot;
+    let newSlot = currentSlot + delta;
+    if (newSlot < 0) newSlot = presetList.length - 1;
+    if (newSlot >= presetList.length) newSlot = 0;
+    if (typeof window._g2LoadPresetBySlot === 'function') window._g2LoadPresetBySlot(newSlot);
+  }
+  window.loadPresetByOffset = loadPresetByOffset;
+
+  function gotoPresetNumber(num) {
+    if (presetList.length === 0) return;
+    const slot = num - 1;
+    if (slot < 0 || slot >= presetList.length) {
+      const input = document.getElementById('gotoInput');
+      input.style.borderColor = '#e74c3c';
+      setTimeout(() => { input.style.borderColor = ''; }, 500);
+      return;
+    }
+    if (typeof window._g2LoadPresetBySlot === 'function') window._g2LoadPresetBySlot(slot);
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('prevBtn').addEventListener('click', () => loadPresetByOffset(-1));
+    document.getElementById('nextBtn').addEventListener('click', () => loadPresetByOffset(1));
+
+    const gotoInput = document.getElementById('gotoInput');
+    gotoInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const val = parseInt(gotoInput.value);
+        if (!isNaN(val) && val > 0) gotoPresetNumber(val);
+        e.preventDefault();
+      }
+    });
+    document.getElementById('gotoBtn').addEventListener('click', () => {
+      const val = parseInt(gotoInput.value);
+      if (!isNaN(val) && val > 0) gotoPresetNumber(val);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      const key = e.key;
+      if (key >= '1' && key <= '7') {
+        const slotIndex = parseInt(key) - 1;
+        if (currentPatchData && currentPatchData.effects && slotIndex < currentPatchData.effects.length) {
+          const fx = currentPatchData.effects[slotIndex];
+          if (fx.id === 0x07000FF0) { handleTapTempo(); return; }
+          const newState = !fx.enabled;
+          toggleSlot(slotIndex, newState);
+          flashPedal(slotIndex);
+          e.preventDefault();
+        }
+      } else if (key === 'ArrowLeft') { loadPresetByOffset(-1); e.preventDefault(); }
+      else if (key === 'ArrowRight') { loadPresetByOffset(1); e.preventDefault(); }
+    });
+
+    if (navigator.requestMIDIAccess) connectMIDI().catch(e => console.warn(e));
+    else document.getElementById('midiLabel').textContent = '⚠ Web MIDI no soportada';
+  });
+
+  // ================================================================
+  // Tabs laterales
   // ================================================================
   document.querySelectorAll('.zone-tab').forEach(tab => {
     tab.addEventListener('click', () => {
@@ -2378,10 +2370,7 @@
     let numPresetPatches = -1;
     let patchesPerBankPreset = -1;
     window._g2GetPatchesPerBank = () => patchesPerBankPreset;
-    let presetList = [];
     let selectedPresetItem = null;
-    // currentPresetSlot vive ahora en el scope principal; se referencia siempre
-    // a través de la variable currentPresetSlot declarada arriba (mismo scope superior).
 
     async function sleepPreset(ms) { return new Promise(r => setTimeout(r, ms)); }
 
@@ -2535,13 +2524,13 @@
         if (slot === currentPresetSlot) item.classList.add('selected');
         item.dataset.slot = slot;
         item.innerHTML = `<span class="preset-num">${String(slot+1).padStart(3,'0')}</span>
-                          <span class="preset-name" title="${name}">${name}</span>`;
+                          <span class="preset-name-text" title="${name}">${name}</span>`;
         item.addEventListener('click', () => {
           if (selectedPresetItem) selectedPresetItem.classList.remove('selected');
           item.classList.add('selected');
           selectedPresetItem = item;
           currentPresetSlot = slot;
-          document.getElementById('topPresetSlot').textContent = String(slot + 1).padStart(3, '0');
+          updateTopBar();
           if (midiOut) {
             window._g2PCIgnore = true;
             setTimeout(() => { window._g2PCIgnore = false; }, 500);
@@ -2561,7 +2550,7 @@
       });
     }
 
-    function loadPresetByOffset(delta) {
+    function loadPresetByOffsetLocal(delta) {
       if (presetList.length === 0) return;
       let newSlot = currentPresetSlot + delta;
       if (newSlot < 0) newSlot = presetList.length - 1;
@@ -2570,10 +2559,7 @@
       if (targetPreset) {
         const items = document.querySelectorAll('.preset-item');
         for (let item of items) {
-          if (parseInt(item.dataset.slot) === newSlot) {
-            item.click();
-            break;
-          }
+          if (parseInt(item.dataset.slot) === newSlot) { item.click(); break; }
         }
       }
     }
@@ -2581,14 +2567,10 @@
     window._g2LoadPresetBySlot = function(absoluteSlot) {
       const items = document.querySelectorAll('.preset-item');
       for (let item of items) {
-        if (parseInt(item.dataset.slot) === absoluteSlot) {
-          item.click();
-          return true;
-        }
+        if (parseInt(item.dataset.slot) === absoluteSlot) { item.click(); return true; }
       }
       currentPresetSlot = absoluteSlot;
-      document.getElementById('topPresetSlot').textContent =
-        String(absoluteSlot + 1).padStart(3, '0');
+      updateTopBar();
       if (typeof syncCurrentPatch === 'function') syncCurrentPatch();
       return false;
     };
@@ -2598,14 +2580,13 @@
       for (let item of items) {
         const match = typeof slotOrName === 'number'
           ? parseInt(item.dataset.slot) === slotOrName
-          : item.querySelector('.preset-name')?.textContent.trim() === String(slotOrName).trim();
+          : item.querySelector('.preset-name-text')?.textContent.trim() === String(slotOrName).trim();
         if (match) {
           if (selectedPresetItem) selectedPresetItem.classList.remove('selected');
           item.classList.add('selected');
           selectedPresetItem = item;
           currentPresetSlot = parseInt(item.dataset.slot);
-          document.getElementById('topPresetSlot').textContent =
-            String(currentPresetSlot + 1).padStart(3, '0');
+          updateTopBar();
           item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
           return true;
         }
@@ -2631,11 +2612,7 @@
       renderPresetsGrid();
       try {
         const ok = await probeProtocolPreset();
-        if (!ok) {
-          detectedPresetProtocol = 'v1';
-          numPresetPatches = 100;
-          patchesPerBankPreset = -1;
-        }
+        if (!ok) { detectedPresetProtocol = 'v1'; numPresetPatches = 100; patchesPerBankPreset = -1; }
         const total = numPresetPatches > 0 ? numPresetPatches : 300;
         document.getElementById('presetsStatus').textContent = `Protocolo ${(detectedPresetProtocol||'v1').toUpperCase()} · escaneando ${total} presets…`;
         for (let i = 0; i < total; i++) {
@@ -2649,12 +2626,10 @@
         renderPresetsGrid();
         document.getElementById('presetsStatus').textContent = `${presetList.length} presets cargados`;
         if (presetList.length && window._g2LastSyncedName) {
-          if (typeof window._g2SyncPresetHighlight === 'function') {
-            window._g2SyncPresetHighlight(window._g2LastSyncedName);
-          }
+          window._g2SyncPresetHighlight(window._g2LastSyncedName);
         }
-        document.getElementById('topPrevBtn').disabled = false;
-        document.getElementById('topNextBtn').disabled = false;
+        document.getElementById('prevBtn').disabled = false;
+        document.getElementById('nextBtn').disabled = false;
         document.getElementById('presetPrevBtn').disabled = false;
         document.getElementById('presetNextBtn').disabled = false;
       } catch(err) {
@@ -2668,14 +2643,13 @@
       }
     });
 
-    document.getElementById('presetPrevBtn').addEventListener('click', () => loadPresetByOffset(-1));
-    document.getElementById('presetNextBtn').addEventListener('click', () => loadPresetByOffset(1));
-    document.getElementById('topPrevBtn').addEventListener('click', () => loadPresetByOffset(-1));
-    document.getElementById('topNextBtn').addEventListener('click', () => loadPresetByOffset(1));
+    document.getElementById('presetPrevBtn').addEventListener('click', () => loadPresetByOffsetLocal(-1));
+    document.getElementById('presetNextBtn').addEventListener('click', () => loadPresetByOffsetLocal(1));
   })();
 
   // ================================================================
-  // GESTIÓN DE ARCHIVOS
+  // GESTIÓN DE ARCHIVOS (.zptc) — basado en la lógica validada con la
+  // pedalera real en zoom-backup-zptc.html
   // ================================================================
   (function() {
     const g2 = window._g2;
@@ -2695,388 +2669,408 @@
     function safeName(name) {
       return (name || 'preset').replace(/[^a-zA-Z0-9_\-áéíóúüñÁÉÍÓÚÜÑ ]/g,'_').trim() || 'preset';
     }
-    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+    function fmSleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-    function patchToJSON(patch) {
-      return JSON.stringify({
-        _editor: 'Zoom G2 Four Editor',
-        _version: 1,
-        timestamp: new Date().toISOString(),
-        patch: patch || g2.currentPatchData
-      }, null, 2);
+    function dbgInto(logElId, msg) {
+      const el = document.getElementById(logElId);
+      if (!el) return;
+      el.style.display = 'block';
+      const line = document.createElement('div');
+      line.textContent = msg;
+      el.appendChild(line);
+      el.scrollTop = el.scrollHeight;
+    }
+    function dbgClearInto(logElId) {
+      const el = document.getElementById(logElId);
+      if (!el) return;
+      el.innerHTML = '';
+      el.style.display = 'none';
     }
 
-    function waitSysex(matchFn, timeoutMs) {
+    // --- 7-bit <-> CRC32, idénticos a los ya verificados byte a byte contra
+    //     el código fuente real de sym.bios.is / zoom-explorer ---
+    function eight2seven(eightBitBytes, start, end) {
+      if (start === undefined) start = 0;
+      if (end === undefined) end = eightBitBytes.length - 1;
+      const out = new Uint8Array((end - start + 1) + Math.ceil((end - start + 1) / 7));
+      let i = start, o = 0, s = 0, c = 0;
+      for (; i <= end;) {
+        s = (i - start) % 7;
+        if (s === 0) c = o++;
+        const a = eightBitBytes[i];
+        out[c] |= (a & 0x80) >> (s + 1);
+        out[o] = a & 0x7F;
+        o++; i++;
+      }
+      return out.slice(0, o);
+    }
+    let _fmCrcTable = null;
+    function fmBuildCrcTable() {
+      const t = new Uint32Array(256);
+      for (let i = 0; i < 256; i++) {
+        let c = i;
+        for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+        t[i] = c >>> 0;
+      }
+      return t;
+    }
+    function fmCrc32(data) {
+      if (!_fmCrcTable) _fmCrcTable = fmBuildCrcTable();
+      let crc = 0 ^ (-1);
+      for (let i = 0; i < data.length; i++) {
+        crc = (crc >>> 8) ^ _fmCrcTable[(crc ^ data[i]) & 0xFF];
+      }
+      return ((crc ^ (-1)) >>> 0);
+    }
+    function getSevenBitCRC(data) {
+      let crc = fmCrc32(data) ^ 0xFFFFFFFF;
+      crc = crc >>> 0;
+      return new Uint8Array([crc & 0x7F, (crc >>> 7) & 0x7F, (crc >>> 14) & 0x7F, (crc >>> 21) & 0x7F, (crc >>> 28) & 0x0F]);
+    }
+
+    function fmWaitSysex(midiIn, matchFn, timeoutMs) {
       return new Promise(resolve => {
-        if (!g2.midiIn) { resolve(null); return; }
         let done = false;
-        const t = setTimeout(() => { if (!done) { done=true; g2.midiIn.removeEventListener('midimessage', h); resolve(null); } }, timeoutMs);
+        const t = setTimeout(() => { if (!done) { done = true; midiIn.removeEventListener('midimessage', h); resolve(null); } }, timeoutMs);
         function h(msg) {
           if (!done && matchFn(msg.data)) {
-            done=true; clearTimeout(t);
-            g2.midiIn.removeEventListener('midimessage', h);
+            done = true; clearTimeout(t);
+            midiIn.removeEventListener('midimessage', h);
             resolve(msg.data);
           }
         }
-        g2.midiIn.addEventListener('midimessage', h);
+        midiIn.addEventListener('midimessage', h);
       });
     }
 
-    function sendPatchToEditBuffer(patch, onDone) {
-      if (!g2.midiOut) return false;
-      const effects = patch.effects || [];
-      let delay = 0;
-      effects.forEach((fx, slot) => {
-        const id = (fx.id||0)>>>0;
-        const b0=id&0x7F,b1=(id>>7)&0x7F,b2=(id>>14)&0x7F,b3=(id>>21)&0x7F,b4=(id>>28)&0x0F;
-        setTimeout(()=>{ if(g2.midiOut) g2.midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x20,0x00,slot,0x01,b0,b1,b2,b3,b4,0xF7]); }, delay); delay+=40;
-        setTimeout(()=>{ if(g2.midiOut) g2.midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x20,0x00,slot,0x00,fx.enabled?1:0,0,0,0,0,0xF7]); }, delay); delay+=30;
-        (fx.parameters||[]).forEach((val,pi)=>{
-          setTimeout(()=>{
-            if(!g2.midiOut) return;
-            const v=Math.min(4095,Math.max(0,val));
-            g2.midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x20,0x00,slot,pi+2,v&0x7F,(v>>7)&0x7F,0,0,0,0xF7]);
-          }, delay); delay+=20;
-        });
-      });
-      setTimeout(()=>{ if(g2.midiOut) g2.midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x13,0x00,0xF7]); if(onDone) onDone(); }, delay+120);
-      return true;
-    }
-
-    function setAutoSaveLed(enabled) {
-      const led  = document.getElementById('autoSaveLed');
-      const lbl  = document.getElementById('autoSaveLabel');
-      const wrap = document.getElementById('autoSaveWrap');
-      if (led)  { led.style.background = enabled ? '#4cff80' : '#ff4444'; led.style.boxShadow = enabled ? '0 0 6px #4cff80' : '0 0 6px #ff4444'; }
-      if (lbl)  { lbl.style.color = enabled ? '#4cff80' : '#ff4444'; }
-      if (wrap) { wrap.style.opacity = '1'; }
-    }
-
-    async function saveCurrentPresetToPedal(statusElId) {
-      const elId = statusElId || 'fmSaveStatus';
-      if (!g2.midiOut) { fmStatus(elId,'⚠ Conecta MIDI primero','warn'); return; }
-      if (!g2.currentPatchData) { fmStatus(elId,'⚠ No hay preset activo','warn'); return; }
-      fmStatus(elId,'⏳ Guardando en pedalera…','');
-
-      // Paso 1: Activar autosave
-      g2.midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x20,0x00,
-                       0x64,0x0F,0x01,0x00,0x00,0x00,0x00,0xF7]);
-      setAutoSaveLed(true);
-      await sleep(40);
-
-      // Paso 2: Ir al preset siguiente y volver — limpia el flag EDITED
-      // y confirma el guardado sin revertir el edit buffer
-      const ppb = (typeof window._g2GetPatchesPerBank === 'function') ? window._g2GetPatchesPerBank() : 10;
-      const slot = g2.currentPresetSlot;
-      const nextSlot = slot + 1;
-      const nextBank = Math.floor(nextSlot / ppb);
-      const nextProg = nextSlot % ppb;
-      const curBank  = Math.floor(slot / ppb);
-      const curProg  = slot % ppb;
-
-      window._g2PCIgnore = true;
-
-      // Ir al siguiente preset
-      if (ppb > 10) {
-        g2.midiOut.send([0xB0, 0x00, (nextBank >> 7) & 0x7F]);
-        g2.midiOut.send([0xB0, 0x20,  nextBank       & 0x7F]);
+    // --- Detecta protocolo v1/v2, nº de presets, presets/banco y el tamaño
+    //     fijo de patch que espera la pedalera (patchLength) ---
+    async function fmDetectProtocol(midiOut, midiIn) {
+      midiOut.send([0xF0, 0x52, 0x00, 0x6E, 0x44, 0xF7]);
+      const r2 = await fmWaitSysex(midiIn, d => d.length > 13 && d[0]===0xF0 && d[1]===0x52 && d[2]===0x00 && d[3]===0x6E && d[4]===0x43, 600);
+      if (r2 && r2.length > 13) {
+        return {
+          protocol: 'v2',
+          numPatches: r2[5] + (r2[6] << 7),
+          patchLength: r2[7] + (r2[8] << 7),
+          patchesPerBank: r2[11] + (r2[12] << 7)
+        };
       }
-      g2.midiOut.send([0xC0, nextProg & 0x7F]);
-      await sleep(40);
-
-      // Volver al preset original
-      if (ppb > 10) {
-        g2.midiOut.send([0xB0, 0x00, (curBank >> 7) & 0x7F]);
-        g2.midiOut.send([0xB0, 0x20,  curBank       & 0x7F]);
+      midiOut.send([0xF0, 0x52, 0x00, 0x6E, 0x07, 0xF7]);
+      const r1 = await fmWaitSysex(midiIn, d => d.length > 5 && d[0]===0xF0 && d[1]===0x52 && d[2]===0x00 && d[3]===0x6E && d[4]===0x06, 600);
+      if (r1 && r1.length >= 10) {
+        const patchLength1 = r1.length > 8 ? (r1[7] + (r1[8] << 7)) : -1;
+        return { protocol: 'v1', numPatches: r1[5] + (r1[6] << 7), patchLength: patchLength1, patchesPerBank: -1 };
       }
-      g2.midiOut.send([0xC0, curProg & 0x7F]);
-      await sleep(40);
-
-      window._g2PCIgnore = false;
-
-      // Paso 4: Desactivar autosave
-      g2.midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x20,0x00,
-                       0x64,0x0F,0x00,0x00,0x00,0x00,0x00,0xF7]);
-      setAutoSaveLed(false);
-
-      fmStatus(elId, `✅ Guardado: "${g2.currentPatchData.name}"`, 'ok');
-
+      return { protocol: 'v2', numPatches: 300, patchLength: -1, patchesPerBank: 10 };
     }
 
+    // --- Decodifica un dump de patch (0x12), recortando por el F7 y por el
+    //     tamaño real declarado dentro del propio chunk PTCF ---
+    function fmDecodeDumpSysex(replyData) {
+      let raw = Array.from(replyData);
+      const endIdx = raw.indexOf(0xF7);
+      if (endIdx >= 0) raw = raw.slice(0, endIdx + 1);
+      const dataStart = 9;
+      const dataEnd = raw.length - 1 - 5 - 1;
+      let decoded = seven2eight(raw, dataStart, dataEnd);
+      if (decoded.length >= 8 && decoded[0]===0x50 && decoded[1]===0x54 && decoded[2]===0x43 && decoded[3]===0x46) {
+        const declaredSize = decoded[4] | (decoded[5]<<8) | (decoded[6]<<16) | (decoded[7]<<24);
+        if (declaredSize > 0 && declaredSize <= decoded.length) decoded = decoded.slice(0, declaredSize);
+      }
+      return decoded;
+    }
 
-    document.getElementById('fmSaveToDeviceBtn').addEventListener('click', () => saveCurrentPresetToPedal('fmSaveStatus'));
-    document.getElementById('topSaveBtn').addEventListener('click', () => saveCurrentPresetToPedal('fmSaveStatus'));
+    async function fmFetchCurrentPatch(midiOut, midiIn) {
+      midiOut.send([0xF0, 0x52, 0x00, 0x6E, 0x64, 0x13, 0x00, 0xF7]);
+      const reply = await fmWaitSysex(midiIn, d => d.length > 50 && d[0]===0xF0 && d[1]===0x52 && d[2]===0x00 && d[3]===0x6E && d[4]===0x64 && d[5]===0x12, 4000);
+      if (!reply) return null;
+      return fmDecodeDumpSysex(reply);
+    }
 
-    document.getElementById('fmRenameBtn').addEventListener('click', () => {
-      if (!g2.currentPatchData) { fmStatus('fmSaveStatus','⚠ No hay preset activo','warn'); return; }
-      const newName = prompt('Nuevo nombre (máx. 10 caracteres):', g2.currentPatchData.name);
-      if (newName === null) return;
-      const trimmed = newName.slice(0,10).trim();
-      if (!trimmed) { fmStatus('fmSaveStatus','⚠ Nombre vacío, sin cambios','warn'); return; }
-      g2.currentPatchData.name = trimmed;
-      document.getElementById('patchName').innerText = trimmed;
-      fmStatus('fmSaveStatus', `✏️ Renombrado a "${trimmed}" — pulsa 💾 para persistir en pedalera`, 'ok');
-    });
-
-    document.getElementById('fmExportJsonBtn').addEventListener('click', () => {
-      if (!g2.currentPatchData) { fmStatus('fmExportStatus','⚠ No hay preset activo','warn'); return; }
-      downloadBlob(new Blob([patchToJSON()],{type:'application/json'}), safeName(g2.currentPatchData.name)+'.json');
-      fmStatus('fmExportStatus', `✅ Guardado: ${safeName(g2.currentPatchData.name)}.json`, 'ok');
-    });
-
-    document.getElementById('fmExportSysexBtn').addEventListener('click', async () => {
-      if (!g2.midiOut || !g2.midiIn) { fmStatus('fmExportStatus','⚠ Conecta MIDI primero','warn'); return; }
-      fmStatus('fmExportStatus','⏳ Solicitando SysEx a la pedalera…','');
-      g2.midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x13,0x00,0xF7]);
-      const reply = await waitSysex(
-        d => d[0]===0xF0&&d[1]===0x52&&d[2]===0x00&&d[3]===0x6E&&d[4]===0x64&&d[5]===0x12,
-        3000
-      );
-      if (reply) {
-        const name = g2.currentPatchData ? safeName(g2.currentPatchData.name) : 'preset';
-        downloadBlob(new Blob([reply],{type:'application/octet-stream'}), name+'.syx');
-        fmStatus('fmExportStatus', `✅ Exportado: ${name}.syx (${reply.length} bytes)`, 'ok');
+    // --- Pide el dump de un slot de memoria concreto, sin tocar el preset activo ---
+    async function fmFetchPatchFromMemorySlot(midiOut, midiIn, slot, protocol, patchesPerBank) {
+      let raw, dataStart;
+      if (protocol === 'v2' && patchesPerBank > 0) {
+        const bank = Math.floor(slot / patchesPerBank);
+        const prog = slot % patchesPerBank;
+        const req = [0xF0,0x52,0x00,0x6E,0x46,0x00,0x00, bank&0x7F,(bank>>7)&0x7F, prog&0x7F,(prog>>7)&0x7F, 0xF7];
+        midiOut.send(req);
+        const reply = await fmWaitSysex(midiIn, d => d.length > 20 && d[0]===0xF0 && d[1]===0x52 && d[2]===0x00 && d[3]===0x6E && d[4]===0x45 && d[5]===0x00 && d[6]===0x00, 4000);
+        if (!reply) return null;
+        raw = Array.from(reply);
+        const endIdx = raw.indexOf(0xF7);
+        if (endIdx >= 0) raw = raw.slice(0, endIdx + 1);
+        dataStart = 13;
       } else {
-        if (g2.currentPatchData) {
-          downloadBlob(new Blob([patchToJSON()],{type:'application/octet-stream'}), safeName(g2.currentPatchData.name)+'.syx');
-          fmStatus('fmExportStatus','⚠ Sin respuesta SysEx — guardado como JSON con ext .syx','warn');
-        } else {
-          fmStatus('fmExportStatus','❌ Sin respuesta de la pedalera','err');
+        const req = [0xF0,0x52,0x00,0x6E,0x09,0x00,0x00, slot&0x7F, 0xF7];
+        midiOut.send(req);
+        const reply = await fmWaitSysex(midiIn, d => d.length > 20 && d[0]===0xF0 && d[1]===0x52 && d[2]===0x00 && d[3]===0x6E && d[4]===0x08 && d[5]===0x00 && d[6]===0x00, 4000);
+        if (!reply) return null;
+        raw = Array.from(reply);
+        const endIdx = raw.indexOf(0xF7);
+        if (endIdx >= 0) raw = raw.slice(0, endIdx + 1);
+        dataStart = 10;
+      }
+      const dataEnd = raw.length - 2;
+      let decoded = seven2eight(raw, dataStart, dataEnd);
+      if (decoded.length >= 8 && decoded[0]===0x50 && decoded[1]===0x54 && decoded[2]===0x43 && decoded[3]===0x46) {
+        const declaredSize = decoded[4] | (decoded[5]<<8) | (decoded[6]<<16) | (decoded[7]<<24);
+        if (declaredSize > 0 && declaredSize <= decoded.length) decoded = decoded.slice(0, declaredSize);
+      }
+      return decoded;
+    }
+
+    function fmExtractPatchName(eight) {
+      let ptcfOff = -1;
+      for (let i = 0; i < eight.length - 3; i++) {
+        if (eight[i]===0x50 && eight[i+1]===0x54 && eight[i+2]===0x43 && eight[i+3]===0x46) { ptcfOff = i; break; }
+      }
+      if (ptcfOff < 0) return 'preset';
+      const numEffects = readI32LE(eight, ptcfOff + 12);
+      const subStart = ptcfOff + 36 + numEffects * 4;
+      let off = subStart;
+      while (off + 8 <= eight.length) {
+        const id = String.fromCharCode(eight[off], eight[off+1], eight[off+2], eight[off+3]);
+        const len = readI32LE(eight, off + 4);
+        if (len < 0 || off + 8 + len > eight.length) break;
+        if (id === 'NAME') {
+          let name = '';
+          for (let b = 0; b < len; b++) { if (eight[off+8+b] === 0) break; name += String.fromCharCode(eight[off+8+b]); }
+          return name.trim() || 'preset';
         }
+        off += 8 + len;
       }
-    });
-
-    let importedPatch = null;
-    let importedRawSyx = null;
-
-    document.getElementById('fmImportBtn').addEventListener('click', () => {
-      document.getElementById('fmFileInput').click();
-    });
-
-    document.getElementById('fmFileInput').addEventListener('change', (e) => {
-      const file = e.target.files[0]; if (!file) return;
-      const ext = file.name.split('.').pop().toLowerCase();
-      const reader = new FileReader();
-      if (ext === 'json') {
-        reader.onload = (ev) => {
-          try {
-            const obj = JSON.parse(ev.target.result);
-            importedPatch = obj.patch || obj;
-            importedRawSyx = null;
-            if (!importedPatch.effects || !importedPatch.name) throw new Error();
-            fmStatus('fmImportStatus', `✅ Listo: "${importedPatch.name}" (${importedPatch.effects.length} efectos) — pulsa Enviar`, 'ok');
-            document.getElementById('fmSendToDeviceBtn').disabled = false;
-          } catch {
-            fmStatus('fmImportStatus','❌ JSON inválido o formato desconocido','err');
-            importedPatch = null;
-            document.getElementById('fmSendToDeviceBtn').disabled = true;
-          }
-        };
-        reader.readAsText(file);
-      } else if (ext === 'syx') {
-        reader.onload = (ev) => {
-          const bytes = new Uint8Array(ev.target.result);
-          try {
-            const obj = JSON.parse(new TextDecoder().decode(bytes));
-            importedPatch = obj.patch || obj;
-            importedRawSyx = null;
-            if (!importedPatch.effects || !importedPatch.name) throw new Error();
-            fmStatus('fmImportStatus', `✅ Listo (JSON): "${importedPatch.name}" — pulsa Enviar`, 'ok');
-            document.getElementById('fmSendToDeviceBtn').disabled = false;
-          } catch {
-            if (bytes[0]===0xF0&&bytes[1]===0x52&&bytes[2]===0x00&&bytes[3]===0x6E) {
-              importedRawSyx = bytes; importedPatch = null;
-              fmStatus('fmImportStatus', `✅ SysEx binario listo — ${bytes.length} bytes — pulsa Enviar`, 'ok');
-              document.getElementById('fmSendToDeviceBtn').disabled = false;
-            } else {
-              fmStatus('fmImportStatus','❌ .syx no reconocido (no es Zoom SysEx)','err');
-              importedPatch = null; importedRawSyx = null;
-              document.getElementById('fmSendToDeviceBtn').disabled = true;
-            }
-          }
-        };
-        reader.readAsArrayBuffer(file);
-      } else {
-        fmStatus('fmImportStatus','❌ Formato no soportado — usa .json o .syx','err');
-      }
-      e.target.value = '';
-    });
-
-    document.getElementById('fmSendToDeviceBtn').addEventListener('click', () => {
-      if (!g2.midiOut) { fmStatus('fmImportStatus','⚠ Conecta MIDI primero','warn'); return; }
-      if (importedRawSyx) {
-        fmStatus('fmImportStatus','⏳ Enviando SysEx al slot activo…','');
-        g2.midiOut.send(importedRawSyx);
-        setTimeout(() => {
-          if(g2.midiOut) g2.midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x13,0x00,0xF7]);
-          fmStatus('fmImportStatus','✅ SysEx enviado y buffer sincronizado','ok');
-        }, 200);
-      } else if (importedPatch) {
-        fmStatus('fmImportStatus','⏳ Cargando preset en slot activo…','');
-        g2.currentPatchData = importedPatch;
-        g2.fullRefresh();
-        sendPatchToEditBuffer(importedPatch, () => {
-          fmStatus('fmImportStatus', `✅ "${importedPatch.name}" enviado al slot activo`, 'ok');
-        });
-      }
-    });
-
-    // ── BACKUP / RESTORE
-    const sessionBackups = [];
-
-    function setBkpProgress(cur, total) {
-      const pct = total > 0 ? Math.round(cur/total*100) : 0;
-      document.getElementById('fmBackupProgressFill').style.width = pct+'%';
-      document.getElementById('fmBackupProgressText').textContent = cur+' / '+total;
+      return 'preset';
     }
 
-    function renderBackupList() {
-      const list = document.getElementById('fmBackupList');
-      if (!sessionBackups.length) {
-        list.innerHTML = '<div style="color:#2a3d5a;font-size:0.68rem;padding:8px 4px;text-align:center">Sin backups en esta sesión</div>';
+    // ============================================================
+    // BOTÓN: SAVE AS ZPTC — descarga el preset activo de la pedalera
+    // ============================================================
+    document.getElementById('fmSaveAsZptcBtn').addEventListener('click', async () => {
+      const btn = document.getElementById('fmSaveAsZptcBtn');
+      btn.disabled = true;
+      try {
+        if (!g2.midiOut || !g2.midiIn) { fmStatus('fmSaveAsStatus', '⚠ Conecta MIDI primero', 'warn'); return; }
+        fmStatus('fmSaveAsStatus', '⏳ Solicitando preset activo…', '');
+        const decoded = await fmFetchCurrentPatch(g2.midiOut, g2.midiIn);
+        if (!decoded) { fmStatus('fmSaveAsStatus', '❌ Sin respuesta de la pedalera', 'err'); return; }
+        const name = fmExtractPatchName(decoded);
+        const filename = safeName(name) + '.zptc';
+        downloadBlob(new Blob([decoded], { type: 'application/octet-stream' }), filename);
+        fmStatus('fmSaveAsStatus', `✅ Descargado: ${filename}`, 'ok');
+      } catch (err) {
+        console.error(err);
+        fmStatus('fmSaveAsStatus', '❌ Error: ' + err.message, 'err');
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // ============================================================
+    // BOTÓN: LOAD ZPTC + slot + UPLOAD — escribe un .zptc en un slot
+    // ============================================================
+    let _fmPendingBytes = null;
+    let _fmPendingName = '';
+
+    document.getElementById('fmPickZptcBtn').addEventListener('click', () => {
+      document.getElementById('fmZptcFileInput').click();
+    });
+
+    document.getElementById('fmZptcFileInput').addEventListener('change', async (ev) => {
+      const f = ev.target.files && ev.target.files[0];
+      const upBtn = document.getElementById('fmUploadZptcBtn');
+      if (!f) { _fmPendingBytes = null; fmStatus('fmUploadStatus', '', ''); upBtn.disabled = true; return; }
+      const buf = new Uint8Array(await f.arrayBuffer());
+      if (buf.length < 12 || buf[0]!==0x50 || buf[1]!==0x54 || buf[2]!==0x43 || buf[3]!==0x46) {
+        fmStatus('fmUploadStatus', `❌ "${f.name}" no es un .zptc válido (falta cabecera PTCF)`, 'err');
+        _fmPendingBytes = null; upBtn.disabled = true;
         return;
       }
-      list.innerHTML = sessionBackups.map((b,i) => `
-        <div class="fm-backup-item">
-          <div class="fm-backup-item-name" title="${b.label}">🗄️ ${b.label}</div>
-          <div class="fm-backup-item-date">${b.time}</div>
-          <button class="fm-backup-item-btn" data-action="download" data-idx="${i}" title="Descargar .json">⬇</button>
-          <button class="fm-backup-item-btn del" data-action="delete" data-idx="${i}" title="Eliminar">✕</button>
-        </div>
-      `).join('');
-      list.querySelectorAll('.fm-backup-item-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const idx = parseInt(btn.dataset.idx);
-          if (btn.dataset.action === 'download') downloadSessionBackup(idx);
-          else { sessionBackups.splice(idx,1); renderBackupList(); }
-        });
-      });
-    }
+      _fmPendingBytes = buf;
+      _fmPendingName = fmExtractPatchName(buf);
+      fmStatus('fmUploadStatus', `✔ "${_fmPendingName}" (${buf.length} bytes) — elige slot y pulsa UPLOAD`, 'ok');
+      upBtn.disabled = false;
+      ev.target.value = '';
+    });
 
-    function downloadSessionBackup(idx) {
-      const b = sessionBackups[idx]; if (!b) return;
-      downloadBlob(
-        new Blob([JSON.stringify(b.data, null, 2)],{type:'application/json'}),
-        `g2four_backup_${b.time.replace(/:/g,'')}.json`
-      );
-    }
+    document.getElementById('fmUploadZptcBtn').addEventListener('click', async () => {
+      const upBtn = document.getElementById('fmUploadZptcBtn');
+      if (!_fmPendingBytes) { fmStatus('fmUploadStatus', 'Primero elige un archivo .zptc', 'err'); return; }
+      const slot1 = parseInt(document.getElementById('fmSlotInput').value, 10);
+      if (!Number.isFinite(slot1) || slot1 < 1 || slot1 > 300) {
+        fmStatus('fmUploadStatus', 'Slot fuera de rango (1-300)', 'err'); return;
+      }
+      const slot = slot1 - 1;
+      upBtn.disabled = true;
+      dbgClearInto('fmUploadDebugLog');
+      try {
+        if (!g2.midiOut || !g2.midiIn) { fmStatus('fmUploadStatus', '⚠ Conecta MIDI primero', 'warn'); return; }
 
-    document.getElementById('fmFullBackupBtn').addEventListener('click', async () => {
-      if (!g2.midiOut || !g2.midiIn) { fmStatus('fmBackupStatus','⚠ Conecta MIDI primero','warn'); return; }
+        fmStatus('fmUploadStatus', 'Detectando configuración de bancos…', '');
+        const { protocol, patchLength, patchesPerBank: detectedPpb } = await fmDetectProtocol(g2.midiOut, g2.midiIn);
+        const patchesPerBank = (protocol === 'v2' && detectedPpb > 0) ? detectedPpb : 10;
+        const bank = Math.floor(slot / patchesPerBank);
+        const prog = slot % patchesPerBank;
 
-      const progressWrap = document.getElementById('fmBackupProgressWrap');
-      progressWrap.style.display = 'flex';
-      fmStatus('fmBackupStatus','⏳ Iniciando backup…','');
-      setBkpProgress(0, 0);
-
-      const PATCHES_PER_BANK = 50;
-      const NUM_BANKS = 6;
-      const NUM_PATCHES = PATCHES_PER_BANK * NUM_BANKS;
-
-      const allPresets = [];
-      let errors = 0;
-
-      for (let i = 0; i < NUM_PATCHES; i++) {
-        const bank = Math.floor(i / PATCHES_PER_BANK);
-        const prog = i % PATCHES_PER_BANK;
-        setBkpProgress(i, NUM_PATCHES);
-
-        const bankL = bank & 0x7F, bankH = (bank >> 7) & 0x7F;
-        const progL = prog & 0x7F,  progH = (prog >> 7) & 0x7F;
-        g2.midiOut.send([0xF0,0x52,0x00,0x6E,0x46,0x00,0x00, bankL,bankH, progL,progH, 0xF7]);
-
-        const resp = await waitSysex(
-          d => d.length > 10 && d[0]===0xF0 && d[1]===0x52 && d[2]===0x00 && d[3]===0x6E && d[4]===0x45,
-          1000
-        );
-        if (resp) {
-          allPresets.push({ slot: i, bank, prog, syx: Array.from(resp) });
-          errors = 0;
+        let patchData = _fmPendingBytes;
+        if (patchLength && patchLength > 0) {
+          if (patchData.length > patchLength) {
+            throw new Error(`El patch (${patchData.length}B) es más grande que el máximo aceptado por la pedalera (${patchLength}B).`);
+          }
+          if (patchData.length < patchLength) {
+            dbgInto('fmUploadDebugLog', `Rellenando patch con ceros: ${patchData.length}B → ${patchLength}B`);
+            const padded = new Uint8Array(patchLength);
+            padded.set(patchData);
+            patchData = padded;
+          }
         } else {
-          errors++;
-          if (errors >= 5) {
-            fmStatus('fmBackupStatus','❌ Sin respuesta — ¿pedalera conectada y en modo editor?','err');
-            progressWrap.style.display = 'none';
+          dbgInto('fmUploadDebugLog', '⚠️ patchLength no detectado; se envía sin relleno.');
+        }
+
+        const len = patchData.length;
+        const sevenData = eight2seven(patchData);
+        const crc = getSevenBitCRC(patchData);
+        const header = [0xF0,0x52,0x00,0x6E,0x45,0x00,0x00, bank&0x7F,(bank>>7)&0x7F, prog&0x7F,(prog>>7)&0x7F, len&0x7F,(len>>7)&0x7F];
+        const msg = new Uint8Array(header.length + sevenData.length + crc.length + 1);
+        msg.set(header, 0);
+        msg.set(sevenData, header.length);
+        msg.set(crc, header.length + sevenData.length);
+        msg[msg.length - 1] = 0xF7;
+
+        dbgInto('fmUploadDebugLog', `Slot destino ${slot1} → banco ${bank}, prog ${prog} (ppb=${patchesPerBank})`);
+        dbgInto('fmUploadDebugLog', `PTCF=${len}B, 7bit=${sevenData.length}B, SysEx total=${msg.length}B`);
+
+        fmStatus('fmUploadStatus', `Enviando "${_fmPendingName}" al slot ${slot1}…`, '');
+        const replyPromise = fmWaitSysex(g2.midiIn, d => d.length >= 6 && d[0]===0xF0 && d[1]===0x52 && d[2]===0x00 && d[3]===0x6E && d[4]===0x00 && d[5]===0x00, 4000);
+        g2.midiOut.send(Array.from(msg));
+        const reply = await replyPromise;
+
+        if (reply) {
+          dbgInto('fmUploadDebugLog', 'Respuesta de éxito recibida (00 00).');
+
+          // Refresca el buffer activo de la pedalera (ir a slot vecino y volver),
+          // por si estábamos parados justo en ese slot.
+          fmStatus('fmUploadStatus', 'Refrescando pantalla de la pedalera…', '');
+          const neighborSlot = (slot1 < 300) ? slot + 1 : slot - 1;
+          if (patchesPerBank > 0) {
+            const nb = Math.floor(neighborSlot / patchesPerBank), np = neighborSlot % patchesPerBank;
+            g2.midiOut.send([0xB0,0x00,(nb>>7)&0x7F]); g2.midiOut.send([0xB0,0x20,nb&0x7F]); g2.midiOut.send([0xC0, np&0x7F]);
+            await fmSleep(250);
+            g2.midiOut.send([0xB0,0x00,(bank>>7)&0x7F]); g2.midiOut.send([0xB0,0x20,bank&0x7F]); g2.midiOut.send([0xC0, prog&0x7F]);
+          } else {
+            g2.midiOut.send([0xC0, neighborSlot & 0x7F]);
+            await fmSleep(250);
+            g2.midiOut.send([0xC0, slot & 0x7F]);
+          }
+          await fmSleep(250);
+          fmStatus('fmUploadStatus', `✅ "${_fmPendingName}" guardado en el slot ${slot1} (banco ${bank}, prog ${prog})`, 'ok');
+        } else {
+          dbgInto('fmUploadDebugLog', '⚠️ Sin respuesta de éxito (00 00) tras 4s.');
+          fmStatus('fmUploadStatus', `⚠️ Enviado, pero sin confirmación. Comprueba el slot ${slot1} manualmente.`, 'err');
+        }
+      } catch (err) {
+        console.error(err);
+        fmStatus('fmUploadStatus', '❌ Error: ' + err.message, 'err');
+      } finally {
+        upBtn.disabled = false;
+      }
+    });
+
+    // ============================================================
+    // BOTÓN: BACKUP ALL ZPTC FILES — descarga los 300 presets
+    // ============================================================
+    function fmSetProgress(cur, total, visible) {
+      const wrap = document.getElementById('fmBackupProgressWrap');
+      wrap.style.display = visible ? 'flex' : 'none';
+      const pct = total > 0 ? Math.round((cur/total)*100) : 0;
+      document.getElementById('fmBackupProgressFill').style.width = pct + '%';
+      document.getElementById('fmBackupProgressText').textContent = cur + ' / ' + total;
+    }
+
+    async function fmFetchAllPresets(onProgress, onPatchReady) {
+      if (!g2.midiOut || !g2.midiIn) throw new Error('Conecta MIDI primero');
+      fmStatus('fmBackupStatus', 'Detectando protocolo de la pedalera…', '');
+      const { protocol, numPatches, patchesPerBank } = await fmDetectProtocol(g2.midiOut, g2.midiIn);
+      const total = numPatches > 0 ? numPatches : 300;
+      const skipped = [];
+      let okCount = 0;
+      for (let slot = 0; slot < total; slot++) {
+        onProgress(slot, total);
+        let decoded = null;
+        for (let attempt = 1; attempt <= 3 && !decoded; attempt++) {
+          decoded = await fmFetchPatchFromMemorySlot(g2.midiOut, g2.midiIn, slot, protocol, patchesPerBank);
+          if (!decoded && attempt < 3) await fmSleep(150);
+        }
+        if (!decoded) { skipped.push(slot + 1); continue; }
+        const name = fmExtractPatchName(decoded);
+        const numStr = String(slot + 1).padStart(3, '0');
+        const filename = numStr + ' ' + safeName(name) + '.zptc';
+        okCount++;
+        if (onPatchReady) await onPatchReady(filename, decoded);
+        await fmSleep(15);
+      }
+      onProgress(total, total);
+      return { okCount, skipped, total };
+    }
+
+    document.getElementById('fmBackupAllBtn').addEventListener('click', async () => {
+      const btn = document.getElementById('fmBackupAllBtn');
+      btn.disabled = true;
+      dbgClearInto('fmBackupDebugLog');
+      try {
+        const supportsDirPicker = typeof window.showDirectoryPicker === 'function';
+        let dirHandle = null;
+        if (supportsDirPicker) {
+          fmStatus('fmBackupStatus', 'Elige la carpeta donde guardar los 300 presets…', '');
+          try {
+            dirHandle = await window.showDirectoryPicker({ id: 'g2fourBackup', mode: 'readwrite' });
+          } catch (e) {
+            fmStatus('fmBackupStatus', 'Cancelado: no se eligió ninguna carpeta.', 'err');
             return;
           }
+        } else {
+          dbgInto('fmBackupDebugLog', 'Tu navegador no permite elegir carpeta; se hará una descarga por archivo.');
         }
-        await sleep(40);
+
+        if (!g2.midiOut || !g2.midiIn) { fmStatus('fmBackupStatus', '⚠ Conecta MIDI primero', 'warn'); return; }
+
+        const onPatchReady = dirHandle
+          ? async (filename, bytes) => {
+              const fileHandle = await dirHandle.getFileHandle(filename, { create: true });
+              const writable = await fileHandle.createWritable();
+              await writable.write(bytes);
+              await writable.close();
+            }
+          : async (filename, bytes) => {
+              downloadBlob(new Blob([bytes], { type: 'application/octet-stream' }), filename);
+              await fmSleep(120);
+            };
+
+        const { okCount, skipped, total } = await fmFetchAllPresets(
+          (cur, total) => {
+            fmSetProgress(cur, total, true);
+            fmStatus('fmBackupStatus', `Guardando preset ${cur+1} / ${total}…`, '');
+          },
+          onPatchReady
+        );
+
+        if (skipped.length === 0) {
+          fmStatus('fmBackupStatus', `✅ ${okCount} / ${total} presets guardados` + (dirHandle ? ` en "${dirHandle.name}"` : ''), 'ok');
+        } else {
+          fmStatus('fmBackupStatus', `⚠️ ${okCount} / ${total} guardados. Slots sin respuesta: ${skipped.join(', ')}`, 'err');
+        }
+      } catch (err) {
+        console.error(err);
+        fmStatus('fmBackupStatus', '❌ Error: ' + err.message, 'err');
+      } finally {
+        fmSetProgress(0, 0, false);
+        btn.disabled = false;
       }
-
-      setBkpProgress(NUM_PATCHES, NUM_PATCHES);
-      progressWrap.style.display = 'none';
-
-      if (!allPresets.length) { fmStatus('fmBackupStatus','❌ No se recibió ningún preset','err'); return; }
-
-      const now = new Date();
-      const time = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}`;
-      const backupData = {
-        _editor: 'Zoom G2 Four Editor',
-        _type: 'full_backup',
-        _version: 2,
-        timestamp: now.toISOString(),
-        device: 'G2 Four',
-        numPatches: allPresets.length,
-        patchesPerBank: PATCHES_PER_BANK,
-        presets: allPresets
-      };
-
-      sessionBackups.unshift({ label: `${allPresets.length} presets`, time, date: now.toISOString(), data: backupData });
-      renderBackupList();
-
-      downloadBlob(
-        new Blob([JSON.stringify(backupData, null, 2)],{type:'application/json'}),
-        `g2four_backup_${now.toISOString().slice(0,10)}_${time.replace(/:/g,'')}.json`
-      );
-
-      fmStatus('fmBackupStatus', `✅ Backup completo: ${allPresets.length} presets guardados`, 'ok');
-      document.getElementById('fmFullRestoreBtn').disabled = false;
     });
-
-    document.getElementById('fmFullRestoreBtn').addEventListener('click', () => {
-      document.getElementById('fmRestoreFileInput').click();
-    });
-
-    document.getElementById('fmRestoreFileInput').addEventListener('change', async (e) => {
-      const file = e.target.files[0]; if (!file) return;
-      e.target.value = '';
-      if (!g2.midiOut) { fmStatus('fmBackupStatus','⚠ Conecta MIDI primero','warn'); return; }
-
-      let backupData;
-      try {
-        const text = await file.text();
-        backupData = JSON.parse(text);
-        if (!backupData.presets || !Array.isArray(backupData.presets)) throw new Error();
-      } catch {
-        fmStatus('fmBackupStatus','❌ Archivo de backup inválido o formato no reconocido','err'); return;
-      }
-
-      const numToRestore = backupData.presets.length;
-      if (!confirm(`¿Restaurar ${numToRestore} presets en la pedalera?\n⚠️ Esto sobreescribirá TODOS los presets actuales.\n\nEsta operación no se puede deshacer.`)) return;
-
-      const progressWrap = document.getElementById('fmBackupProgressWrap');
-      progressWrap.style.display = 'flex';
-      fmStatus('fmBackupStatus','⏳ Restaurando presets…','');
-
-      const presets = backupData.presets;
-      let ok = 0;
-
-      for (let i = 0; i < presets.length; i++) {
-        setBkpProgress(i, presets.length);
-        const p = presets[i];
-        const syx = new Uint8Array(p.syx);
-        g2.midiOut.send(syx);
-        await sleep(100);
-        ok++;
-      }
-
-      setBkpProgress(presets.length, presets.length);
-      progressWrap.style.display = 'none';
-      fmStatus('fmBackupStatus', `✅ Restore completo: ${ok} de ${numToRestore} presets restaurados`, 'ok');
-    });
-
-    renderBackupList();
   })();
+
+
 </script>
 </body>
 </html>
