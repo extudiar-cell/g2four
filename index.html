@@ -833,27 +833,27 @@
 
       <div class="zone-section" id="zone-filemanager">
         <div class="fm-section">
-          <div class="fm-section-title">📤 Guardar preset actual a archivo</div>
+          <div class="fm-section-title">📤 Guardar preset actual a archivo zptc/Save current preset to zptc file</div>
           <div class="fm-btn-row">
             <button type="button" class="fm-btn primary-action" id="fmSaveAsZptcBtn">💾 SAVE AS ZPTC</button>
           </div>
-          <div class="fm-status-bar" id="fmSaveAsStatus">Descarga el preset activo de la pedalera como archivo .zptc</div>
+          <div class="fm-status-bar" id="fmSaveAsStatus">Descarga el preset activo de la pedalera como archivo .zptc / Download the active preset from the pedalboard as a .zptc file</div>
         </div>
 
         <div class="fm-section">
-          <div class="fm-section-title">📥 Cargar un .zptc en un slot de la pedalera</div>
+          <div class="fm-section-title">📥 Cargar un .zptc en un slot de la pedalera/Load a .zptc file to a slot number</div>
           <div class="fm-btn-row">
             <button type="button" class="fm-btn primary-action" id="fmPickZptcBtn">📂 LOAD ZPTC</button>
             <input type="number" class="fm-slot-input" id="fmSlotInput" min="1" max="300" placeholder="Slot 1-300">
             <button type="button" class="fm-btn" id="fmUploadZptcBtn" disabled>⬆️ UPLOAD</button>
           </div>
           <input type="file" id="fmZptcFileInput" accept=".zptc" style="display:none">
-          <div class="fm-status-bar" id="fmUploadStatus">Elige un .zptc, indica el slot destino (1-300) y pulsa Upload</div>
+          <div class="fm-status-bar" id="fmUploadStatus">Elige un .zptc, indica el slot destino (1-300) y pulsa Upload / Select a .zptc file, choose an slot number and press Upload</div>
           <div class="fm-debug-log" id="fmUploadDebugLog" style="display:none"></div>
         </div>
 
         <div class="fm-section">
-          <div class="fm-section-title">🗄️ Copia de seguridad completa de la pedalera</div>
+          <div class="fm-section-title">🗄️ Copia de seguridad completa de la pedalera / Backup done</div>
           <div class="fm-btn-row">
             <button type="button" class="fm-btn primary-action" id="fmBackupAllBtn">📦 BACKUP ALL ZPTC FILES</button>
           </div>
@@ -861,14 +861,14 @@
             <div class="fm-progress-track"><div class="fm-progress-fill" id="fmBackupProgressFill"></div></div>
             <div class="fm-progress-text" id="fmBackupProgressText">0 / 0</div>
           </div>
-          <div class="fm-status-bar" id="fmBackupStatus">Descarga los 300 presets como archivos .zptc sueltos (elige carpeta una sola vez)</div>
+          <div class="fm-status-bar" id="fmBackupStatus">Descarga los 300 presets como archivos .zptc individuales / Download all 300 presets as individual .zptc files</div>
           <div class="fm-debug-log" id="fmBackupDebugLog" style="display:none"></div>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="footer">Toca el LED para ON/OFF · Toca el nombre o ⇄ para cambiar de efecto · Sliders inferiores = parámetros · Teclas 1-7 · Flechas ← → · Nº + Enter</div>
+  <div class="footer">Toca el efecto para ON/OFF · Toca ⇄ para cambiar de efecto · Sliders inferiores = parámetros · Teclas 1-7 · Flechas ← → · Nº + Enter / Tap the effect to turn ON/OFF · Tap ⇄ to change the effect · Lower sliders = parameters · Keys 1-7 · Arrows ← → · Number + Enter</div>
 </div>
 
 <div id="tunerModal" class="tuner-modal">
@@ -1857,8 +1857,8 @@
     const remainingDSP = Math.max(0, DSP_LIMIT - usedDSP);
 
     let html = `<div class="dsp-budget-bar">
-      <span>DSP usado por el resto del patch: <strong>${usedDSP}%</strong></span>
-      <span>Disponible para este slot: <strong>${remainingDSP}%</strong></span>
+      <span>DSP Used by the rest of the patch: <strong>${usedDSP}%</strong></span>
+      <span>Disponible/Available for this slot: <strong>${remainingDSP}%</strong></span>
     </div>`;
 
     for (let [groupId, group] of sortedGroups) {
@@ -2625,7 +2625,7 @@
         }
         setPresetProgress(presetList.length, presetList.length);
         renderPresetsGrid();
-        document.getElementById('presetsStatus').textContent = `${presetList.length} presets cargados`;
+        document.getElementById('presetsStatus').textContent = `${presetList.length} presets loaded`;
         if (presetList.length && window._g2LastSyncedName) {
           window._g2SyncPresetHighlight(window._g2LastSyncedName);
         }
@@ -3023,7 +3023,7 @@
         const supportsDirPicker = typeof window.showDirectoryPicker === 'function';
         let dirHandle = null;
         if (supportsDirPicker) {
-          fmStatus('fmBackupStatus', 'Elige la carpeta donde guardar los 300 presets…', '');
+          fmStatus('fmBackupStatus', 'Elige la carpeta donde guardar los 300 presets…/Choose the folder to save the 300 presets…', '');
           try {
             dirHandle = await window.showDirectoryPicker({ id: 'g2fourBackup', mode: 'readwrite' });
           } catch (e) {
