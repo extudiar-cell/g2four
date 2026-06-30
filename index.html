@@ -653,6 +653,70 @@
     }
     .fm-debug-log div { white-space: pre-wrap; word-break: break-word; }
 
+
+    /* ============================================================
+       RITMOS — estilos con estética del editor
+       ============================================================ */
+    .rhy-toolbar {
+      display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 14px;
+    }
+    .rhy-label { font-size: 0.68rem; font-weight: 600; color: #4a6080; text-transform: uppercase; letter-spacing: 1px; }
+    .rhy-select {
+      background: #0a0e18; border: 1px solid #2a3d5a; border-radius: 20px;
+      padding: 5px 12px; font-size: 0.78rem; color: #eef2ff; outline: none; cursor: pointer; transition: border-color 0.15s;
+    }
+    .rhy-select:focus { border-color: #6bc9b0; }
+    .rhy-bpm-pill {
+      display: flex; align-items: center; gap: 8px;
+      background: #0a0e18; border: 1px solid #2a3a50; border-radius: 24px; padding: 5px 12px;
+    }
+    .rhy-bpm-val { font-size: 1rem; font-weight: 700; color: #6bc9b0; font-family: monospace; min-width: 36px; text-align: center; }
+    .rhy-bpm-slider { width: 110px; accent-color: #6bc9b0; }
+    .rhy-toggle-btn {
+      background: #1a3a2c; border: 1px solid #2c6e5c; border-radius: 30px;
+      padding: 6px 18px; font-size: 0.78rem; font-weight: 700; color: #6bc9b0;
+      cursor: pointer; transition: 0.15s; letter-spacing: 0.5px;
+    }
+    .rhy-toggle-btn:hover { background: #1e4a38; border-color: #6bc9b0; box-shadow: 0 0 12px rgba(107,201,176,0.2); }
+    .rhy-toggle-btn.running { background: #4a1a1a; border-color: #e74c3c; color: #e74c3c; }
+    .rhy-toggle-btn.running:hover { background: #6a1a1a; }
+    .rhy-block { margin-bottom: 14px; }
+    .rhy-block-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid #1a2638;
+    }
+    .rhy-block-title { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #4a7090; display: flex; align-items: center; gap: 6px; }
+    .rhy-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+    .rhy-dot-drum { background: #b873cf; }
+    .rhy-dot-bass { background: #6bc9b0; }
+    .rhy-lane { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+    .rhy-lane-name { font-size: 0.62rem; color: #4a6080; min-width: 62px; text-align: right; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; }
+    .rhy-cells { display: flex; gap: 3px; flex: 1; }
+    .rhy-cell {
+      flex: 1; height: 20px; border-radius: 4px;
+      background: #0d1422; border: 1px solid #1a2638;
+      cursor: pointer; transition: background 0.1s, border-color 0.1s;
+    }
+    .rhy-cell.beat { border-color: #2a3a50; }
+    .rhy-cell.on { background: #2c6e5c; border-color: #6bc9b0; }
+    .rhy-cell.play { background: #f0c040 !important; border-color: #f0c040 !important; }
+    .rhy-mute-label { display: flex; align-items: center; gap: 6px; font-size: 0.68rem; color: #4a6080; cursor: pointer; }
+    .rhy-mute-label input { accent-color: #6bc9b0; }
+    .rhy-bass-controls { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 8px; align-items: center; }
+    .rhy-chordbar { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+    .rhy-chord {
+      background: #0d1422; border: 1px solid #2a3a50; border-radius: 20px;
+      padding: 3px 12px; font-size: 0.78rem; font-weight: 600; color: #8fa8c8; cursor: default; transition: 0.15s;
+    }
+    .rhy-chord.active { background: #1a3a2c; border-color: #6bc9b0; color: #6bc9b0; }
+    .rhy-cell.d1 { background: #1a3a6a; border-color: #5a9fd4; }
+    .rhy-cell.d3 { background: #4a2a6a; border-color: #b873cf; }
+    .rhy-cell.d5 { background: #6a2a1a; border-color: #e9a23b; }
+    .rhy-cell.d8 { background: #1a4a2a; border-color: #6bc9b0; }
+    .rhy-cell.d1.play,.rhy-cell.d3.play,.rhy-cell.d5.play,.rhy-cell.d8.play { background: #f0c040 !important; border-color: #f0c040 !important; }
+    .rhy-legend { display: flex; flex-wrap: wrap; gap: 10px; font-size: 0.6rem; color: #4a6080; margin-top: 6px; }
+    .rhy-legend-dot { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 3px; vertical-align: middle; }
+
     /* ============================================================
        MODALES
        ============================================================ */
@@ -786,6 +850,7 @@
     <div class="zone-tabs">
       <button type="button" class="zone-tab active" data-zone="presets">📋 PRESETS</button>
       <button type="button" class="zone-tab" data-zone="audio">🎵 BACKING TRACKS MP3</button>
+      <button type="button" class="zone-tab" data-zone="rhythm">🥁 RITMOS</button>
       <button type="button" class="zone-tab" data-zone="filemanager">📁 FILES MANAGER</button>
     </div>
     <div class="zone-body">
@@ -829,6 +894,72 @@
           </div>
         </div>
         <div class="audio-playlist" id="audioPlaylist"></div>
+      </div>
+
+
+      <div class="zone-section" id="zone-rhythm">
+        <!-- TOOLBAR -->
+        <div class="rhy-toolbar">
+          <button type="button" class="rhy-toggle-btn" id="rhyToggleBtn">▶ INICIAR</button>
+          <div>
+            <span class="rhy-label">Groove&nbsp;</span>
+            <select class="rhy-select" id="rhyGroove"></select>
+          </div>
+          <div class="rhy-bpm-pill">
+            <span class="rhy-label">BPM</span>
+            <input type="range" class="rhy-bpm-slider" id="rhyBpmSlider" min="40" max="220" value="100">
+            <span class="rhy-bpm-val" id="rhyBpmVal">100</span>
+          </div>
+        </div>
+
+        <!-- DRUMS -->
+        <div class="rhy-block">
+          <div class="rhy-block-head">
+            <div class="rhy-block-title"><span class="rhy-dot rhy-dot-drum"></span>🥁 Percusión <label class="rhy-mute-label" style="margin-left:10px"><input type="checkbox" id="rhyDrumMute"> MUTE</label></div>
+          </div>
+          <div id="rhySeq"></div>
+        </div>
+
+        <!-- BASS -->
+        <div class="rhy-block">
+          <div class="rhy-block-head">
+            <div class="rhy-block-title"><span class="rhy-dot rhy-dot-bass"></span>🎸 Bajo <label class="rhy-mute-label" style="margin-left:10px"><input type="checkbox" id="rhyBassMute"> MUTE</label></div>
+          </div>
+          <div class="rhy-bass-controls">
+            <div>
+              <span class="rhy-label">Tonalidad&nbsp;</span>
+              <select class="rhy-select" id="rhyBassKey"></select>
+            </div>
+            <div>
+              <span class="rhy-label">Progresión&nbsp;</span>
+              <select class="rhy-select" id="rhyProg"></select>
+            </div>
+            <div>
+              <span class="rhy-label">Cambio cada&nbsp;</span>
+              <select class="rhy-select" id="rhyBarsPer">
+                <option value="1">1 compás</option>
+                <option value="2" selected>2 compases</option>
+              </select>
+            </div>
+            <div>
+              <span class="rhy-label">Octava&nbsp;</span>
+              <select class="rhy-select" id="rhyBassOct">
+                <option value="1">Grave (E1)</option>
+                <option value="2" selected>Media (E2)</option>
+                <option value="3">Alta (E3)</option>
+              </select>
+            </div>
+          </div>
+          <div class="rhy-chordbar" id="rhyChordbar"></div>
+          <div id="rhyBassSeq"></div>
+          <div class="rhy-legend">
+            <span><span class="rhy-legend-dot" style="background:#5a9fd4"></span>Fundamental</span>
+            <span><span class="rhy-legend-dot" style="background:#b873cf"></span>Tercera</span>
+            <span><span class="rhy-legend-dot" style="background:#e9a23b"></span>Quinta</span>
+            <span><span class="rhy-legend-dot" style="background:#6bc9b0"></span>Octava</span>
+            <span style="color:#2a3a50">· Clic en celda para cambiar el grado</span>
+          </div>
+        </div>
       </div>
 
       <div class="zone-section" id="zone-filemanager">
@@ -3069,6 +3200,212 @@
         btn.disabled = false;
       }
     });
+  })();
+
+
+  // ================================================================
+  // SECCIÓN DE RITMOS
+  // ================================================================
+  (function(){
+    const NOTE_NAMES_R=["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+    const A4_R=440;
+    let _rhyAC=null;
+    function rhyCtx(){if(!_rhyAC)_rhyAC=new(window.AudioContext||window.webkitAudioContext)();return _rhyAC;}
+
+    const GROOVES={
+      // ── ROCK ──────────────────────────────────────────────
+      "Rock 1 – básico":      {K:[0,8],S:[4,12],H:[0,2,4,6,8,10,12,14]},
+      "Rock 2 – abierto":     {K:[0,8],S:[4,12],H:[0,4,8,12],CR:[0]},
+      "Rock 3 – doble bombo": {K:[0,2,8,10],S:[4,12],H:[0,2,4,6,8,10,12,14]},
+      "Rock 4 – medio tiempo":{K:[0,8],S:[8],H:[0,2,4,6,8,10,12,14]},
+      "Rock 5 – shuffle rock":{K:[0,8],S:[4,12],H:[0,3,4,7,8,11,12,15]},
+      // ── BLUES ─────────────────────────────────────────────
+      "Blues 1 – shuffle":    {K:[0,8],S:[4,12],H:[0,3,4,7,8,11,12,15]},
+      "Blues 2 – lento":      {K:[0,6],S:[4,12],H:[0,4,8,12]},
+      "Blues 3 – 12/8 feel":  {K:[0,9],S:[6,15],H:[0,3,6,9,12,15]},
+      "Blues 4 – swing":      {K:[0,8],S:[4,12],H:[0,3,6,9,12,15],CR:[0]},
+      "Blues 5 – boogie":     {K:[0,4,8,12],S:[4,12],H:[0,2,4,6,8,10,12,14]},
+      // ── POP ───────────────────────────────────────────────
+      "Pop 1 – básico":       {CR:[0],K:[0,10],S:[4,12],H:[0,2,4,6,8,10,12,14]},
+      "Pop 2 – dance":        {K:[0,4,8,12],S:[4,12],H:[0,2,4,6,8,10,12,14]},
+      "Pop 3 – medio tiempo": {K:[0,8],S:[8],H:[0,2,4,6,8,10,12,14]},
+      // ── FUNK ──────────────────────────────────────────────
+      "Funk 1 – clásico":     {K:[0,6,10],S:[4,12],H:[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]},
+      "Funk 2 – pesado":      {K:[0,3,8,11],S:[4,12],H:[0,2,4,6,8,10,12,14]},
+      "Funk 3 – 16vos":       {K:[0,5,8],S:[4,10,12],H:[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]},
+      // ── REGGAE / SKA ──────────────────────────────────────
+      "Reggae":               {K:[8],S:[4,12],H:[2,6,10,14]},
+      "Ska":                  {K:[0,8],S:[4,12],H:[2,6,10,14]},
+      // ── LATIN ─────────────────────────────────────────────
+      "Bossa Nova":           {K:[0,3,7,12],S:[4,9,12],H:[0,2,4,6,8,10,12,14]},
+      "Samba":                {K:[0,4,6,10],S:[2,6,10,14],H:[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]},
+      // ── METAL ─────────────────────────────────────────────
+      "Metal 1 – básico":     {CR:[0],K:[0,2,8,10],S:[4,12],RD:[0,2,4,6,8,10,12,14]},
+      "Metal 2 – blast beat": {K:[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],S:[0,2,4,6,8,10,12,14],H:[]},
+      "Metal 3 – groove":     {K:[0,3,6,10],S:[4,12],H:[0,2,4,6,8,10,12,14]},
+      // ── MISCELÁNEOS ───────────────────────────────────────
+      "Disco":                {CR:[0],K:[0,4,8,12],S:[4,12],H:[2,6,10,14]},
+      "Balada 6/8":           {K:[0,6],S:[9],H:[0,3,6,9,12,15]},
+      "Toms (fill)":          {K:[0,8],S:[4,12],T1:[2,3,10,11],T2:[6,7,14,15],H:[0,8]},
+    };
+    const LANES=[["Crash","CR"],["Ride","RD"],["Hi-Hat","H"],["Tom alto","T1"],["Tom bajo","T2"],["Caja","S"],["Bombo","K"]];
+
+    // Populate groove select
+    const grooveSel=document.getElementById('rhyGroove');
+    Object.keys(GROOVES).forEach(g=>{const o=document.createElement('option');o.value=g;o.textContent=g;grooveSel.appendChild(o);});
+
+    function norm(p){const r={};LANES.forEach(([,k])=>r[k]=p[k]?p[k].slice():[]);return r;}
+    let pattern=norm(GROOVES["Rock 1 – básico"]);
+    const seqEl=document.getElementById('rhySeq');
+
+    function buildDrums(){
+      seqEl.innerHTML='';
+      LANES.forEach(([label,key])=>{
+        const lane=document.createElement('div');lane.className='rhy-lane';
+        const nameEl=document.createElement('span');nameEl.className='rhy-lane-name';nameEl.textContent=label;
+        const cells=document.createElement('div');cells.className='rhy-cells';
+        for(let i=0;i<16;i++){
+          const c=document.createElement('div');
+          c.className='rhy-cell'+(i%4===0?' beat':'')+(pattern[key].includes(i)?' on':'');
+          c.dataset.i=i;
+          c.onclick=()=>{
+            const arr=pattern[key];const idx=arr.indexOf(i);
+            if(idx>=0)arr.splice(idx,1);else arr.push(i);
+            c.classList.toggle('on');
+          };
+          cells.appendChild(c);
+        }
+        lane.appendChild(nameEl);lane.appendChild(cells);seqEl.appendChild(lane);
+      });
+    }
+    grooveSel.onchange=()=>{pattern=norm(GROOVES[grooveSel.value]);buildDrums();};
+
+    // --- DRUM SYNTHESIS ---
+    function noiseBuf(c,dur){const len=Math.floor(c.sampleRate*dur);const b=c.createBuffer(1,len,c.sampleRate);
+      const d=b.getChannelData(0);for(let i=0;i<len;i++)d[i]=Math.random()*2-1;return b;}
+    function rhyHit(time,key){
+      const c=rhyCtx();
+      if(key==='K'){const o=c.createOscillator(),g=c.createGain();o.frequency.setValueAtTime(130,time);o.frequency.exponentialRampToValueAtTime(45,time+0.12);g.gain.setValueAtTime(1,time);g.gain.exponentialRampToValueAtTime(0.001,time+0.22);o.connect(g).connect(c.destination);o.start(time);o.stop(time+0.25);return;}
+      if(key==='S'){const o=c.createOscillator(),g=c.createGain();o.type='triangle';o.frequency.setValueAtTime(190,time);g.gain.setValueAtTime(0.5,time);g.gain.exponentialRampToValueAtTime(0.001,time+0.12);o.connect(g).connect(c.destination);o.start(time);o.stop(time+0.14);const n=c.createBufferSource();n.buffer=noiseBuf(c,0.2);const bp=c.createBiquadFilter();bp.type='bandpass';bp.frequency.value=1800;bp.Q.value=0.6;const ng=c.createGain();ng.gain.setValueAtTime(0.7,time);ng.gain.exponentialRampToValueAtTime(0.001,time+0.16);n.connect(bp).connect(ng).connect(c.destination);n.start(time);n.stop(time+0.2);return;}
+      if(key==='H'){const n=c.createBufferSource();n.buffer=noiseBuf(c,0.08);const hp=c.createBiquadFilter();hp.type='highpass';hp.frequency.value=8000;const g=c.createGain();g.gain.setValueAtTime(0.45,time);g.gain.exponentialRampToValueAtTime(0.001,time+0.05);n.connect(hp).connect(g).connect(c.destination);n.start(time);n.stop(time+0.08);return;}
+      if(key==='RD'){const out=c.createGain();out.gain.value=0.5;out.connect(c.destination);const n=c.createBufferSource();n.buffer=noiseBuf(c,0.9);const hp=c.createBiquadFilter();hp.type='highpass';hp.frequency.value=6500;const ng=c.createGain();ng.gain.setValueAtTime(0.0001,time);ng.gain.exponentialRampToValueAtTime(0.16,time+0.006);ng.gain.exponentialRampToValueAtTime(0.0001,time+0.9);n.connect(hp).connect(ng).connect(out);n.start(time);n.stop(time+0.9);const base=380,ratios=[1,1.48,1.81,2.31,2.83,3.41];const bp=c.createBiquadFilter();bp.type='bandpass';bp.frequency.value=3200;bp.Q.value=1.2;const pg=c.createGain();pg.gain.setValueAtTime(0.0001,time);pg.gain.exponentialRampToValueAtTime(0.22,time+0.003);pg.gain.exponentialRampToValueAtTime(0.0001,time+0.45);bp.connect(pg).connect(out);ratios.forEach((r,i)=>{const o=c.createOscillator();o.type='square';o.frequency.value=base*r;const og=c.createGain();og.gain.value=1/(i+1.5);o.connect(og).connect(bp);o.start(time);o.stop(time+0.45);});return;}
+      if(key==='CR'){const dur=1.6;const n=c.createBufferSource();n.buffer=noiseBuf(c,dur);const hp=c.createBiquadFilter();hp.type='highpass';hp.frequency.value=3000;const bp=c.createBiquadFilter();bp.type='bandpass';bp.frequency.value=5000;bp.Q.value=0.4;const g=c.createGain();g.gain.setValueAtTime(0.0001,time);g.gain.exponentialRampToValueAtTime(0.5,time+0.004);g.gain.exponentialRampToValueAtTime(0.001,time+dur);n.connect(hp);hp.connect(bp).connect(g).connect(c.destination);n.start(time);n.stop(time+dur);return;}
+      if(key==='T1'||key==='T2'){const hi=key==='T1';const f0=hi?260:150,f1=hi?120:70,dur=hi?0.32:0.45;const o=c.createOscillator(),g=c.createGain();o.type='sine';o.frequency.setValueAtTime(f0,time);o.frequency.exponentialRampToValueAtTime(f1,time+dur*0.8);g.gain.setValueAtTime(0.9,time);g.gain.exponentialRampToValueAtTime(0.001,time+dur);o.connect(g).connect(c.destination);o.start(time);o.stop(time+dur);const n=c.createBufferSource();n.buffer=noiseBuf(c,0.05);const lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.value=hi?900:500;const ng=c.createGain();ng.gain.setValueAtTime(0.25,time);ng.gain.exponentialRampToValueAtTime(0.001,time+0.05);n.connect(lp).connect(ng).connect(c.destination);n.start(time);n.stop(time+0.05);return;}
+    }
+
+    // --- BASS ---
+    const SCALE_R=[0,2,4,5,7,9,11];
+    const QUAL_R=['maj','min','min','maj','maj','min','dim'];
+    const ROMAN_R=['I','ii','iii','IV','V','vi','vii°'];
+    const PROGRESSIONS_R={
+      "I – V – vi – IV":[0,4,5,3],
+      "I – IV – V":[0,3,4],
+      "I – vi – IV – V":[0,5,3,4],
+      "vi – IV – I – V":[5,3,0,4],
+      "ii – V – I":[1,4,0],
+      "I – IV – V – IV":[0,3,4,3],
+      "Blues (12)":[0,0,0,0,3,3,0,0,4,3,0,4],
+    };
+    let rhyKi=0, rhyProg=PROGRESSIONS_R["I – V – vi – IV"], rhyBarsPer=2, rhyOct=2;
+    let rhyBassMuted=false;
+    let rhyDrumMuted=false;
+
+    function midiToFreqR(m){return A4_R*Math.pow(2,(m-69)/12);}
+    function chordRootMidiR(deg){return (rhyOct+1)*12+rhyKi+SCALE_R[deg];}
+    function chordNameR(deg){const root=NOTE_NAMES_R[(rhyKi+SCALE_R[deg])%12];const q=QUAL_R[deg];return root+(q==='min'?'m':q==='dim'?'dim':'');}
+    function degMidiR(deg,grade){const q=QUAL_R[deg];const root=chordRootMidiR(deg);
+      if(grade===1)return root;if(grade===3)return root+(q==='maj'?4:3);
+      if(grade===5)return root+(q==='dim'?6:7);if(grade===8)return root+12;return root;}
+
+    const ORDER_R=[0,1,3,5,8],DCLS_R={1:'d1',3:'d3',5:'d5',8:'d8'};
+    const DEFAULT_BASS_R={0:1,4:1,7:5,8:1,11:8,12:1,14:5};
+    let rhyBass=new Array(16).fill(0);for(const k in DEFAULT_BASS_R)rhyBass[k]=DEFAULT_BASS_R[k];
+
+    // Populate bass key select
+    const bassKeySel=document.getElementById('rhyBassKey');
+    NOTE_NAMES_R.forEach((n,i)=>{const o=document.createElement('option');o.value=i;o.textContent=n;bassKeySel.appendChild(o);});
+    bassKeySel.onchange=e=>{rhyKi=+e.target.value;renderRhyChords();};
+
+    // Populate prog select
+    const progSel=document.getElementById('rhyProg');
+    Object.keys(PROGRESSIONS_R).forEach(p=>{const o=document.createElement('option');o.value=p;o.textContent=p;progSel.appendChild(o);});
+    progSel.onchange=e=>{rhyProg=PROGRESSIONS_R[e.target.value];renderRhyChords();};
+
+    document.getElementById('rhyBarsPer').onchange=e=>rhyBarsPer=+e.target.value;
+    document.getElementById('rhyBassOct').onchange=e=>rhyOct=+e.target.value;
+    document.getElementById('rhyBassMute').onchange=e=>rhyBassMuted=e.target.checked;
+    document.getElementById('rhyDrumMute').onchange=e=>rhyDrumMuted=e.target.checked;
+
+    const bassSeqEl=document.getElementById('rhyBassSeq');
+    function bassCellClass(i){const g=rhyBass[i];return 'rhy-cell'+(i%4===0?' beat':'')+(g?' '+DCLS_R[g]:'');}
+    function buildBassSeq(){
+      bassSeqEl.innerHTML='';
+      const lane=document.createElement('div');lane.className='rhy-lane';
+      const nameEl=document.createElement('span');nameEl.className='rhy-lane-name';nameEl.textContent='Bajo';
+      const cells=document.createElement('div');cells.className='rhy-cells';
+      for(let i=0;i<16;i++){
+        const c=document.createElement('div');c.className=bassCellClass(i);c.dataset.i=i;
+        c.onclick=()=>{const cur=rhyBass[i];const idx=ORDER_R.indexOf(cur);rhyBass[i]=ORDER_R[(idx+1)%ORDER_R.length];c.className=bassCellClass(i);};
+        cells.appendChild(c);
+      }
+      lane.appendChild(nameEl);lane.appendChild(cells);bassSeqEl.appendChild(lane);
+    }
+
+    const chordbarEl=document.getElementById('rhyChordbar');
+    function renderRhyChords(){
+      chordbarEl.innerHTML='';
+      rhyProg.forEach((deg,idx)=>{
+        const d=document.createElement('div');d.className='rhy-chord';d.dataset.ci=idx;
+        d.textContent=chordNameR(deg)+' ('+ROMAN_R[deg]+')';chordbarEl.appendChild(d);
+      });
+    }
+    function chordIdxForStepR(stp){return Math.floor(Math.floor(stp/16)/rhyBarsPer)%rhyProg.length;}
+    function highlightRhyChord(ci){chordbarEl.querySelectorAll('.rhy-chord').forEach(d=>d.classList.toggle('active',+d.dataset.ci===ci));}
+
+    function playBassR(time,midi){
+      const c=rhyCtx();const freq=midiToFreqR(midi);
+      const o=c.createOscillator();o.type='sawtooth';o.frequency.value=freq;
+      const g=c.createGain();const lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.value=500;
+      g.gain.setValueAtTime(0.45,time);g.gain.exponentialRampToValueAtTime(0.001,time+0.18);
+      o.connect(lp).connect(g).connect(c.destination);o.start(time);o.stop(time+0.2);
+    }
+
+    // --- MOTOR ---
+    let rhyBpm=100,rhyRunning=false,rhyStep=0,rhyNext=0,rhyTimer=null;
+    function rhySchedule(){
+      const c=rhyCtx();
+      while(rhyNext<c.currentTime+0.1){
+        const s=rhyStep%16;
+        if(!rhyDrumMuted) LANES.forEach(([,key])=>{if(pattern[key].includes(s))rhyHit(rhyNext,key);});
+        const ci=chordIdxForStepR(rhyStep);
+        if(rhyBass[s]&&!rhyBassMuted)playBassR(rhyNext,degMidiR(rhyProg[ci],rhyBass[s]));
+        const t=rhyNext;const cidx=ci;
+        const delay=Math.max(0,(t-c.currentTime)*1000);
+        setTimeout(()=>{rhyHighlight(s);highlightRhyChord(cidx);},delay);
+        rhyNext+=(60/rhyBpm)/4;rhyStep++;
+      }
+    }
+    function rhyHighlight(s){
+      seqEl.querySelectorAll('.rhy-cell').forEach(c=>c.classList.toggle('play',+c.dataset.i===s));
+      bassSeqEl.querySelectorAll('.rhy-cell').forEach(c=>c.classList.toggle('play',+c.dataset.i===s));
+    }
+    function rhyStart(){
+      const c=rhyCtx();c.resume();rhyRunning=true;rhyStep=0;rhyNext=c.currentTime+0.06;
+      rhyTimer=setInterval(rhySchedule,25);
+      const btn=document.getElementById('rhyToggleBtn');btn.textContent='⏹ DETENER';btn.classList.add('running');
+    }
+    function rhyStop(){
+      rhyRunning=false;clearInterval(rhyTimer);
+      seqEl.querySelectorAll('.rhy-cell').forEach(c=>c.classList.remove('play'));
+      bassSeqEl.querySelectorAll('.rhy-cell').forEach(c=>c.classList.remove('play'));
+      highlightRhyChord(-1);
+      const btn=document.getElementById('rhyToggleBtn');btn.textContent='▶ INICIAR';btn.classList.remove('running');
+    }
+
+    document.getElementById('rhyToggleBtn').onclick=()=>rhyRunning?rhyStop():rhyStart();
+    document.getElementById('rhyBpmSlider').oninput=e=>{rhyBpm=+e.target.value;document.getElementById('rhyBpmVal').textContent=rhyBpm;};
+
+    buildDrums();buildBassSeq();renderRhyChords();
   })();
 
 
