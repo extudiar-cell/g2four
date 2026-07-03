@@ -2112,6 +2112,111 @@
   });
 
   // --------------------------------------------------------------
+  // BOTÓN SAVE — guarda el parche activo en la memoria flash de la G2 Four
+  // usando el truco del Auto-Save. ESTA SECUENCIA DE GUARDADO (pasos 1-3)
+  // ES LA QUE CONFIRMASTE QUE FUNCIONABA — no se toca:
+  //   1) Activar auto-save (0x0F -> 01)
+  //   2) Reenviar el Program Change del preset actual (dispara el volcado
+  //      del buffer de edición a memoria flash)
+  //   3) Desactivar auto-save (0x0F -> 00)
+  // Después de eso, y SOLO como paso adicional para el refresco visual
+  // (el ON/OFF de pedales en pantalla), separado en el tiempo para no
+  // interferir con la escritura en flash:
+  //   4) Preset vecino y volver (recarga el buffer activo)
+  //   5) Releer el parche real (syncCurrentPatch) para refrescar la UI
+  // --------------------------------------------------------------
+  function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+
+  function sendProgramSelect(absSlot, ppb) {
+    if (ppb > 0) {
+      const bank = Math.floor(absSlot / ppb), program = absSlot % ppb;
+      midiOut.send([0xB0, 0x00, (bank >> 7) & 0x7F]);
+      midiOut.send([0xB0, 0x20, bank & 0x7F]);
+      midiOut.send([0xC0, program & 0x7F]);
+    } else {
+      midiOut.send([0xC0, absSlot & 0x7F]);
+    }
+  }
+
+  async function saveCurrentPatchToFlash() {
+    if (!midiOut) return false;
+    const slot = currentPresetSlot;
+
+    // Paso 1: activar auto-save
+    midiOut.send([0xF0, 0x52, 0x00, 0x6E, 0x64, 0x20, 0x00, 0x64, 0x0F, 0x01, 0x00, 0x00, 0x00, 0x00, 0xF7]);
+    await sleep(80);
+
+    // Paso 2: forzar el "cambio de preset" reenviando el Program Change
+    // (y Bank Select si aplica) del preset activo
+    if (slot >= 0) {
+      window._g2PCIgnore = true;
+      const ppb = (typeof window._g2GetPatchesPerBank === 'function') ? window._g2GetPatchesPerBank() : -1;
+      sendProgramSelect(slot, ppb);
+    }
+    await sleep(200);
+
+    // Paso 3: desactivar auto-save
+    midiOut.send([0xF0, 0x52, 0x00, 0x6E, 0x64, 0x20, 0x00, 0x64, 0x0F, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF7]);
+    await sleep(80);
+
+    if (slot >= 0) window._g2PCIgnore = false;
+
+    // ---- hasta aquí, el guardado ya está confirmado ----
+    // TASA DE REFRESCO VISUAL TRAS EL SAVE: los 3 sleep(100) de aquí abajo
+    // controlan el timing del truco "preset vecino y volver" (paso 4) que
+    // solo sirve para refrescar el visor en pantalla, no afecta al
+    // guardado en sí. Ajustados a 100 ms tras pruebas manuales para que
+    // el salto de preset sea lo menos perceptible posible.
+    await sleep(100);
+
+    // Paso 4 (extra, solo visual): preset vecino y volver, para forzar
+    // una recarga real del buffer visible en pantalla
+    if (slot >= 0) {
+      window._g2PCIgnore = true;
+      const ppb = (typeof window._g2GetPatchesPerBank === 'function') ? window._g2GetPatchesPerBank() : -1;
+      const neighborSlot = (slot < 299) ? slot + 1 : slot - 1;
+      sendProgramSelect(neighborSlot, ppb);
+      await sleep(100);
+      sendProgramSelect(slot, ppb);
+      await sleep(100);
+      setTimeout(() => { window._g2PCIgnore = false; }, 300);
+    }
+
+    // Paso 5: refrescar la UI con el parche real desde el dispositivo
+    syncCurrentPatch();
+
+    return true;
+  }
+
+  document.getElementById('saveBtn').addEventListener('click', async (e) => {
+    e.stopPropagation();
+    const btn = document.getElementById('saveBtn');
+    if (!midiOut) {
+      const original = btn.textContent;
+      btn.textContent = '⚠ Sin MIDI';
+      setTimeout(() => { btn.textContent = original; }, 1500);
+      return;
+    }
+    const original = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '⏳ Guardando…';
+    try {
+      await saveCurrentPatchToFlash();
+      // El indicador "edited" se limpia solo cuando llega la respuesta
+      // real de syncCurrentPatch() (ver handler de SysEx -> fullRefresh()).
+      btn.textContent = '✅ Guardado';
+    } catch (err) {
+      console.error('Error al guardar el parche:', err);
+      btn.textContent = '❌ Error';
+    } finally {
+      setTimeout(() => {
+        btn.textContent = original;
+        btn.disabled = false;
+      }, 1200);
+    }
+  });
+
+  // --------------------------------------------------------------
   // AFINADOR
   // --------------------------------------------------------------
   (function() {
