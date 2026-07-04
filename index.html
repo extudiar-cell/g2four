@@ -2204,7 +2204,7 @@
       await saveCurrentPatchToFlash();
       // El indicador "edited" se limpia solo cuando llega la respuesta
       // real de syncCurrentPatch() (ver handler de SysEx -> fullRefresh()).
-      btn.textContent = '✅ Guardado';
+      btn.textContent = '✅ SAVED';
     } catch (err) {
       console.error('Error al guardar el parche:', err);
       btn.textContent = '❌ Error';
