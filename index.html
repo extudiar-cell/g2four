@@ -573,6 +573,11 @@
     }
     .audio-drop-zone:hover, .audio-drop-zone.drag-over { border-color: #6bc9b0; color: #6bc9b0; background: #0a1520; }
     .audio-drop-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .audio-main-row { display: flex; align-items: stretch; gap: 16px; }
+    .audio-left-col { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+    .audio-eq-divider { width: 1px; background: #2a3a50; flex-shrink: 0; }
+    .audio-right-col { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 4px 6px 0; }
+    .audio-eq-title { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; color: #4a6080; }
     .audio-controls { background: #0c101e; border-radius: 20px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
     .audio-now-playing { font-size: 0.82rem; font-weight: 600; color: #e2e8f0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; }
     .audio-progress-wrap { position: relative; height: 4px; background: #1e2a3a; border-radius: 10px; cursor: pointer; }
@@ -586,10 +591,28 @@
     .audio-btn:hover { background: #243550; border-color: #6bc9b0; }
     .audio-btn.play-pause { width: 44px; height: 44px; font-size: 1.2rem; background: #6bc9b0; border-color: #6bc9b0; color: #060910; }
     .audio-btn.play-pause:hover { background: #4da98e; }
-    .audio-vol-row { display: flex; align-items: center; gap: 8px; font-size: 0.7rem; color: #4a6080; }
-    .audio-vol-row input[type="range"] { flex: 1; height: 4px; -webkit-appearance: none; background: #1e2a3a; border-radius: 10px; outline: none; }
-    .audio-vol-row input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: #6bc9b0; cursor: pointer; }
-    .audio-playlist { display: flex; flex-direction: column; gap: 4px; max-height: 130px; overflow-y: auto; }
+    .audio-eq-row { display: flex; justify-content: center; align-items: flex-end; gap: 12px; padding: 6px 4px 4px; }
+    .audio-eq-channel { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .audio-eq-value { font-size: 0.6rem; color: #6bc9b0; font-family: monospace; min-height: 12px; }
+    .audio-eq-label { font-size: 0.6rem; color: #4a6080; letter-spacing: 0.05em; }
+    .audio-eq-slider {
+      writing-mode: vertical-lr;
+      direction: rtl;
+      -webkit-appearance: slider-vertical;
+      width: 6px;
+      height: 140px;
+      background: #1e2a3a;
+      border-radius: 10px;
+      outline: none;
+      cursor: pointer;
+    }
+    .audio-eq-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #6bc9b0; cursor: pointer; box-shadow: 0 0 6px rgba(107,201,176,0.4); }
+    .audio-eq-slider::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: #6bc9b0; cursor: pointer; border: none; box-shadow: 0 0 6px rgba(107,201,176,0.4); }
+    .audio-eq-slider::-webkit-slider-runnable-track { background: #1e2a3a; border-radius: 10px; }
+    .audio-eq-slider::-moz-range-track { background: #1e2a3a; border-radius: 10px; }
+    .audio-eq-slider-vol::-webkit-slider-thumb { background: #e9a23b; box-shadow: 0 0 6px rgba(233,162,59,0.4); }
+    .audio-eq-slider-vol::-moz-range-thumb { background: #e9a23b; box-shadow: 0 0 6px rgba(233,162,59,0.4); }
+    .audio-playlist { flex: 1; display: flex; flex-direction: column; gap: 4px; max-height: 160px; overflow-y: auto; }
     .audio-track { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 12px; cursor: pointer; transition: 0.1s; font-size: 0.75rem; color: #8fa8c8; }
     .audio-track:hover { background: #111828; color: #e2e8f0; }
     .audio-track.playing { background: #0d1f30; color: #6bc9b0; font-weight: 600; }
@@ -842,6 +865,8 @@
     </div>
   </div>
 
+
+
   <!-- Pedalboard -->
   <div class="pedalboard" id="pedalboard"></div>
 
@@ -875,25 +900,52 @@
           <input type="file" id="audioFileInput" accept="audio/*" multiple>
           🎵 Arrastra MP3/WAV aquí o haz click para seleccionar
         </div>
-        <div class="audio-controls" id="audioControls" style="display:none">
-          <div class="audio-now-playing" id="audioNowPlaying">—</div>
-          <div class="audio-progress-wrap" id="audioProgressWrap">
-            <div class="audio-progress-bar" id="audioProgressBar"></div>
+        <div class="audio-main-row" id="audioMainRow" style="display:none">
+          <div class="audio-left-col">
+            <div class="audio-controls" id="audioControls">
+              <div class="audio-now-playing" id="audioNowPlaying">—</div>
+              <div class="audio-progress-wrap" id="audioProgressWrap">
+                <div class="audio-progress-bar" id="audioProgressBar"></div>
+              </div>
+              <div class="audio-time-row">
+                <span id="audioTimeCur">0:00</span>
+                <span id="audioTimeTot">0:00</span>
+              </div>
+              <div class="audio-btn-row">
+                <button type="button" class="audio-btn" id="audioPrevBtn" title="PREV">⏮</button>
+                <button type="button" class="audio-btn play-pause" id="audioPlayBtn" title="Play/Pause">▶</button>
+                <button type="button" class="audio-btn" id="audioNextBtn" title="NEXT">⏭</button>
+              </div>
+            </div>
+            <div class="audio-playlist" id="audioPlaylist"></div>
           </div>
-          <div class="audio-time-row">
-            <span id="audioTimeCur">0:00</span>
-            <span id="audioTimeTot">0:00</span>
-          </div>
-          <div class="audio-btn-row">
-            <button type="button" class="audio-btn" id="audioPrevBtn" title="PREV">⏮</button>
-            <button type="button" class="audio-btn play-pause" id="audioPlayBtn" title="Play/Pause">▶</button>
-            <button type="button" class="audio-btn" id="audioNextBtn" title="NEXT">⏭</button>
-          </div>
-          <div class="audio-vol-row">
-            🔈 <input type="range" id="audioVol" min="0" max="1" step="0.01" value="0.8"> 🔊
+          <div class="audio-eq-divider"></div>
+          <div class="audio-right-col">
+            <div class="audio-eq-title">EQ</div>
+            <div class="audio-eq-row" id="audioEqRow">
+              <div class="audio-eq-channel">
+                <span class="audio-eq-value" id="audioEqBassVal">0</span>
+                <input type="range" class="audio-eq-slider" id="audioEqBass" min="-20" max="20" step="1" value="0" orient="vertical" title="Graves">
+                <span class="audio-eq-label">BASS</span>
+              </div>
+              <div class="audio-eq-channel">
+                <span class="audio-eq-value" id="audioEqMidVal">0</span>
+                <input type="range" class="audio-eq-slider" id="audioEqMid" min="-20" max="20" step="1" value="0" orient="vertical" title="Medios">
+                <span class="audio-eq-label">MID</span>
+              </div>
+              <div class="audio-eq-channel">
+                <span class="audio-eq-value" id="audioEqTrebleVal">0</span>
+                <input type="range" class="audio-eq-slider" id="audioEqTreble" min="-20" max="20" step="1" value="0" orient="vertical" title="Agudos">
+                <span class="audio-eq-label">TREBLE</span>
+              </div>
+              <div class="audio-eq-channel">
+                <span class="audio-eq-value" id="audioEqVolVal">80</span>
+                <input type="range" class="audio-eq-slider audio-eq-slider-vol" id="audioVol" min="0" max="100" step="1" value="80" orient="vertical" title="Volumen">
+                <span class="audio-eq-label">VOL</span>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="audio-playlist" id="audioPlaylist"></div>
       </div>
 
 
@@ -980,7 +1032,6 @@
           </div>
           <input type="file" id="fmZptcFileInput" accept=".zptc" style="display:none">
           <div class="fm-status-bar" id="fmUploadStatus">Elige un .zptc, indica el slot destino (1-300) y pulsa Upload / Select a .zptc file, choose an slot number and press Upload</div>
-          <div class="fm-debug-log" id="fmUploadDebugLog" style="display:none"></div>
         </div>
 
         <div class="fm-section">
@@ -1616,6 +1667,47 @@
     return value >> (7 - endOff);
   }
 
+  // Mirror exacto (validado con pruebas de round-trip) de getNumberFromBits,
+  // para poder ESCRIBIR un campo de bits en vez de solo leerlo. Se usa para
+  // construir un registro de slot (EDTB) puramente en memoria, sin pasar
+  // nunca por el comando de "cambio de tipo en tiempo real" de la pedalera.
+  // Usa BigInt porque el campo "id" tiene 29 bits y, desplazado, puede
+  // superar los 32 bits que los operadores << / & de JS truncan.
+  function setNumberInBits(data, startBit, endBit, value) {
+    const numBits = endBit - startBit + 1;
+    const mask1 = (1n << BigInt(numBits)) - 1n;
+    let v = BigInt(value >>> 0) & mask1;
+    const shift = BigInt(7 - (endBit % 8));
+    const shiftedVal = v << shift;
+    const maskInt = mask1 << shift;
+    const startByte = Math.floor(startBit / 8);
+    const endByte = Math.floor(endBit / 8);
+    const nbytes = endByte - startByte + 1;
+    for (let j = 0; j < nbytes; j++) {
+      const byteIdx = startByte + j;
+      const shiftAmount = BigInt((nbytes - 1 - j) * 8);
+      const valByte = Number((shiftedVal >> shiftAmount) & 0xFFn);
+      const maskByte = Number((maskInt >> shiftAmount) & 0xFFn);
+      data[byteIdx] = (data[byteIdx] & (~maskByte & 0xFF)) | (valByte & maskByte);
+    }
+  }
+
+  // Construye los 24 bytes de un registro de slot (formato EDTB) desde cero,
+  // con la MISMA disposición de bits que usa parsePatchFromSysex para leer:
+  // 1 bit enabled + 29 bits id + 5 params de 12 bits + 3 de 8 bits + 4 de 12 bits.
+  function encodeSlotRecord({ enabled, id, parameters }) {
+    const rev = new Uint8Array(24);
+    const bitpos = rev.length * 8 - 1;
+    setNumberInBits(rev, bitpos, bitpos, enabled ? 1 : 0);
+    setNumberInBits(rev, bitpos - 29, bitpos - 1, id >>> 0);
+    let bp = bitpos - 30;
+    const p = parameters || [];
+    for (let i = 0; i < 5; i++) { setNumberInBits(rev, bp - 11, bp, p[i] || 0); bp -= 12; }
+    for (let i = 5; i < 8; i++) { setNumberInBits(rev, bp - 7, bp, p[i] || 0); bp -= 8; }
+    for (let i = 8; i < 12; i++) { setNumberInBits(rev, bp - 11, bp, p[i] || 0); bp -= 12; }
+    return rev.slice().reverse();
+  }
+
   function readI32LE(data, off) {
     return (data[off] | (data[off+1]<<8) | (data[off+2]<<16) | (data[off+3]<<24)) >>> 0;
   }
@@ -1737,6 +1829,68 @@
         setTimeout(() => syncCurrentPatch(), 100);
       }
     }, 150);
+  }
+
+  // --- Camino alternativo, SOLO para el slot 7 (índice 6) ---
+  // La pedalera acepta el comando de "cambio de tipo en tiempo real"
+  // (0x64 0x20 ... 0x01 ...) y reproduce el efecto correctamente, pero deja
+  // ese slot marcado internamente de forma que CUALQUIER guardado posterior
+  // (con cualquier mecanismo) lo revierte a Output VP. La única manera
+  // fiable de fijarlo es no usar nunca ese comando para el slot 7: en su
+  // lugar, se lee el patch activo, se reconstruye su registro EDTB
+  // completamente en memoria (bit a bit) con el nuevo efecto, y se escribe
+  // de vuelta con el mismo camino de escritura directa que usa UPLOAD.
+  async function setSlot7EffectDirect(slot, effectId) {
+    if (!midiOut || !midiIn) return;
+    const FM = window._g2FM;
+    if (!FM) throw new Error('Módulo de gestión de archivos no disponible.');
+
+    saveDbgClear();
+    saveDbg(`Cambiando el efecto del slot ${slot + 1} sin pasar por edición en vivo…`);
+    const decoded = await FM.fmFetchCurrentPatch(midiOut, midiIn);
+    if (!decoded) { saveDbg('❌ Sin respuesta al leer el patch activo.'); throw new Error('Sin respuesta al leer el patch activo.'); }
+
+    // Localizar el chunk EDTB dentro del patch decodificado
+    const numEffects = readI32LE(decoded, 12);
+    let off = 36 + numEffects * 4, edtbOffset = -1;
+    while (off + 8 <= decoded.length) {
+      const cid = String.fromCharCode(decoded[off], decoded[off+1], decoded[off+2], decoded[off+3]);
+      const len = readI32LE(decoded, off + 4);
+      if (len < 0 || off + 8 + len > decoded.length) break;
+      if (cid === 'EDTB') { edtbOffset = off + 8; break; }
+      off += 8 + len;
+    }
+    if (edtbOffset < 0) { saveDbg('❌ No se encontró el bloque EDTB en el patch leído.'); throw new Error('No se encontró EDTB.'); }
+
+    const id = effectId >>> 0;
+    const defaults = (typeof DEFAULT_PARAMS_MAP !== 'undefined') ? DEFAULT_PARAMS_MAP.get(id) : null;
+    const paramNames = (typeof getParamNames === 'function') ? getParamNames(id) : null;
+    const numParams = paramNames ? paramNames.length : (defaults ? defaults.length : 0);
+    const parameters = new Array(12).fill(0);
+    if (defaults) for (let i = 0; i < numParams && i < defaults.length; i++) parameters[i] = defaults[i];
+
+    const newRecord = encodeSlotRecord({ enabled: true, id, parameters });
+    const modified = decoded.slice();
+    modified.set(newRecord, edtbOffset + slot * 24);
+
+    const check = fmDebugGetSlotEffectId(modified, slot);
+    saveDbg(`Registro reconstruido para el slot ${slot + 1}: 0x${(check>>>0).toString(16).padStart(8,'0')} (${getEffectName(check)})`);
+
+    window._g2PCIgnore = true;
+    try {
+      await FM.fmWriteRawPatchToSlot(midiOut, midiIn, modified, currentPresetSlot, saveDbg);
+    } finally {
+      window._g2PCIgnore = false;
+    }
+
+    if (currentPatchData && currentPatchData.effects[slot]) {
+      currentPatchData.effects[slot].id = id;
+      currentPatchData.effects[slot].enabled = true;
+      currentPatchData.effects[slot].parameters = parameters;
+      renderPedalboard();
+    }
+    saveDbg('✅ Escrito directamente en memoria y recargado. El slot no pasó por el comando de edición en vivo.');
+    syncCurrentPatch();
   }
 
   let _lastSyncedName = null;
@@ -2013,8 +2167,16 @@
       if (item.dataset.disabled === 'true') return; // no clicable
       item.addEventListener('click', () => {
         const newId = parseInt(item.dataset.effectId);
-        changeEffectType(slot, newId);
-        modal.style.display = 'none';
+        if (slot === 6) {
+          modal.style.display = 'none';
+          setSlot7EffectDirect(slot, newId).catch(err => {
+            console.error('Error al cambiar el efecto del slot 7:', err);
+            alert('No se pudo cambiar el efecto del slot 7: ' + err.message);
+          });
+        } else {
+          changeEffectType(slot, newId);
+          modal.style.display = 'none';
+        }
       });
     });
   }
@@ -2113,19 +2275,63 @@
 
   // --------------------------------------------------------------
   // BOTÓN SAVE — guarda el parche activo en la memoria flash de la G2 Four
-  // usando el truco del Auto-Save. ESTA SECUENCIA DE GUARDADO (pasos 1-3)
-  // ES LA QUE CONFIRMASTE QUE FUNCIONABA — no se toca:
-  //   1) Activar auto-save (0x0F -> 01)
-  //   2) Reenviar el Program Change del preset actual (dispara el volcado
-  //      del buffer de edición a memoria flash)
-  //   3) Desactivar auto-save (0x0F -> 00)
-  // Después de eso, y SOLO como paso adicional para el refresco visual
-  // (el ON/OFF de pedales en pantalla), separado en el tiempo para no
-  // interferir con la escritura en flash:
-  //   4) Preset vecino y volver (recarga el buffer activo)
-  //   5) Releer el parche real (syncCurrentPatch) para refrescar la UI
+  // ESCRIBIENDO DIRECTAMENTE EL PATCH EN EL SLOT DE MEMORIA, con el mismo
+  // mecanismo SysEx (0x45, escritura directa) que usa el botón UPLOAD.
+  //
+  // Motivo del cambio: el truco anterior de "Auto-Save" (activar auto-save,
+  // reenviar Program Change y desactivarlo) delega el guardado en la propia
+  // máquina de estados de edición en vivo del firmware. Esa ruta SÍ revalida
+  // la categoría de efecto permitida en el slot 7 (solo tipo "Pedal") y
+  // revierte cualquier otro tipo de efecto a "Output VP" al comprometerlo a
+  // flash. La escritura directa a memoria (0x45) no pasa por esa
+  // revalidación, así que conserva tal cual cualquier efecto que esté
+  // sonando en el slot 7 (o en cualquier otro slot) en el momento de guardar.
+  //
+  // Pasos:
+  //   1) Leer el patch activo tal cual está en el buffer de edición en vivo
+  //      de la pedalera (0x64 0x13 — el mismo dump que usa "SAVE AS ZPTC").
+  //   2) Detectar protocolo/nº de presets por banco y calcular banco+programa
+  //      del slot activo.
+  //   3) Ajustar el tamaño del patch al patchLength esperado por la pedalera.
+  //   4) Construir y enviar el SysEx de escritura directa (0x45) — igual que
+  //      UPLOAD.
+  //   5) (Solo visual) Preset vecino y volver, para refrescar el visor en
+  //      pantalla de la pedalera.
+  //   6) Releer el parche real (syncCurrentPatch) para refrescar la UI.
   // --------------------------------------------------------------
   function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+
+  // --- Lee el ID de efecto (4 bytes, categoría+índice) de un slot concreto
+  //     directamente de un buffer PTCF ya decodificado a 8-bit (sin cabecera
+  //     de SysEx). Se usa solo para diagnóstico del botón SAVE: nos permite
+  //     comprobar, antes y después de escribir, si el slot 7 conserva su
+  //     categoría real o si algo lo ha revertido a Output VP (0x0B000010).
+  function fmDebugGetSlotEffectId(eight, slotIndex) {
+    if (!eight || eight.length < 40 || eight[0] !== 0x50 || eight[1] !== 0x54 || eight[2] !== 0x43 || eight[3] !== 0x46) return null;
+    const numEffects = readI32LE(eight, 12);
+    const subStart = 36 + numEffects * 4;
+    let off = subStart, edtb = null;
+    while (off + 8 <= eight.length) {
+      const id = String.fromCharCode(eight[off], eight[off+1], eight[off+2], eight[off+3]);
+      const len = readI32LE(eight, off + 4);
+      if (len < 0 || off + 8 + len > eight.length) break;
+      if (id === 'EDTB') { edtb = eight.slice(off + 8, off + 8 + len); break; }
+      off += 8 + len;
+    }
+    if (!edtb) return null;
+    const start = slotIndex * 24;
+    if (start + 24 > edtb.length) return null;
+    const rev = edtb.slice(start, start + 24).reverse();
+    const bitpos = rev.length * 8 - 1;
+    return getNumberFromBits(rev, bitpos - 29, bitpos - 1) >>> 0;
+  }
+
+  // Panel de diagnóstico ya retirado de la interfaz; se deja constancia en
+  // consola por si hace falta depurar en el futuro, sin mostrar nada en pantalla.
+  function saveDbg(msg) {
+    console.log('[SAVE]', msg);
+  }
+  function saveDbgClear() {}
 
   function sendProgramSelect(absSlot, ppb) {
     if (ppb > 0) {
@@ -2139,59 +2345,48 @@
   }
 
   async function saveCurrentPatchToFlash() {
-    if (!midiOut) return false;
+    if (!midiOut || !midiIn) return false;
     const slot = currentPresetSlot;
+    if (slot < 0) throw new Error('No hay ningún preset activo detectado todavía.');
 
-    // Paso 1: activar auto-save
-    midiOut.send([0xF0, 0x52, 0x00, 0x6E, 0x64, 0x20, 0x00, 0x64, 0x0F, 0x01, 0x00, 0x00, 0x00, 0x00, 0xF7]);
-    await sleep(80);
+    const FM = window._g2FM;
+    if (!FM) throw new Error('Módulo de gestión de archivos no disponible.');
 
-    // Paso 2: forzar el "cambio de preset" reenviando el Program Change
-    // (y Bank Select si aplica) del preset activo
-    if (slot >= 0) {
-      window._g2PCIgnore = true;
-      const ppb = (typeof window._g2GetPatchesPerBank === 'function') ? window._g2GetPatchesPerBank() : -1;
-      sendProgramSelect(slot, ppb);
-    }
-    await sleep(200);
+    saveDbgClear();
+    saveDbg(`Slot activo detectado: ${slot + 1} (índice ${slot})`);
 
-    // Paso 3: desactivar auto-save
-    midiOut.send([0xF0, 0x52, 0x00, 0x6E, 0x64, 0x20, 0x00, 0x64, 0x0F, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF7]);
-    await sleep(80);
+    // Leer el patch tal cual está en el buffer de edición en vivo de la
+    // pedalera. El slot 7 ya no se toca aquí: si se cambió su efecto, se
+    // hizo por el camino de escritura directa (setSlot7EffectDirect) en el
+    // momento de elegirlo, así que este buffer ya lo trae correcto.
+    saveDbg('Pidiendo patch activo (buffer de edición en vivo, 0x64 0x13)…');
+    const decoded = await FM.fmFetchCurrentPatch(midiOut, midiIn);
+    if (!decoded) { saveDbg('❌ Sin respuesta al pedir el patch activo.'); throw new Error('Sin respuesta al pedir el patch activo a la pedalera.'); }
+    saveDbg(`Patch leído: ${decoded.length} bytes`);
 
-    if (slot >= 0) window._g2PCIgnore = false;
-
-    // ---- hasta aquí, el guardado ya está confirmado ----
-    // TASA DE REFRESCO VISUAL TRAS EL SAVE: los 3 sleep(100) de aquí abajo
-    // controlan el timing del truco "preset vecino y volver" (paso 4) que
-    // solo sirve para refrescar el visor en pantalla, no afecta al
-    // guardado en sí. Ajustados a 100 ms tras pruebas manuales para que
-    // el salto de preset sea lo menos perceptible posible.
-    await sleep(100);
-
-    // Paso 4 (extra, solo visual): preset vecino y volver, para forzar
-    // una recarga real del buffer visible en pantalla
-    if (slot >= 0) {
-      window._g2PCIgnore = true;
-      const ppb = (typeof window._g2GetPatchesPerBank === 'function') ? window._g2GetPatchesPerBank() : -1;
-      const neighborSlot = (slot < 299) ? slot + 1 : slot - 1;
-      sendProgramSelect(neighborSlot, ppb);
-      await sleep(100);
-      sendProgramSelect(slot, ppb);
-      await sleep(100);
-      setTimeout(() => { window._g2PCIgnore = false; }, 300);
+    const slot7 = fmDebugGetSlotEffectId(decoded, 6);
+    if (slot7 !== null) {
+      saveDbg(`Slot 7 en el buffer leído: 0x${slot7.toString(16).padStart(8,'0')} (${getEffectName(slot7)})`);
     }
 
-    // Paso 5: refrescar la UI con el parche real desde el dispositivo
+    // Escritura directa a memoria (0x45) — el mismo mecanismo que UPLOAD,
+    // sin generar ni descargar ningún archivo. (Para eso está SAVE AS ZPTC.)
+    window._g2PCIgnore = true;
+    try {
+      await FM.fmWriteRawPatchToSlot(midiOut, midiIn, decoded, slot, saveDbg);
+    } finally {
+      window._g2PCIgnore = false;
+    }
+
+    saveDbg('✅ Guardado en la pedalera.');
     syncCurrentPatch();
-
     return true;
   }
 
   document.getElementById('saveBtn').addEventListener('click', async (e) => {
     e.stopPropagation();
     const btn = document.getElementById('saveBtn');
-    if (!midiOut) {
+    if (!midiOut || !midiIn) {
       const original = btn.textContent;
       btn.textContent = '⚠ Sin MIDI';
       setTimeout(() => { btn.textContent = original; }, 1500);
@@ -2199,12 +2394,10 @@
     }
     const original = btn.textContent;
     btn.disabled = true;
-    btn.textContent = '⏳ SAVE…';
+    btn.textContent = '⏳ Guardando…';
     try {
       await saveCurrentPatchToFlash();
-      // El indicador "edited" se limpia solo cuando llega la respuesta
-      // real de syncCurrentPatch() (ver handler de SysEx -> fullRefresh()).
-      btn.textContent = '✅ SAVED';
+      btn.textContent = '✅ Guardado';
     } catch (err) {
       console.error('Error al guardar el parche:', err);
       btn.textContent = '❌ Error';
@@ -2574,23 +2767,69 @@
     const timeCur   = document.getElementById('audioTimeCur');
     const timeTot   = document.getElementById('audioTimeTot');
     const volSlider = document.getElementById('audioVol');
-    const controls  = document.getElementById('audioControls');
+    const volVal    = document.getElementById('audioEqVolVal');
+    const bassSlider    = document.getElementById('audioEqBass');
+    const midSlider     = document.getElementById('audioEqMid');
+    const trebleSlider  = document.getElementById('audioEqTreble');
+    const bassVal    = document.getElementById('audioEqBassVal');
+    const midVal     = document.getElementById('audioEqMidVal');
+    const trebleVal  = document.getElementById('audioEqTrebleVal');
+    const controls  = document.getElementById('audioMainRow');
     const plDiv     = document.getElementById('audioPlaylist');
     const dropZone  = document.getElementById('audioDropZone');
     const fileInput = document.getElementById('audioFileInput');
     function fmtTime(s) { if (!isFinite(s)) return '—:——'; const m = Math.floor(s / 60), ss = Math.floor(s % 60); return `${m}:${ss.toString().padStart(2,'0')}`; }
+
+    // --------------------------------------------------------------
+    // ECUALIZADOR (Bass / Mid / Treble) vía Web Audio API
+    // El volumen (Vol) se controla directamente con audio.volume, que
+    // sigue aplicándose aunque el elemento esté enrutado por el grafo
+    // de Web Audio, así que no hace falta un GainNode aparte.
+    // --------------------------------------------------------------
+    let eqCtx = null, eqSource = null, eqBassNode = null, eqMidNode = null, eqTrebleNode = null, eqReady = false;
+    function ensureEqGraph() {
+      if (eqReady) {
+        if (eqCtx && eqCtx.state === 'suspended') eqCtx.resume();
+        return;
+      }
+      try {
+        eqCtx = new (window.AudioContext || window.webkitAudioContext)();
+        eqSource = eqCtx.createMediaElementSource(audio);
+        eqBassNode = eqCtx.createBiquadFilter();
+        eqBassNode.type = 'lowshelf';
+        eqBassNode.frequency.value = 150;
+        eqMidNode = eqCtx.createBiquadFilter();
+        eqMidNode.type = 'peaking';
+        eqMidNode.frequency.value = 1000;
+        eqMidNode.Q.value = 1;
+        eqTrebleNode = eqCtx.createBiquadFilter();
+        eqTrebleNode.type = 'highshelf';
+        eqTrebleNode.frequency.value = 3000;
+        eqBassNode.gain.value = parseFloat(bassSlider.value);
+        eqMidNode.gain.value = parseFloat(midSlider.value);
+        eqTrebleNode.gain.value = parseFloat(trebleSlider.value);
+        eqSource.connect(eqBassNode).connect(eqMidNode).connect(eqTrebleNode).connect(eqCtx.destination);
+        eqReady = true;
+      } catch (err) {
+        console.warn('No se pudo inicializar el ecualizador de audio:', err);
+      }
+    }
+    bassSlider.addEventListener('input', () => { const v = parseFloat(bassSlider.value); bassVal.textContent = (v > 0 ? '+' : '') + v; if (eqBassNode) eqBassNode.gain.value = v; });
+    midSlider.addEventListener('input', () => { const v = parseFloat(midSlider.value); midVal.textContent = (v > 0 ? '+' : '') + v; if (eqMidNode) eqMidNode.gain.value = v; });
+    trebleSlider.addEventListener('input', () => { const v = parseFloat(trebleSlider.value); trebleVal.textContent = (v > 0 ? '+' : '') + v; if (eqTrebleNode) eqTrebleNode.gain.value = v; });
+    volSlider.addEventListener('input', () => { const v = parseFloat(volSlider.value); volVal.textContent = v; audio.volume = v / 100; });
+
     function renderPlaylist() {
       plDiv.innerHTML = playlist.map((t, i) => `<div class="audio-track ${i === currentIdx ? 'playing' : ''}" data-idx="${i}"><span class="audio-track-num">${i+1}</span><span class="audio-track-name">${t.name}</span><span class="audio-track-dur">${t.duration || '—:——'}</span></div>`).join('');
       plDiv.querySelectorAll('.audio-track').forEach(row => row.addEventListener('click', () => playTrack(parseInt(row.dataset.idx))));
     }
-    function playTrack(idx) { if (idx < 0 || idx >= playlist.length) return; currentIdx = idx; audio.src = playlist[idx].url; audio.volume = parseFloat(volSlider.value); audio.play(); isPlaying = true; playBtn.textContent = '⏸'; nowPlay.textContent = playlist[idx].name; controls.style.display = 'flex'; renderPlaylist(); }
+    function playTrack(idx) { if (idx < 0 || idx >= playlist.length) return; ensureEqGraph(); currentIdx = idx; audio.src = playlist[idx].url; audio.volume = parseFloat(volSlider.value) / 100; audio.play(); isPlaying = true; playBtn.textContent = '⏸'; nowPlay.textContent = playlist[idx].name; controls.style.display = 'flex'; renderPlaylist(); }
     audio.addEventListener('timeupdate', () => { if (audio.duration) { const pct = (audio.currentTime / audio.duration) * 100; progBar.style.width = pct + '%'; timeCur.textContent = fmtTime(audio.currentTime); timeTot.textContent = fmtTime(audio.duration); } });
     audio.addEventListener('ended', () => { if (currentIdx < playlist.length - 1) playTrack(currentIdx + 1); else { isPlaying = false; playBtn.textContent = '▶'; } });
     progWrap.addEventListener('click', (e) => { const rect = progWrap.getBoundingClientRect(); const pct = (e.clientX - rect.left) / rect.width; audio.currentTime = pct * audio.duration; });
-    playBtn.addEventListener('click', () => { if (playlist.length === 0) return; if (currentIdx < 0) { playTrack(0); return; } if (isPlaying) { audio.pause(); isPlaying = false; playBtn.textContent = '▶'; } else { audio.play(); isPlaying = true; playBtn.textContent = '⏸'; } });
+    playBtn.addEventListener('click', () => { if (playlist.length === 0) return; ensureEqGraph(); if (currentIdx < 0) { playTrack(0); return; } if (isPlaying) { audio.pause(); isPlaying = false; playBtn.textContent = '▶'; } else { audio.play(); isPlaying = true; playBtn.textContent = '⏸'; } });
     prevBtn.addEventListener('click', () => { if (currentIdx > 0) playTrack(currentIdx - 1); });
     nextBtn.addEventListener('click', () => { if (currentIdx < playlist.length - 1) playTrack(currentIdx + 1); });
-    volSlider.addEventListener('input', () => { audio.volume = parseFloat(volSlider.value); });
     function addFiles(files) { Array.from(files).forEach(file => { if (!file.type.startsWith('audio/')) return; const url = URL.createObjectURL(file); const tmp = new Audio(url); const name = file.name.replace(/\.[^.]+$/, ''); const entry = { name, url, duration: '—:——' }; playlist.push(entry); tmp.addEventListener('loadedmetadata', () => { entry.duration = fmtTime(tmp.duration); renderPlaylist(); }); }); if (playlist.length > 0) { controls.style.display = 'flex'; renderPlaylist(); } }
     fileInput.addEventListener('change', (e) => addFiles(e.target.files));
     dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
@@ -3081,6 +3320,26 @@
       return 'preset';
     }
 
+    // ------------------------------------------------------------
+    // Exponemos las funciones internas de bajo nivel (detección de
+    // protocolo, lectura del patch activo, codificación 7-bit y CRC,
+    // espera de SysEx) para que el botón SAVE pueda reutilizar
+    // exactamente el mismo mecanismo de escritura directa a memoria
+    // que usa UPLOAD, en vez del truco de auto-save.
+    // ------------------------------------------------------------
+    window._g2FM = {
+      fmDetectProtocol,
+      fmFetchCurrentPatch,
+      fmFetchPatchFromMemorySlot,
+      fmWriteRawPatchToSlot,
+      fmSetPendingUpload,
+      fmSaveAndPreloadUpload,
+      eight2seven,
+      getSevenBitCRC,
+      fmWaitSysex,
+      fmExtractPatchName
+    };
+
     // ============================================================
     // BOTÓN: SAVE AS ZPTC — descarga el preset activo de la pedalera
     // ============================================================
@@ -3110,6 +3369,33 @@
     let _fmPendingBytes = null;
     let _fmPendingName = '';
 
+    // Permite que otro botón (SAVE) "precargue" el panel de UPLOAD con un
+    // patch ya construido en memoria (el .zptc virtual), exactamente como
+    // si el usuario hubiera elegido un archivo con LOAD ZPTC, para que el
+    // clic de UPLOAD sea 100% el mismo camino manual ya validado.
+    function fmSetPendingUpload(bytes, name, slot1) {
+      _fmPendingBytes = bytes;
+      _fmPendingName = name || 'preset';
+      const slotInput = document.getElementById('fmSlotInput');
+      if (slotInput && slot1) slotInput.value = slot1;
+      const upBtn = document.getElementById('fmUploadZptcBtn');
+      if (upBtn) upBtn.disabled = false;
+      fmStatus('fmUploadStatus', `✔ "${_fmPendingName}" (${bytes.length} bytes) precargado desde SAVE — pulsa UPLOAD`, 'ok');
+    }
+
+    // Usado por el botón SAVE: descarga el patch activo como .zptc real
+    // (igual que SAVE AS ZPTC) y lo deja precargado en el panel de UPLOAD,
+    // con el slot ya puesto, para que el usuario solo tenga que pulsar
+    // UPLOAD — el mismo camino manual ya validado, sin ninguna escritura
+    // automática de por medio.
+    function fmSaveAndPreloadUpload(bytes, slot1) {
+      const name = fmExtractPatchName(bytes);
+      const filename = safeName(name) + '.zptc';
+      downloadBlob(new Blob([bytes], { type: 'application/octet-stream' }), filename);
+      fmSetPendingUpload(bytes, name, slot1);
+      return { name, filename };
+    }
+
     document.getElementById('fmPickZptcBtn').addEventListener('click', () => {
       document.getElementById('fmZptcFileInput').click();
     });
@@ -3131,6 +3417,78 @@
       ev.target.value = '';
     });
 
+    // ------------------------------------------------------------
+    // Escritura directa a memoria (0x45) + refresco de pantalla.
+    // Función única compartida por UPLOAD y por SAVE: así se garantiza
+    // que ambos caminos son exactamente el mismo código, byte a byte,
+    // sin ninguna reimplementación paralela que pueda divergir.
+    // `patchBytes` es el PTCF de 8 bits (sin cabecera SysEx) ya sea
+    // leído de un archivo .zptc o "virtualizado" desde el buffer en
+    // vivo de la pedalera vía fmFetchCurrentPatch().
+    // ------------------------------------------------------------
+    async function fmWriteRawPatchToSlot(midiOut, midiIn, patchBytes, slot, log) {
+      log = log || function(){};
+      const { protocol, patchLength, patchesPerBank: detectedPpb } = await fmDetectProtocol(midiOut, midiIn);
+      const patchesPerBank = (protocol === 'v2' && detectedPpb > 0) ? detectedPpb : 10;
+      const bank = Math.floor(slot / patchesPerBank);
+      const prog = slot % patchesPerBank;
+
+      let patchData = patchBytes;
+      if (patchLength && patchLength > 0) {
+        if (patchData.length > patchLength) {
+          throw new Error(`El patch (${patchData.length}B) es más grande que el máximo aceptado por la pedalera (${patchLength}B).`);
+        }
+        if (patchData.length < patchLength) {
+          log(`Rellenando patch con ceros: ${patchData.length}B → ${patchLength}B`);
+          const padded = new Uint8Array(patchLength);
+          padded.set(patchData);
+          patchData = padded;
+        }
+      } else {
+        log('⚠️ patchLength no detectado; se envía sin relleno.');
+      }
+
+      const len = patchData.length;
+      const sevenData = eight2seven(patchData);
+      const crc = getSevenBitCRC(patchData);
+      const header = [0xF0,0x52,0x00,0x6E,0x45,0x00,0x00, bank&0x7F,(bank>>7)&0x7F, prog&0x7F,(prog>>7)&0x7F, len&0x7F,(len>>7)&0x7F];
+      const msg = new Uint8Array(header.length + sevenData.length + crc.length + 1);
+      msg.set(header, 0);
+      msg.set(sevenData, header.length);
+      msg.set(crc, header.length + sevenData.length);
+      msg[msg.length - 1] = 0xF7;
+
+      log(`Slot destino ${slot+1} → banco ${bank}, prog ${prog} (ppb=${patchesPerBank})`);
+      log(`PTCF=${len}B, 7bit=${sevenData.length}B, SysEx total=${msg.length}B`);
+
+      const replyPromise = fmWaitSysex(midiIn, d => d.length >= 6 && d[0]===0xF0 && d[1]===0x52 && d[2]===0x00 && d[3]===0x6E && d[4]===0x00 && d[5]===0x00, 4000);
+      midiOut.send(Array.from(msg));
+      const reply = await replyPromise;
+
+      if (!reply) {
+        log('⚠️ Sin respuesta de éxito (00 00) tras 4s.');
+        throw new Error('Sin confirmación (00 00) de la pedalera tras la escritura en memoria.');
+      }
+      log('Respuesta de éxito recibida (00 00).');
+
+      // Refresca el buffer activo de la pedalera (ir a slot vecino y volver),
+      // por si estábamos parados justo en ese slot.
+      const neighborSlot = (slot < 299) ? slot + 1 : slot - 1;
+      if (patchesPerBank > 0) {
+        const nb = Math.floor(neighborSlot / patchesPerBank), np = neighborSlot % patchesPerBank;
+        midiOut.send([0xB0,0x00,(nb>>7)&0x7F]); midiOut.send([0xB0,0x20,nb&0x7F]); midiOut.send([0xC0, np&0x7F]);
+        await fmSleep(250);
+        midiOut.send([0xB0,0x00,(bank>>7)&0x7F]); midiOut.send([0xB0,0x20,bank&0x7F]); midiOut.send([0xC0, prog&0x7F]);
+      } else {
+        midiOut.send([0xC0, neighborSlot & 0x7F]);
+        await fmSleep(250);
+        midiOut.send([0xC0, slot & 0x7F]);
+      }
+      await fmSleep(250);
+
+      return { protocol, patchesPerBank, bank, prog };
+    }
+
     document.getElementById('fmUploadZptcBtn').addEventListener('click', async () => {
       const upBtn = document.getElementById('fmUploadZptcBtn');
       if (!_fmPendingBytes) { fmStatus('fmUploadStatus', 'Primero elige un archivo .zptc', 'err'); return; }
@@ -3143,69 +3501,11 @@
       dbgClearInto('fmUploadDebugLog');
       try {
         if (!g2.midiOut || !g2.midiIn) { fmStatus('fmUploadStatus', '⚠ Conecta MIDI primero', 'warn'); return; }
-
         fmStatus('fmUploadStatus', 'Detectando configuración de bancos…', '');
-        const { protocol, patchLength, patchesPerBank: detectedPpb } = await fmDetectProtocol(g2.midiOut, g2.midiIn);
-        const patchesPerBank = (protocol === 'v2' && detectedPpb > 0) ? detectedPpb : 10;
-        const bank = Math.floor(slot / patchesPerBank);
-        const prog = slot % patchesPerBank;
-
-        let patchData = _fmPendingBytes;
-        if (patchLength && patchLength > 0) {
-          if (patchData.length > patchLength) {
-            throw new Error(`El patch (${patchData.length}B) es más grande que el máximo aceptado por la pedalera (${patchLength}B).`);
-          }
-          if (patchData.length < patchLength) {
-            dbgInto('fmUploadDebugLog', `Rellenando patch con ceros: ${patchData.length}B → ${patchLength}B`);
-            const padded = new Uint8Array(patchLength);
-            padded.set(patchData);
-            patchData = padded;
-          }
-        } else {
-          dbgInto('fmUploadDebugLog', '⚠️ patchLength no detectado; se envía sin relleno.');
-        }
-
-        const len = patchData.length;
-        const sevenData = eight2seven(patchData);
-        const crc = getSevenBitCRC(patchData);
-        const header = [0xF0,0x52,0x00,0x6E,0x45,0x00,0x00, bank&0x7F,(bank>>7)&0x7F, prog&0x7F,(prog>>7)&0x7F, len&0x7F,(len>>7)&0x7F];
-        const msg = new Uint8Array(header.length + sevenData.length + crc.length + 1);
-        msg.set(header, 0);
-        msg.set(sevenData, header.length);
-        msg.set(crc, header.length + sevenData.length);
-        msg[msg.length - 1] = 0xF7;
-
-        dbgInto('fmUploadDebugLog', `Slot destino ${slot1} → banco ${bank}, prog ${prog} (ppb=${patchesPerBank})`);
-        dbgInto('fmUploadDebugLog', `PTCF=${len}B, 7bit=${sevenData.length}B, SysEx total=${msg.length}B`);
-
         fmStatus('fmUploadStatus', `Enviando "${_fmPendingName}" al slot ${slot1}…`, '');
-        const replyPromise = fmWaitSysex(g2.midiIn, d => d.length >= 6 && d[0]===0xF0 && d[1]===0x52 && d[2]===0x00 && d[3]===0x6E && d[4]===0x00 && d[5]===0x00, 4000);
-        g2.midiOut.send(Array.from(msg));
-        const reply = await replyPromise;
-
-        if (reply) {
-          dbgInto('fmUploadDebugLog', 'Respuesta de éxito recibida (00 00).');
-
-          // Refresca el buffer activo de la pedalera (ir a slot vecino y volver),
-          // por si estábamos parados justo en ese slot.
-          fmStatus('fmUploadStatus', 'Refrescando pantalla de la pedalera…', '');
-          const neighborSlot = (slot1 < 300) ? slot + 1 : slot - 1;
-          if (patchesPerBank > 0) {
-            const nb = Math.floor(neighborSlot / patchesPerBank), np = neighborSlot % patchesPerBank;
-            g2.midiOut.send([0xB0,0x00,(nb>>7)&0x7F]); g2.midiOut.send([0xB0,0x20,nb&0x7F]); g2.midiOut.send([0xC0, np&0x7F]);
-            await fmSleep(250);
-            g2.midiOut.send([0xB0,0x00,(bank>>7)&0x7F]); g2.midiOut.send([0xB0,0x20,bank&0x7F]); g2.midiOut.send([0xC0, prog&0x7F]);
-          } else {
-            g2.midiOut.send([0xC0, neighborSlot & 0x7F]);
-            await fmSleep(250);
-            g2.midiOut.send([0xC0, slot & 0x7F]);
-          }
-          await fmSleep(250);
-          fmStatus('fmUploadStatus', `✅ "${_fmPendingName}" guardado en el slot ${slot1} (banco ${bank}, prog ${prog})`, 'ok');
-        } else {
-          dbgInto('fmUploadDebugLog', '⚠️ Sin respuesta de éxito (00 00) tras 4s.');
-          fmStatus('fmUploadStatus', `⚠️ Enviado, pero sin confirmación. Comprueba el slot ${slot1} manualmente.`, 'err');
-        }
+        const { bank, prog } = await fmWriteRawPatchToSlot(g2.midiOut, g2.midiIn, _fmPendingBytes, slot, m => dbgInto('fmUploadDebugLog', m));
+        fmStatus('fmUploadStatus', 'Refrescando pantalla de la pedalera…', '');
+        fmStatus('fmUploadStatus', `✅ "${_fmPendingName}" guardado en el slot ${slot1} (banco ${bank}, prog ${prog})`, 'ok');
       } catch (err) {
         console.error(err);
         fmStatus('fmUploadStatus', '❌ Error: ' + err.message, 'err');
