@@ -81,6 +81,20 @@
       -webkit-text-fill-color: #f0c040;
       margin-left: 4px;
     }
+    .dsp-usage-badge {
+      font-size: 0.78rem;
+      font-weight: 700;
+      font-family: monospace;
+      color: #6bc9b0;
+      background: #0a0e18;
+      border: 1px solid #2a3a50;
+      border-radius: 20px;
+      padding: 3px 12px;
+      margin-left: 4px;
+      white-space: nowrap;
+    }
+    .dsp-usage-badge.warn { color: #e9a23b; border-color: #e9a23b; }
+    .dsp-usage-badge.over { color: #e74c3c; border-color: #e74c3c; }
     .header-right {
       display: flex;
       align-items: center;
@@ -58070,6 +58084,7 @@
       <div class="preset-number" id="presetNumber">—</div>
       <div class="preset-name-wrapper">
         <div class="preset-name" id="presetName" title="Click para renombrar">—</div>
+        <div class="dsp-usage-badge" id="dspUsageBadge" title="DSP usado por el patch actual">DSP: —%</div>
       </div>
     </div>
     <div class="header-right">
@@ -59656,6 +59671,19 @@
     else { prevBtn.disabled = true; nextBtn.disabled = true; }
     const bpmDisplay = document.getElementById('bpmDisplay');
     if (bpmDisplay && currentPatchData) bpmDisplay.innerText = currentPatchData.tempo || 120;
+
+    const dspBadge = document.getElementById('dspUsageBadge');
+    if (dspBadge) {
+      if (!currentPatchData) {
+        dspBadge.textContent = 'DSP: —%';
+        dspBadge.classList.remove('warn', 'over');
+      } else {
+        const used = getUsedDSP();
+        dspBadge.textContent = `DSP: ${used}%`;
+        dspBadge.classList.toggle('over', used > 100);
+        dspBadge.classList.toggle('warn', used > 85 && used <= 100);
+      }
+    }
   }
 
   function fullRefresh() {
@@ -59967,7 +59995,7 @@
   // --------------------------------------------------------------
   document.getElementById('presetName').addEventListener('click', () => {
     if (!currentPatchData) return;
-    const newName = prompt('Nuevo nombre (máx. 14 caracteres):', currentPatchData.name);
+    const newName = prompt('Nuevo nombre (máx. 10 caracteres):', currentPatchData.name);
     if (newName === null) return;
     const trimmed = newName.slice(0,14).trim();
     if (!trimmed) return;
