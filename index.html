@@ -59967,7 +59967,7 @@
   // --------------------------------------------------------------
   document.getElementById('presetName').addEventListener('click', () => {
     if (!currentPatchData) return;
-    const newName = prompt('Nuevo nombre (máx. 10 caracteres):', currentPatchData.name);
+    const newName = prompt('Nuevo nombre (máx. 14 caracteres):', currentPatchData.name);
     if (newName === null) return;
     const trimmed = newName.slice(0,14).trim();
     if (!trimmed) return;
