@@ -747,6 +747,35 @@
     }
     .fm-debug-log div { white-space: pre-wrap; word-break: break-word; }
 
+    /* ============================================================
+       FILES EXPLORER — árbol de carpetas locales (.zptc)
+       ============================================================ */
+    .fx-toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .fx-note { font-size: 0.65rem; color: #3a5a7a; margin-top: 4px; }
+    .fx-tree {
+      background: #0c101e; border: 1px solid #1a2a3a; border-radius: 12px;
+      padding: 8px; max-height: 320px; overflow-y: auto; font-size: 0.78rem; margin-top: 8px;
+    }
+    .fx-tree-empty { color: #3a5070; text-align: center; padding: 26px 10px; font-size: 0.75rem; }
+    ul.fx-dir-list { list-style: none; margin: 0; padding-left: 0; }
+    ul.fx-dir-list ul.fx-dir-list { padding-left: 16px; border-left: 1px dashed #1a2a3a; margin-left: 6px; }
+    .fx-node { display: flex; align-items: center; gap: 6px; padding: 4px 6px; border-radius: 6px; cursor: pointer; user-select: none; }
+    .fx-node:hover { background: #111828; }
+    .fx-node.folder .fx-icon { color: #e9a23b; }
+    .fx-node.zptc { color: #c8daf0; }
+    .fx-node.zptc .fx-icon { color: #6bc9b0; }
+    .fx-node.zptc:hover { background: #0d1f30; }
+    .fx-node.other { color: #2a3d5a; cursor: default; }
+    .fx-node.other:hover { background: transparent; }
+    .fx-node.uploading { background: #3a2f10 !important; color: #e9a23b; }
+    .fx-node.done { background: #10301f !important; color: #6bc9b0; }
+    .fx-node.failed { background: #3a141a !important; color: #e74c3c; }
+    .fx-icon { flex: 0 0 auto; width: 14px; text-align: center; }
+    .fx-fname { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .fx-fsize { font-size: 0.62rem; color: #3a5070; flex: 0 0 auto; }
+    .fx-fstatus { font-size: 0.65rem; flex: 0 0 auto; font-weight: 700; }
+    .fx-toggle { display: inline-block; width: 12px; text-align: center; color: #3a5070; transition: transform 0.15s; }
+    .fx-toggle.open { transform: rotate(90deg); }
 
     /* ============================================================
        RITMOS — estilos con estética del editor
@@ -1835,11 +1864,359 @@
       }
     ]
   },
-  "01000040": {
-    "name": "ZNR",
-    "screenName": "",
-    "parameters": []
+ "01000040": {
+    "name": "OPTComp",
+    "screenName": "OPTComp",
+    "parameters": [
+      {
+        "name": "Drive",
+        "values": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "max": 10,
+        "valuesUCNSP": null,
+        "default": 5
+      },
+      {
+        "name": "Lo",
+        "values": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10",
+          "11",
+          "12",
+          "13",
+          "14",
+          "15",
+          "16",
+          "17",
+          "18",
+          "19",
+          "20",
+          "21",
+          "22",
+          "23",
+          "24",
+          "25",
+          "26",
+          "27",
+          "28",
+          "29",
+          "30",
+          "31",
+          "32",
+          "33",
+          "34",
+          "35",
+          "36",
+          "37",
+          "38",
+          "39",
+          "40",
+          "41",
+          "42",
+          "43",
+          "44",
+          "45",
+          "46",
+          "47",
+          "48",
+          "49",
+          "50",
+          "51",
+          "52",
+          "53",
+          "54",
+          "55",
+          "56",
+          "57",
+          "58",
+          "59",
+          "60",
+          "61",
+          "62",
+          "63",
+          "64",
+          "65",
+          "66",
+          "67",
+          "68",
+          "69",
+          "70",
+          "71",
+          "72",
+          "73",
+          "74",
+          "75",
+          "76",
+          "77",
+          "78",
+          "79",
+          "80",
+          "81",
+          "82",
+          "83",
+          "84",
+          "85",
+          "86",
+          "87",
+          "88",
+          "89",
+          "90",
+          "91",
+          "92",
+          "93",
+          "94",
+          "95",
+          "96",
+          "97",
+          "98",
+          "99",
+          "100"
+        ],
+        "max": 100,
+        "valuesUCNSP": null,
+        "default": 50
+      },
+      {
+        "name": "Hi",
+        "values": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10",
+          "11",
+          "12",
+          "13",
+          "14",
+          "15",
+          "16",
+          "17",
+          "18",
+          "19",
+          "20",
+          "21",
+          "22",
+          "23",
+          "24",
+          "25",
+          "26",
+          "27",
+          "28",
+          "29",
+          "30",
+          "31",
+          "32",
+          "33",
+          "34",
+          "35",
+          "36",
+          "37",
+          "38",
+          "39",
+          "40",
+          "41",
+          "42",
+          "43",
+          "44",
+          "45",
+          "46",
+          "47",
+          "48",
+          "49",
+          "50",
+          "51",
+          "52",
+          "53",
+          "54",
+          "55",
+          "56",
+          "57",
+          "58",
+          "59",
+          "60",
+          "61",
+          "62",
+          "63",
+          "64",
+          "65",
+          "66",
+          "67",
+          "68",
+          "69",
+          "70",
+          "71",
+          "72",
+          "73",
+          "74",
+          "75",
+          "76",
+          "77",
+          "78",
+          "79",
+          "80",
+          "81",
+          "82",
+          "83",
+          "84",
+          "85",
+          "86",
+          "87",
+          "88",
+          "89",
+          "90",
+          "91",
+          "92",
+          "93",
+          "94",
+          "95",
+          "96",
+          "97",
+          "98",
+          "99",
+          "100"
+        ],
+        "max": 100,
+        "valuesUCNSP": null,
+        "default": 50
+      },
+      {
+        "name": "VOL",
+        "values": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10",
+          "11",
+          "12",
+          "13",
+          "14",
+          "15",
+          "16",
+          "17",
+          "18",
+          "19",
+          "20",
+          "21",
+          "22",
+          "23",
+          "24",
+          "25",
+          "26",
+          "27",
+          "28",
+          "29",
+          "30",
+          "31",
+          "32",
+          "33",
+          "34",
+          "35",
+          "36",
+          "37",
+          "38",
+          "39",
+          "40",
+          "41",
+          "42",
+          "43",
+          "44",
+          "45",
+          "46",
+          "47",
+          "48",
+          "49",
+          "50",
+          "51",
+          "52",
+          "53",
+          "54",
+          "55",
+          "56",
+          "57",
+          "58",
+          "59",
+          "60",
+          "61",
+          "62",
+          "63",
+          "64",
+          "65",
+          "66",
+          "67",
+          "68",
+          "69",
+          "70",
+          "71",
+          "72",
+          "73",
+          "74",
+          "75",
+          "76",
+          "77",
+          "78",
+          "79",
+          "80",
+          "81",
+          "82",
+          "83",
+          "84",
+          "85",
+          "86",
+          "87",
+          "88",
+          "89",
+          "90",
+          "91",
+          "92",
+          "93",
+          "94",
+          "95",
+          "96",
+          "97",
+          "98",
+          "99",
+          "100"
+        ],
+        "max": 100,
+        "valuesUCNSP": null,
+        "default": 88
+      }
+    ]
   },
+
   "01000050": {
     "name": "MuteSW",
     "screenName": "BlackOpt",
@@ -2889,439 +3266,6 @@
         "default": 0
       }
     ]
-  },
-  "01000080": {
-    "name": "OptComp",
-    "screenName": "NoiseGate",
-    "parameters": [
-      {
-        "name": "DETCT",
-        "values": [
-          "GTRIN",
-          "EFXIN"
-        ],
-        "max": 1,
-        "valuesUCNSP": null,
-        "default": 1
-      },
-      {
-        "name": "Depth",
-        "values": [
-          "0",
-          "1",
-          "2",
-          "3",
-          "4",
-          "5",
-          "6",
-          "7",
-          "8",
-          "9",
-          "10",
-          "11",
-          "12",
-          "13",
-          "14",
-          "15",
-          "16",
-          "17",
-          "18",
-          "19",
-          "20",
-          "21",
-          "22",
-          "23",
-          "24",
-          "25",
-          "26",
-          "27",
-          "28",
-          "29",
-          "30",
-          "31",
-          "32",
-          "33",
-          "34",
-          "35",
-          "36",
-          "37",
-          "38",
-          "39",
-          "40",
-          "41",
-          "42",
-          "43",
-          "44",
-          "45",
-          "46",
-          "47",
-          "48",
-          "49",
-          "50",
-          "51",
-          "52",
-          "53",
-          "54",
-          "55",
-          "56",
-          "57",
-          "58",
-          "59",
-          "60",
-          "61",
-          "62",
-          "63",
-          "64",
-          "65",
-          "66",
-          "67",
-          "68",
-          "69",
-          "70",
-          "71",
-          "72",
-          "73",
-          "74",
-          "75",
-          "76",
-          "77",
-          "78",
-          "79",
-          "80",
-          "81",
-          "82",
-          "83",
-          "84",
-          "85",
-          "86",
-          "87",
-          "88",
-          "89",
-          "90",
-          "91",
-          "92",
-          "93",
-          "94",
-          "95",
-          "96",
-          "97",
-          "98",
-          "99",
-          "100"
-        ],
-        "max": 100,
-        "valuesUCNSP": null,
-        "default": 100
-      },
-      {
-        "name": "THRSH",
-        "values": [
-          "0",
-          "1",
-          "2",
-          "3",
-          "4",
-          "5",
-          "6",
-          "7",
-          "8",
-          "9",
-          "10",
-          "11",
-          "12",
-          "13",
-          "14",
-          "15",
-          "16",
-          "17",
-          "18",
-          "19",
-          "20",
-          "21",
-          "22",
-          "23",
-          "24",
-          "25",
-          "26",
-          "27",
-          "28",
-          "29",
-          "30",
-          "31",
-          "32",
-          "33",
-          "34",
-          "35",
-          "36",
-          "37",
-          "38",
-          "39",
-          "40",
-          "41",
-          "42",
-          "43",
-          "44",
-          "45",
-          "46",
-          "47",
-          "48",
-          "49",
-          "50",
-          "51",
-          "52",
-          "53",
-          "54",
-          "55",
-          "56",
-          "57",
-          "58",
-          "59",
-          "60",
-          "61",
-          "62",
-          "63",
-          "64",
-          "65",
-          "66",
-          "67",
-          "68",
-          "69",
-          "70",
-          "71",
-          "72",
-          "73",
-          "74",
-          "75",
-          "76",
-          "77",
-          "78",
-          "79",
-          "80",
-          "81",
-          "82",
-          "83",
-          "84",
-          "85",
-          "86",
-          "87",
-          "88",
-          "89",
-          "90",
-          "91",
-          "92",
-          "93",
-          "94",
-          "95",
-          "96",
-          "97",
-          "98",
-          "99",
-          "100"
-        ],
-        "max": 100,
-        "valuesUCNSP": null,
-        "default": 54
-      },
-      {
-        "name": "Decay",
-        "values": [
-          "0",
-          "1",
-          "2",
-          "3",
-          "4",
-          "5",
-          "6",
-          "7",
-          "8",
-          "9",
-          "10",
-          "11",
-          "12",
-          "13",
-          "14",
-          "15",
-          "16",
-          "17",
-          "18",
-          "19",
-          "20",
-          "21",
-          "22",
-          "23",
-          "24",
-          "25",
-          "26",
-          "27",
-          "28",
-          "29",
-          "30",
-          "31",
-          "32",
-          "33",
-          "34",
-          "35",
-          "36",
-          "37",
-          "38",
-          "39",
-          "40",
-          "41",
-          "42",
-          "43",
-          "44",
-          "45",
-          "46",
-          "47",
-          "48",
-          "49",
-          "50",
-          "51",
-          "52",
-          "53",
-          "54",
-          "55",
-          "56",
-          "57",
-          "58",
-          "59",
-          "60",
-          "61",
-          "62",
-          "63",
-          "64",
-          "65",
-          "66",
-          "67",
-          "68",
-          "69",
-          "70",
-          "71",
-          "72",
-          "73",
-          "74",
-          "75",
-          "76",
-          "77",
-          "78",
-          "79",
-          "80",
-          "81",
-          "82",
-          "83",
-          "84",
-          "85",
-          "86",
-          "87",
-          "88",
-          "89",
-          "90",
-          "91",
-          "92",
-          "93",
-          "94",
-          "95",
-          "96",
-          "97",
-          "98",
-          "99",
-          "100"
-        ],
-        "max": 100,
-        "valuesUCNSP": null,
-        "default": 0
-      }
-    ]
-  },
-  "01090030": {
-    "name": "SlowATTCK",
-    "screenName": "",
-    "parameters": []
-  },
-  "01090040": {
-    "name": "ZNR",
-    "screenName": "",
-    "parameters": []
-  },
-  "01090080": {
-    "name": "OptComp",
-    "screenName": "",
-    "parameters": []
-  },
-  "01800010": {
-    "name": "BlackOpt",
-    "screenName": "",
-    "parameters": []
-  },
-  "01800020": {
-    "name": "LMT-76",
-    "screenName": "",
-    "parameters": []
-  },
-  "01800030": {
-    "name": "160 Comp",
-    "screenName": "",
-    "parameters": []
-  },
-  "01800040": {
-    "name": "DualComp",
-    "screenName": "",
-    "parameters": []
-  },
-  "01800050": {
-    "name": "MB Comp",
-    "screenName": "",
-    "parameters": []
-  },
-  "01800060": {
-    "name": "DYN Comp",
-    "screenName": "",
-    "parameters": []
-  },
-  "01800070": {
-    "name": "Glam Comp",
-    "screenName": "",
-    "parameters": []
-  },
-  "01890010": {
-    "name": "BlackOpt",
-    "screenName": "",
-    "parameters": []
-  },
-  "01890020": {
-    "name": "LMT-76",
-    "screenName": "",
-    "parameters": []
-  },
-  "01890030": {
-    "name": "160 Comp",
-    "screenName": "",
-    "parameters": []
-  },
-  "01890040": {
-    "name": "DualComp",
-    "screenName": "",
-    "parameters": []
-  },
-  "01890050": {
-    "name": "MB Comp",
-    "screenName": "",
-    "parameters": []
-  },
-  "01890060": {
-    "name": "DYN Comp",
-    "screenName": "",
-    "parameters": []
-  },
-  "01890070": {
-    "name": "Glam Comp",
-    "screenName": "",
-    "parameters": []
-  },
-  "01a01000": {
-    "name": "Adv.NR",
-    "screenName": "",
-    "parameters": []
   },
   "02000010": {
     "name": "AutoWah",
@@ -58118,6 +58062,7 @@
       <button type="button" class="zone-tab" data-zone="audio">🎵 BACKING TRACKS MP3</button>
       <button type="button" class="zone-tab" data-zone="rhythm">🥁 RITMOS</button>
       <button type="button" class="zone-tab" data-zone="filemanager">📁 FILES MANAGER</button>
+      <button type="button" class="zone-tab" data-zone="filesexplorer">🗂️ FILES EXPLORER</button>
     </div>
     <div class="zone-body">
       <div class="zone-section active" id="zone-presets">
@@ -58294,6 +58239,26 @@
           </div>
           <div class="fm-status-bar" id="fmBackupStatus">Descarga los 300 presets como archivos .zptc individuales / Download all 300 presets as individual .zptc files</div>
           <div class="fm-debug-log" id="fmBackupDebugLog" style="display:none"></div>
+        </div>
+      </div>
+
+      <div class="zone-section" id="zone-filesexplorer">
+        <div class="fm-section">
+          <div class="fm-section-title">🗂️ Explorador de archivos .zptc — click para cargar directamente en la pedalera</div>
+          <div class="fx-toolbar">
+            <button type="button" class="fm-btn primary-action" id="fxPickFolderBtn">📂 ELEGIR CARPETA</button>
+            <button type="button" class="fm-btn" id="fxRefreshBtn" disabled>⟳ REFRESCAR</button>
+            <label class="rhy-mute-label" style="margin-left:4px;">
+              <input type="checkbox" id="fxManualSlotToggle"> forzar slot manual
+            </label>
+            <input type="number" class="fm-slot-input" id="fxManualSlotInput" min="1" max="300" placeholder="1-300" style="width:70px;">
+          </div>
+          <div class="fx-note">Click en un archivo <b>.zptc</b> = se escribe directamente en el slot activo de la pedalera (el mismo que detecta el resto del editor) y se escucha al instante. Usa "forzar slot manual" para elegir otro slot en vez del activo.</div>
+          <div class="fx-tree" id="fxTreeContainer">
+            <div class="fx-tree-empty">Elige una carpeta para empezar a explorar…</div>
+          </div>
+          <div class="fm-status-bar" id="fxStatus">Elige una carpeta con tus copias de seguridad .zptc</div>
+          <div class="fm-debug-log" id="fxDebugLog" style="display:none"></div>
         </div>
       </div>
     </div>
@@ -58616,7 +58581,9 @@
     let total = 0;
     currentPatchData.effects.forEach((fx, i) => {
       if (i === excludeSlot) return;
-      if (!fx.enabled) return; // los efectos en OFF no consumen DSP
+      // El DSP lo reserva cualquier efecto CARGADO en el slot, esté activado
+      // o no (así se comporta la pedalera real: apagar un efecto no libera
+      // su cuota de DSP, solo lo hace quitarlo/sustituirlo por otro).
       total += getEffectDspCost(fx.id);
     });
     return total;
@@ -58629,7 +58596,7 @@
     [0x01000010, ["Sense","ATTCK","Tone","VOL"]],
     [0x01000020, ["THRSH","Ratio","ATTCK","VOL"]],
     [0x01000030, ["SUSTN","Lo","Hi","VOL"]],
-    [0x01000040, ["COMP","LOW","HI","VOL"]],
+    [0x01000040, ["Drive","LOW","HI","VOL"]],
     [0x01000050, ["Comp","Lo","Hi","VOL"]],
     [0x01000060, ["Input","Ratio","REL","Output"]],
     [0x01000070, ["DETCT","Depth","THRSH","Decay"]],
@@ -58831,12 +58798,12 @@
   // VALORES POR DEFECTO
   // --------------------------------------------------------------
   const DEFAULT_PARAMS_MAP = new Map();
-  DEFAULT_PARAMS_MAP.set(0x01000010, [0x02, 0x00, 0x02, 0x0a, 0x64]);
-  DEFAULT_PARAMS_MAP.set(0x01000020, [0x0a, 0x02, 0x02, 0x64]);
-  DEFAULT_PARAMS_MAP.set(0x01000030, [0x02, 0x00, 0x02, 0x64]);
-  DEFAULT_PARAMS_MAP.set(0x01000040, [0x02, 0x00, 0x02, 0x64]);
-  DEFAULT_PARAMS_MAP.set(0x01000050, [0x02, 0x00, 0x02, 0x64]);
-  DEFAULT_PARAMS_MAP.set(0x01000060, [0x0a, 0x02, 0x00, 0x64]);
+  DEFAULT_PARAMS_MAP.set(0x01000010, [0x04, 0x00, 0x05, 0x50]);
+  DEFAULT_PARAMS_MAP.set(0x01000020, [0x0a, 0x05, 0x05, 0x54]);
+  DEFAULT_PARAMS_MAP.set(0x01000030, [0x02, 0x30, 0x30, 0x54]);
+  DEFAULT_PARAMS_MAP.set(0x01000040, [0x02, 0x30, 0x30, 0x54]);
+  DEFAULT_PARAMS_MAP.set(0x01000050, [0x10, 0x30, 0x30, 0x54]);
+  DEFAULT_PARAMS_MAP.set(0x01000060, [0x0a, 0x01, 0x20, 0x44]);
   DEFAULT_PARAMS_MAP.set(0x04000020, [0x32, 0x46, 0x5a, 0x00, 0x00, 0x00, 0x50]);
   DEFAULT_PARAMS_MAP.set(0x03000020, [0x32, 0x46, 0x5a, 0x50]);
   DEFAULT_PARAMS_MAP.set(0x03000030, [0x32, 0x00, 0x46, 0x5a]);
@@ -61124,6 +61091,205 @@
         fmSetProgress(0, 0, false);
         btn.disabled = false;
       }
+    });
+  })();
+
+  // ================================================================
+  // FILES EXPLORER — árbol de carpetas locales, click en un .zptc =
+  // cargarlo directamente en el slot activo de la pedalera (reutiliza
+  // la conexión MIDI y el mecanismo de escritura a memoria ya
+  // validados por el resto del editor: window._g2 y window._g2FM).
+  // ================================================================
+  (function() {
+    const g2 = window._g2;
+    const FM = window._g2FM;
+
+    function fxStatus(msg, type) {
+      const el = document.getElementById('fxStatus');
+      if (!el) return;
+      el.textContent = msg;
+      el.className = 'fm-status-bar' + (type ? ' ' + type : '');
+    }
+    function fxLog(msg) {
+      const el = document.getElementById('fxDebugLog');
+      if (!el) return;
+      el.style.display = 'block';
+      const line = document.createElement('div');
+      line.textContent = msg;
+      el.appendChild(line);
+      el.scrollTop = el.scrollHeight;
+    }
+    function fxClearLog() {
+      const el = document.getElementById('fxDebugLog');
+      if (!el) return;
+      el.innerHTML = '';
+      el.style.display = 'none';
+    }
+    function fxEscapeHtml(str) {
+      return String(str ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+    function fxFmtBytes(n) {
+      if (n < 1024) return n + ' B';
+      if (n < 1024*1024) return (n/1024).toFixed(1) + ' KB';
+      return (n/1024/1024).toFixed(2) + ' MB';
+    }
+    function fxIsZptc(name) { return /\.zptc$/i.test(name); }
+
+    let fxUploadInProgress = false;
+
+    async function fxUploadZptcFile(fileHandle, nodeEl) {
+      if (fxUploadInProgress) return;
+      if (!g2.midiOut || !g2.midiIn) {
+        fxStatus('⚠ Conecta MIDI primero (el editor se conecta solo al abrir la página).', 'warn');
+        return;
+      }
+
+      const manualToggle = document.getElementById('fxManualSlotToggle').checked;
+      const manualVal = parseInt(document.getElementById('fxManualSlotInput').value, 10);
+      let slot;
+      if (manualToggle) {
+        if (!Number.isFinite(manualVal) || manualVal < 1 || manualVal > 300) {
+          fxStatus('❌ Indica un slot manual válido (1-300) o desmarca la casilla.', 'err');
+          return;
+        }
+        slot = manualVal - 1;
+      } else if (g2.currentPresetSlot >= 0) {
+        slot = g2.currentPresetSlot;
+      } else {
+        fxStatus('❌ No se detectó el slot activo. Marca "forzar slot manual" o cambia de preset en la pedalera y vuelve a intentarlo.', 'err');
+        return;
+      }
+
+      fxUploadInProgress = true;
+      fxClearLog();
+      document.querySelectorAll('.fx-node.zptc').forEach(n => n.classList.remove('done','failed','uploading'));
+      if (nodeEl) nodeEl.classList.add('uploading');
+      const statusSpan = nodeEl ? nodeEl.querySelector('.fx-fstatus') : null;
+      if (statusSpan) statusSpan.textContent = '⏳';
+
+      try {
+        const file = await fileHandle.getFile();
+        fxStatus(`⏳ Leyendo "${file.name}" (${fxFmtBytes(file.size)})…`, '');
+        const buf = new Uint8Array(await file.arrayBuffer());
+        if (buf.length < 12 || buf[0]!==0x50 || buf[1]!==0x54 || buf[2]!==0x43 || buf[3]!==0x46) {
+          throw new Error(`"${file.name}" no parece un .zptc válido (falta cabecera PTCF).`);
+        }
+        const name = FM.fmExtractPatchName(buf);
+        fxStatus(`⏳ Enviando "${name}" (${file.name}) al slot ${slot+1}…`, '');
+        await FM.fmWriteRawPatchToSlot(g2.midiOut, g2.midiIn, buf, slot, fxLog);
+        fxStatus(`✅ "${name}" cargado y sonando en el slot ${slot+1}.`, 'ok');
+        if (nodeEl) { nodeEl.classList.remove('uploading'); nodeEl.classList.add('done'); }
+        if (statusSpan) statusSpan.textContent = '✅';
+        if (typeof g2.fullRefresh === 'function') g2.fullRefresh();
+      } catch (err) {
+        console.error(err);
+        fxStatus('❌ Error: ' + err.message, 'err');
+        if (nodeEl) { nodeEl.classList.remove('uploading'); nodeEl.classList.add('failed'); }
+        if (statusSpan) statusSpan.textContent = '❌';
+      } finally {
+        fxUploadInProgress = false;
+      }
+    }
+
+    let fxRootHandle = null;
+
+    async function fxBuildDirNode(dirHandle, containerEl) {
+      const ul = document.createElement('ul');
+      ul.className = 'fx-dir-list';
+      containerEl.appendChild(ul);
+
+      const entries = [];
+      for await (const [name, handle] of dirHandle.entries()) entries.push({ name, handle });
+      entries.sort((a,b) => {
+        if (a.handle.kind !== b.handle.kind) return a.handle.kind === 'directory' ? -1 : 1;
+        return a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' });
+      });
+
+      if (entries.length === 0) {
+        const li = document.createElement('li');
+        li.innerHTML = `<div class="fx-node other"><span class="fx-icon">·</span><span class="fx-fname">(carpeta vacía)</span></div>`;
+        ul.appendChild(li);
+        return;
+      }
+
+      for (const { name, handle } of entries) {
+        const li = document.createElement('li');
+        if (handle.kind === 'directory') {
+          const node = document.createElement('div');
+          node.className = 'fx-node folder';
+          node.innerHTML = `<span class="fx-toggle">▶</span><span class="fx-icon">📁</span><span class="fx-fname">${fxEscapeHtml(name)}</span>`;
+          li.appendChild(node);
+          let expanded = false, childrenLoaded = false;
+          const childWrap = document.createElement('div');
+          childWrap.style.display = 'none';
+          li.appendChild(childWrap);
+          node.addEventListener('click', async () => {
+            expanded = !expanded;
+            node.querySelector('.fx-toggle').classList.toggle('open', expanded);
+            childWrap.style.display = expanded ? 'block' : 'none';
+            if (expanded && !childrenLoaded) {
+              childrenLoaded = true;
+              try {
+                await fxBuildDirNode(handle, childWrap);
+              } catch (e) {
+                const errLi = document.createElement('div');
+                errLi.className = 'fx-node other';
+                errLi.textContent = '⚠ No se pudo leer esta carpeta';
+                childWrap.appendChild(errLi);
+              }
+            }
+          });
+        } else {
+          const zptc = fxIsZptc(name);
+          const node = document.createElement('div');
+          node.className = 'fx-node ' + (zptc ? 'zptc' : 'other');
+          let sizeLabel = '';
+          try {
+            const file = await handle.getFile();
+            sizeLabel = fxFmtBytes(file.size);
+          } catch(e) {}
+          node.innerHTML = `<span class="fx-icon">${zptc ? '🎸' : '📄'}</span><span class="fx-fname">${fxEscapeHtml(name)}</span><span class="fx-fsize">${sizeLabel}</span><span class="fx-fstatus"></span>`;
+          if (zptc) {
+            node.title = 'Click para cargar este preset en la pedalera';
+            node.addEventListener('click', () => fxUploadZptcFile(handle, node));
+          }
+          li.appendChild(node);
+        }
+        ul.appendChild(li);
+      }
+    }
+
+    async function fxRenderRoot(rootHandle) {
+      const container = document.getElementById('fxTreeContainer');
+      container.innerHTML = '';
+      try {
+        await fxBuildDirNode(rootHandle, container);
+      } catch (e) {
+        container.innerHTML = `<div class="fx-tree-empty">⚠ No se pudo leer la carpeta: ${fxEscapeHtml(e.message)}</div>`;
+      }
+    }
+
+    document.getElementById('fxPickFolderBtn').addEventListener('click', async () => {
+      if (typeof window.showDirectoryPicker !== 'function') {
+        fxStatus('❌ Tu navegador no soporta elegir carpetas (usa Chrome o Edge de escritorio).', 'err');
+        return;
+      }
+      try {
+        const handle = await window.showDirectoryPicker({ id: 'g2fourFilesExplorerTab', mode: 'read' });
+        fxRootHandle = handle;
+        document.getElementById('fxRefreshBtn').disabled = false;
+        fxStatus(`📂 Explorando "${handle.name}"`, '');
+        await fxRenderRoot(handle);
+      } catch (e) {
+        if (e && e.name === 'AbortError') return;
+        console.error(e);
+        fxStatus('❌ No se pudo abrir la carpeta: ' + e.message, 'err');
+      }
+    });
+
+    document.getElementById('fxRefreshBtn').addEventListener('click', async () => {
+      if (!fxRootHandle) return;
+      await fxRenderRoot(fxRootHandle);
     });
   })();
 
