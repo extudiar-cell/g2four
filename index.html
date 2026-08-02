@@ -1006,7 +1006,45 @@
       font-size: 1.1rem;
     }
 
-    </style>
+    
+    /* ============================================================
+       PresetAI - boton + modal flotante con el artist-loader embebido
+       ============================================================ */
+    .presetai-btn {
+      background: #2a1e3a; border: 1px solid #b873cf; color: #d9b8ff;
+    }
+    .presetai-btn:hover:not(:disabled) {
+      border-color: #b873cf; color: #fff; background: #3a2a4e;
+      box-shadow: 0 0 16px rgba(184,115,207,0.25);
+    }
+    .presetai-modal {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(6px); z-index: 3000;
+      justify-content: center; align-items: center; padding: 20px;
+    }
+    .presetai-modal.open { display: flex; }
+    .presetai-panel {
+      background: #0a0e18; border: 1px solid #3f4f66; border-radius: 20px;
+      width: 100%; max-width: 940px; height: 92vh;
+      display: flex; flex-direction: column; overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.7);
+    }
+    .presetai-panel-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 18px; background: #141a28; border-bottom: 1px solid #3f4f66;
+      flex-shrink: 0;
+    }
+    .presetai-panel-head strong { color: #d9b8ff; font-size: 1rem; }
+    .presetai-close-btn {
+      background: #1a2a3c; border: 1px solid #3f5270; color: #f0f4ff;
+      border-radius: 40px; padding: 6px 16px; font-size: 0.82rem; cursor: pointer;
+    }
+    .presetai-close-btn:hover { border-color: #e74c3c; color: #e74c3c; }
+    .presetai-iframe { flex: 1; width: 100%; border: none; background: #0a0e18; }
+    @media (max-width: 700px) {
+      .presetai-panel { height: 96vh; border-radius: 14px; }
+    }
+</style>
 </head>
 <body>
 <script type="application/json" id="effectParamDbJson">{
@@ -58108,7 +58146,9 @@
         <button class="lang-btn active" onclick="setLanguage('es')" id="lang-es">ES</button>
         <button class="lang-btn" onclick="setLanguage('en')" id="lang-en">EN</button>
       </div>
+      <button class="nav-btn presetai-btn" id="presetAiBtn" type="button">🤖 PresetAI</button>
       <button class="nav-btn save-btn" id="saveBtn" data-i18n="save">💾 GUARDAR</button>
+      <button class="nav-btn save-btn" id="saveToDiskBtn" data-i18n="save_to_disk">💾 GUARDAR EN DISCO</button>
       <div class="midi-indicator">
         <span class="midi-dot" id="midiDot"></span>
         <span class="midi-label" id="midiLabel">MIDI</span>
@@ -58173,9 +58213,9 @@
                 <button type="button" class="audio-btn" id="audioNextBtn" title="NEXT">⏭</button>
               </div>
             </div>
-            <div class="audio-drop-zone" id="audioDropZone" data-i18n="drop_zone">
+            <div class="audio-drop-zone" id="audioDropZone">
               <input type="file" id="audioFileInput" accept="audio/*" multiple>
-              🎵 Arrastra MP3/WAV aquí o haz click para seleccionar
+              <span id="audioDropZoneLabel" data-i18n="drop_zone">🎵 Arrastra MP3/WAV aquí o haz click para seleccionar</span>
             </div>
           </div>
           <div class="audio-divider"></div>
@@ -58371,6 +58411,7 @@
     "preset_no": "Número de preset",
     "tuner": "🎸 Afinador",
     "save": "💾 GUARDAR",
+    "save_to_disk": "💾 GUARDAR EN DISCO",
     "midi_status": "Conecta MIDI y pulsa Escanear",
     "scan_presets": "⟳ ESCANEAR PRESETS",
     "no_presets": "Sin presets cargados aún",
@@ -58445,6 +58486,7 @@
     "preset_no": "Preset number",
     "tuner": "🎸 Tuner",
     "save": "💾 SAVE",
+    "save_to_disk": "💾 SAVE TO DISK",
     "midi_status": "Connect MIDI and press Scan",
     "scan_presets": "⟳ SCAN PRESETS",
     "no_presets": "No presets loaded yet",
@@ -60126,6 +60168,30 @@
     }
   });
 
+  document.getElementById('saveToDiskBtn').addEventListener('click', async (e) => {
+    e.stopPropagation();
+    const btn = document.getElementById('saveToDiskBtn');
+    const FM = window._g2FM;
+    if (!FM) return;
+    const original = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '⏳ Guardando…';
+    try {
+      const { filename } = await FM.fmSaveActivePresetAsZptc();
+      btn.textContent = '✅ ' + filename;
+    } catch (err) {
+      console.error('Error al guardar en disco:', err);
+      if (err.code === 'NO_MIDI') btn.textContent = '⚠ Sin MIDI';
+      else if (err.code === 'NO_RESPONSE') btn.textContent = '❌ Sin respuesta';
+      else btn.textContent = '❌ Error';
+    } finally {
+      setTimeout(() => {
+        btn.textContent = original;
+        btn.disabled = false;
+      }, 1800);
+    }
+  });
+
   // --------------------------------------------------------------
   // AFINADOR
   // --------------------------------------------------------------
@@ -60594,6 +60660,7 @@
     nextBtn.addEventListener('click', () => { if (currentIdx < playlist.length - 1) playTrack(currentIdx + 1); });
     function addFiles(files) { Array.from(files).forEach(file => { if (!file.type.startsWith('audio/')) return; const url = URL.createObjectURL(file); const tmp = new Audio(url); const name = file.name.replace(/\.[^.]+$/, ''); const entry = { name, url, duration: '—:——' }; playlist.push(entry); tmp.addEventListener('loadedmetadata', () => { entry.duration = fmtTime(tmp.duration); renderPlaylist(); }); }); renderPlaylist(); }
     fileInput.addEventListener('change', (e) => addFiles(e.target.files));
+    dropZone.addEventListener('click', (e) => { if (e.target !== fileInput) fileInput.click(); });
     dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
     dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
     dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('drag-over'); addFiles(e.dataTransfer.files); });
@@ -61083,6 +61150,32 @@
     }
 
     // ------------------------------------------------------------
+    // Lógica compartida de "SAVE AS ZPTC": lee el preset activo de la
+    // pedalera y lo descarga como archivo .zptc. La usan tanto el botón
+    // del Gestor de Archivos (fmSaveAsZptcBtn) como el botón "GUARDAR EN
+    // DISCO" de la cabecera (saveToDiskBtn), para que ambos se comporten
+    // exactamente igual sin duplicar código.
+    // ------------------------------------------------------------
+    async function fmSaveActivePresetAsZptc() {
+      if (!g2.midiOut || !g2.midiIn) {
+        const err = new Error('Conecta MIDI primero');
+        err.code = 'NO_MIDI';
+        throw err;
+      }
+      const decoded = await fmFetchCurrentPatch(g2.midiOut, g2.midiIn);
+      if (!decoded) {
+        const err = new Error('Sin respuesta de la pedalera');
+        err.code = 'NO_RESPONSE';
+        throw err;
+      }
+      const name = fmExtractPatchName(decoded);
+      const slotNow = g2.currentPresetSlot;
+      const filename = (slotNow >= 0 ? String(slotNow + 1).padStart(3, '0') + ' ' : '') + safeName(name) + '.zptc';
+      downloadBlob(new Blob([decoded], { type: 'application/octet-stream' }), filename);
+      return { name, filename };
+    }
+
+    // ------------------------------------------------------------
     // Exponemos las funciones internas de bajo nivel (detección de
     // protocolo, lectura del patch activo, codificación 7-bit y CRC,
     // espera de SysEx) para que el botón SAVE pueda reutilizar
@@ -61096,6 +61189,7 @@
       fmWriteRawPatchToSlot,
       fmSetPendingUpload,
       fmSaveAndPreloadUpload,
+      fmSaveActivePresetAsZptc,
       eight2seven,
       getSevenBitCRC,
       fmWaitSysex,
@@ -61109,18 +61203,14 @@
       const btn = document.getElementById('fmSaveAsZptcBtn');
       btn.disabled = true;
       try {
-        if (!g2.midiOut || !g2.midiIn) { fmStatus('fmSaveAsStatus', '⚠ Conecta MIDI primero', 'warn'); return; }
         fmStatus('fmSaveAsStatus', '⏳ Solicitando preset activo…', '');
-        const decoded = await fmFetchCurrentPatch(g2.midiOut, g2.midiIn);
-        if (!decoded) { fmStatus('fmSaveAsStatus', '❌ Sin respuesta de la pedalera', 'err'); return; }
-        const name = fmExtractPatchName(decoded);
-        const slotNow = g2.currentPresetSlot;
-        const filename = (slotNow >= 0 ? String(slotNow + 1).padStart(3, '0') + ' ' : '') + safeName(name) + '.zptc';
-        downloadBlob(new Blob([decoded], { type: 'application/octet-stream' }), filename);
+        const { filename } = await fmSaveActivePresetAsZptc();
         fmStatus('fmSaveAsStatus', `✅ Descargado: ${filename}`, 'ok');
       } catch (err) {
         console.error(err);
-        fmStatus('fmSaveAsStatus', '❌ Error: ' + err.message, 'err');
+        if (err.code === 'NO_MIDI') fmStatus('fmSaveAsStatus', '⚠ Conecta MIDI primero', 'warn');
+        else if (err.code === 'NO_RESPONSE') fmStatus('fmSaveAsStatus', '❌ Sin respuesta de la pedalera', 'err');
+        else fmStatus('fmSaveAsStatus', '❌ Error: ' + err.message, 'err');
       } finally {
         btn.disabled = false;
       }
@@ -61961,6 +62051,1724 @@
   })();
 
 
+</script>
+<div id="presetAiModal" class="presetai-modal">
+  <div class="presetai-panel">
+    <div class="presetai-panel-head">
+      <strong>PresetAI - Asistente de Presets de Artistas</strong>
+      <button class="presetai-close-btn" id="presetAiCloseBtn" type="button">Cerrar</button>
+    </div>
+    <iframe id="presetAiFrame" class="presetai-iframe" allow="midi; usb; clipboard-read; clipboard-write" title="PresetAI"></iframe>
+  </div>
+</div>
+
+<template id="presetAiTemplate">
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>G2 Four — Asistente de Presets de Artistas</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter','Segoe UI',system-ui,sans-serif;background:#0a0e18;color:#eef2ff;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px;}
+.wrap{max-width:860px;width:100%;}
+h1{font-size:1.3rem;margin-bottom:4px;}
+.sub{color:#8f9bb5;font-size:.88rem;margin-bottom:18px;}
+.card{background:#121726;border:1px solid #1e2840;border-radius:10px;padding:18px;margin-bottom:14px;position:relative;}
+.card.locked{opacity:.45;pointer-events:none;}
+.card h2{font-size:1rem;color:#9fd3ff;margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+.step-num{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:#1c2336;border:1px solid #2a3349;font-size:.78rem;font-weight:700;color:#9fd3ff;flex-shrink:0;}
+.card .hint{font-size:.78rem;color:#8f9bb5;margin-bottom:10px;}
+label{font-size:.82rem;color:#8f9bb5;display:block;margin-bottom:5px;}
+textarea,input[type=text],input[type=number]{width:100%;background:#0e1320;color:#eef2ff;border:1px solid #2a3349;border-radius:6px;padding:10px;font-size:.82rem;font-family:monospace;resize:vertical;}
+textarea{min-height:110px;}
+#promptText{min-height:230px;font-size:.74rem;line-height:1.5;}
+select,input[type=file]{width:100%;background:#0e1320;color:#eef2ff;border:1px solid #2a3349;border-radius:6px;padding:8px 10px;font-size:.88rem;margin-bottom:10px;}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+button,a.ai-btn{padding:9px 16px;border-radius:7px;border:none;font-size:.86rem;font-weight:600;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;}
+button:disabled{opacity:.35;cursor:not-allowed;}
+.btn-primary{background:linear-gradient(135deg,#3a8dde,#2a6fc9);color:#fff;}
+.btn-secondary{background:#1c2336;border:1px solid #2a3349;color:#eef2ff;}
+.btn-green{background:linear-gradient(135deg,#22a06b,#147a50);color:#fff;}
+.btn-warn{background:linear-gradient(135deg,#c97b2a,#a05c15);color:#fff;}
+a.ai-btn{background:#1c2336;border:1px solid #2a3349;color:#eef2ff;}
+a.ai-btn:hover{border-color:#3a8dde;color:#9fd3ff;}
+.status{margin-top:10px;padding:9px 12px;border-radius:6px;font-size:.84rem;white-space:pre-wrap;}
+.status.ok{background:#10301f;color:#7be0a8;border:1px solid #1d5c3c;}
+.status.err{background:#3a141a;color:#ff9aa6;border:1px solid #5c1d2c;}
+.status.info{background:#10243a;color:#9fd3ff;border:1px solid #1d3c5c;}
+.status.warn{background:#3a2f10;color:#ffd27a;border:1px solid #5c4a1d;}
+table{width:100%;border-collapse:collapse;font-size:.8rem;margin-top:8px;}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid #1a2030;}
+th{color:#8f9bb5;font-weight:600;font-size:.75rem;}
+.badge{display:inline-block;padding:2px 7px;border-radius:10px;font-size:.7rem;font-weight:700;}
+.on{background:#10301f;color:#7be0a8;}
+.off{background:#2a2030;color:#c79aff;}
+.dsp-wrap{background:#1c2336;border-radius:5px;height:8px;overflow:hidden;margin-top:8px;}
+.dsp-fill{height:100%;background:linear-gradient(90deg,#47c9b0,#3a8dde);transition:width .3s;}
+.dsp-fill.over{background:linear-gradient(90deg,#e34234,#b8263a);}
+.dsp-label{font-size:.78rem;color:#8f9bb5;margin-top:4px;}
+.log{background:#080c14;border:1px solid #1a2030;border-radius:6px;padding:10px;font-size:.72rem;font-family:monospace;max-height:180px;overflow-y:auto;margin-top:8px;color:#6a9a7a;}
+.progress-bar-wrap{background:#1c2336;border-radius:5px;height:6px;overflow:hidden;margin-top:6px;}
+.progress-bar{height:100%;background:#3a8dde;transition:width .2s;}
+.midi-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.dot{width:11px;height:11px;border-radius:50%;background:#3a4258;flex:0 0 auto;}
+.dot.on{background:#2ecc71;box-shadow:0 0 8px #2ecc71;}
+.dot.pending{background:#e9a23b;animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.slot-row{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap;}
+.slot-row input{width:120px;}
+.chain-cards{margin-top:8px;}
+.chain-card{background:#0e1420;border:1px solid #1e2840;border-radius:10px;padding:12px 14px;margin-bottom:10px;}
+.chain-card.off{opacity:.5;}
+.chain-card-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:2px;}
+.chain-card-slot{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#1c2336;border:1px solid #2a3349;font-size:.72rem;font-weight:700;color:#9fd3ff;flex-shrink:0;}
+.chain-card-name{font-weight:700;font-size:.92rem;color:#eef2ff;}
+.chain-card-role{font-size:.64rem;text-transform:uppercase;letter-spacing:.6px;color:#6a7a9a;background:#161c2c;border:1px solid #232d45;border-radius:10px;padding:2px 8px;}
+.chain-card-dsp{margin-left:auto;font-size:.72rem;color:#8f9bb5;font-family:monospace;}
+.chain-params{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.param-chip{background:#161c2c;border:1px solid #232d45;border-radius:20px;padding:3px 10px;font-size:.72rem;color:#c8d4ea;white-space:nowrap;}
+.param-chip b{color:#9fd3ff;font-weight:700;}
+.chain-card-reason{margin-top:8px;font-size:.72rem;color:#6a7a9a;font-style:italic;}
+details.param-debug{margin-top:6px;}
+details.param-debug summary{cursor:pointer;font-size:.76rem;color:#6a7a9a;padding:4px 2px;user-select:none;}
+details.param-debug summary:hover{color:#9fd3ff;}
+details.param-debug .debug-log-box{background:#080c14;border:1px solid #1a2030;border-radius:6px;padding:8px 10px;margin-top:6px;font-size:.68rem;font-family:monospace;color:#6a9a7a;max-height:220px;overflow-y:auto;white-space:pre-wrap;}
+.prompt-lang-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.prompt-lang-label{font-size:.78rem;color:#8f9bb5;}
+.prompt-lang-switch{display:inline-flex;background:#161c2c;border:1px solid #232d45;border-radius:20px;padding:2px;}
+.prompt-lang-btn{background:transparent;border:none;color:#c8d4ea;padding:4px 12px;font-size:.78rem;font-weight:700;border-radius:18px;cursor:pointer;}
+.prompt-lang-btn.active{background:#3a8dde;color:#fff;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 data-pai="h1">🎸 G2 Four — Asistente de Presets de Artistas</h1>
+  <p class="sub" data-pai="sub">Puedes preparar el prompt, generar la respuesta de la IA y analizar el JSON (pasos 1-3) sin la pedalera conectada. Solo necesitas la conexión MIDI activa para enviar la cadena (paso 5) y guardar/extraer el .zptc (paso 6).</p>
+
+  <!-- PASO MIDI (oculto): sigue funcionando en segundo plano (adopta la conexión
+       del editor principal), pero ya no se muestra como paso visible del asistente. -->
+  <div class="card" id="step1" style="display:none;">
+    <h2><span class="step-num">1</span> <span data-pai="step1_title">Conexión MIDI</span></h2>
+    <p class="hint" data-pai="step1_hint">Al abrir esta página, Chrome te pedirá permiso MIDI/SysEx automáticamente. Si lo rechazaste o cambiaste de pedalera, usa "Reconectar". Puedes seguir sin conectar hasta que llegues al paso 6 (enviar) o al 7 (guardar/.zptc): ahí sí hace falta la pedalera conectada.</p>
+    <div class="midi-row">
+      <span class="dot" id="midiDot"></span>
+      <span id="midiLabel" data-pai="midi_requesting">Solicitando acceso MIDI…</span>
+      <button class="btn-secondary" id="midiReconnectBtn" data-pai="midi_reconnect">🔌 Reconectar</button>
+    </div>
+    <div id="midiStatus" class="status info" style="display:none;"></div>
+  </div>
+
+  <!-- PASO 1: PROMPT -->
+  <div class="card" id="step2">
+    <h2><span class="step-num">1</span> <span data-pai="step2_title">Prompt para la IA</span></h2>
+    <p class="hint" data-pai="step2_hint">Este texto es el que le pides a otra IA (Claude, ChatGPT, Gemini…) para que investigue el equipo del artista y te devuelva el JSON del preset. Puedes editarlo: se guarda automáticamente en este navegador.</p>
+    <div class="prompt-lang-row">
+      <span class="prompt-lang-label" data-pai="prompt_lang_label">Idioma del prompt:</span>
+      <div class="prompt-lang-switch">
+        <button type="button" class="prompt-lang-btn" id="promptLangEsBtn">ES</button>
+        <button type="button" class="prompt-lang-btn" id="promptLangEnBtn">EN</button>
+      </div>
+    </div>
+    <textarea id="promptText" spellcheck="false"></textarea>
+    <div class="btn-row">
+      <button class="btn-primary" id="copyPromptBtn" data-pai="copy_prompt">📋 Copiar prompt</button>
+      <button class="btn-secondary" id="resetPromptBtn" data-pai="reset_prompt">↺ Restaurar prompt por defecto</button>
+    </div>
+    <div id="promptStatus" class="status info" style="display:none;"></div>
+  </div>
+
+  <!-- PASO 2: ACCESOS DIRECTOS -->
+  <div class="card" id="step3">
+    <h2><span class="step-num">2</span> <span data-pai="step3_title">Abrir una IA</span></h2>
+    <p class="hint" data-pai="step3_hint">Pega el prompt copiado en el paso 1 dentro de una de estas IAs y espera el JSON completo.</p>
+    <div class="btn-row">
+      <a class="ai-btn" target="_blank" rel="noopener" href="https://claude.ai/new">🟠 Claude</a>
+      <a class="ai-btn" target="_blank" rel="noopener" href="https://chatgpt.com/">🟢 ChatGPT</a>
+      <a class="ai-btn" target="_blank" rel="noopener" href="https://gemini.google.com/app">🔵 Gemini</a>
+      <a class="ai-btn" target="_blank" rel="noopener" href="https://copilot.microsoft.com/">🟣 Copilot</a>
+      <a class="ai-btn" target="_blank" rel="noopener" href="https://www.perplexity.ai/">⚪ Perplexity</a>
+      <a class="ai-btn" target="_blank" rel="noopener" href="https://chat.mistral.ai/">🟡 Le Chat</a>
+      <a class="ai-btn" target="_blank" rel="noopener" href="https://lovable.dev/dashboard/">🟠 Lovable</a>
+      <a class="ai-btn" target="_blank" rel="noopener" href="https://chat.qwen.ai//">🟢 Qwen</a>
+      <a class="ai-btn" target="_blank" rel="noopener" href="https://chat.deepseek.com/">🔵 Deepseek</a>
+      <a class="ai-btn" target="_blank" rel="noopener" href="https://manus.im/">🟣 Manus</a>
+      <a class="ai-btn" target="_blank" rel="noopener" href="https://bolt.new/">⚪ Bolt</a>
+      <a class="ai-btn" target="_blank" rel="noopener" href="https://replit.com/">🟡 Replit</a>
+
+
+    </div>
+  </div>
+
+  <!-- PASO 3: JSON -->
+  <div class="card" id="step4">
+    <h2><span class="step-num">3</span> <span data-pai="step4_title">Pega la respuesta de la IA</span></h2>
+    <p class="hint" data-pai="step4_hint">Copia el JSON completo que te devolvió la IA (solo el bloque JSON) y pégalo aquí.</p>
+    <textarea id="jsonInput" placeholder='{ "artist": "...", "song": "...", "slots": [...] }' data-pai-ph="json_placeholder"></textarea>
+    <div class="btn-row">
+      <button class="btn-primary" id="parseBtn" data-pai="parse_btn">🔍 Generar JSON (analizar)</button>
+    </div>
+    <div id="parseStatus" class="status info" style="display:none;"></div>
+    <details id="paramConversionLog" class="param-debug" style="display:none;">
+      <summary data-pai="debug_summary">🔧 Ver detalle técnico de la conversión de parámetros (solo para depuración)</summary>
+      <div class="debug-log-box" id="paramConversionLogBody"></div>
+    </details>
+  </div>
+
+  <!-- PASO 4: CADENA -->
+  <div class="card locked" id="step5">
+    <h2><span class="step-num">4</span> <span data-pai="step5_title">Cadena de efectos</span></h2>
+    <div id="chainMeta" style="font-size:.84rem;color:#8f9bb5;margin-bottom:8px;"></div>
+    <div id="chainTable" class="chain-cards"></div>
+    <div class="dsp-wrap"><div class="dsp-fill" id="dspFill" style="width:0%"></div></div>
+    <div class="dsp-label" id="dspLabel"></div>
+  </div>
+
+  <!-- PASO 5: ENVIAR -->
+  <div class="card locked" id="step6">
+    <h2><span class="step-num">5</span> <span data-pai="step6_title">Enviar a la pedalera</span></h2>
+    <p class="hint" data-pai="step6_hint">Envía los 7 efectos con sus parámetros al parche actual de la pedalera (en tiempo real). El nombre se guardará junto con el preset en el paso 6.</p>
+    <label data-pai="preset_name_label">Nombre del preset (máx. 10 caracteres)</label>
+    <input type="text" id="presetNameInput" maxlength="10" placeholder="EJ: SRV TX" data-pai-ph="preset_name_ph">
+    <div class="btn-row">
+      <button class="btn-primary" id="sendBtn" data-pai="send_btn">📡 Enviar cadena + nombre al parche actual</button>
+    </div>
+    <div class="progress-bar-wrap" id="progressWrap" style="display:none;">
+      <div class="progress-bar" id="progressBar" style="width:0%"></div>
+    </div>
+    <div class="log" id="sendLog" style="display:none;"></div>
+    <div id="sendStatus" class="status" style="display:none;"></div>
+  </div>
+
+  <!-- PASO 6: GUARDAR EN FLASH -->
+  <div class="card locked" id="step7">
+    <h2><span class="step-num">6</span> <span data-pai="step7_title">Guardar en la pedalera y extraer .zptc</span></h2>
+    <p class="hint" data-pai="step7_hint">Escribe el preset de forma permanente en la memoria de la pedalera (slot detectado automáticamente, o indícalo a mano) y descarga el archivo .zptc resultante como copia de seguridad.</p>
+    <div class="slot-row">
+      <label style="margin:0;" data-pai="slot_detected_label">Slot detectado:</label>
+      <span id="slotDetected" style="font-weight:700;color:#6bc9b0;">—</span>
+      <label style="margin:0 0 0 12px;" data-pai="slot_override_label">Forzar slot (1-300):</label>
+      <input type="number" id="slotOverride" min="1" max="300" placeholder="opcional" data-pai-ph="slot_override_ph">
+    </div>
+    <div class="btn-row">
+      <button class="btn-green" id="saveFlashBtn" data-pai="save_flash_btn">💾 Guardar permanentemente + descargar .zptc</button>
+    </div>
+    <div id="saveStatus" class="status" style="display:none;"></div>
+    <div class="log" id="saveLog" style="display:none;"></div>
+  </div>
+
+</div>
+<script>
+(function(){
+"use strict";
+
+// ================================================================
+// IDIOMA — reutiliza el mismo idioma que el editor principal
+// ================================================================
+// Este panel vive en un <iframe srcdoc> sin atributo sandbox, así que
+// hereda el mismo origen que el documento padre y puede leer la MISMA
+// clave de localStorage que usa el editor principal para recordar el
+// idioma elegido (ver setLanguage() en el editor). Si por lo que sea no
+// se puede leer (navegador raro, storage bloqueado...), se cae a 'es'.
+const paiLang = (function () {
+  try { return (localStorage.getItem('g2four_lang') || 'es') === 'en' ? 'en' : 'es'; }
+  catch (e) { return 'es'; }
+})();
+function pt(key) {
+  const entry = PAI_I18N[key];
+  if (!entry) return key;
+  return entry[paiLang] || entry.es || key;
+}
+const PAI_I18N = {
+  h1: { es: '🎸 G2 Four — Asistente de Presets de Artistas', en: '🎸 G2 Four — Artist Preset Assistant' },
+  sub: { es: 'Puedes preparar el prompt, generar la respuesta de la IA y analizar el JSON (pasos 1-3) sin la pedalera conectada. Solo necesitas la conexión MIDI activa para enviar la cadena (paso 5) y guardar/extraer el .zptc (paso 6).',
+         en: 'You can prepare the prompt, generate the AI response, and analyze the JSON (steps 1-3) without the pedalboard connected. You only need an active MIDI connection to send the chain (step 5) and save/export the .zptc (step 6).' },
+  step1_title: { es: 'Conexión MIDI', en: 'MIDI connection' },
+  step1_hint: { es: 'Al abrir esta página, Chrome te pedirá permiso MIDI/SysEx automáticamente. Si lo rechazaste o cambiaste de pedalera, usa "Reconectar". Puedes seguir sin conectar hasta que llegues al paso 5 (enviar) o al 6 (guardar/.zptc): ahí sí hace falta la pedalera conectada.',
+              en: 'When you open this page, Chrome will ask for MIDI/SysEx permission automatically. If you declined it or switched pedalboards, use "Reconnect". You can keep going without a connection until you reach step 5 (send) or step 6 (save/.zptc): those do need the pedalboard connected.' },
+  midi_requesting: { es: 'Solicitando acceso MIDI…', en: 'Requesting MIDI access…' },
+  midi_reconnect: { es: '🔌 Reconectar', en: '🔌 Reconnect' },
+  step2_title: { es: 'Prompt para la IA', en: 'Prompt for the AI' },
+  step2_hint: { es: 'Este texto es el que le pides a otra IA (Claude, ChatGPT, Gemini…) para que investigue el equipo del artista y te devuelva el JSON del preset. Puedes editarlo: se guarda automáticamente en este navegador.',
+                en: 'This is the text you give to another AI (Claude, ChatGPT, Gemini…) so it researches the artist\'s gear and returns the preset JSON. You can edit it: it\'s saved automatically in this browser.' },
+  copy_prompt: { es: '📋 Copiar prompt', en: '📋 Copy prompt' },
+  reset_prompt: { es: '↺ Restaurar prompt por defecto', en: '↺ Reset to default prompt' },
+  step3_title: { es: 'Abrir una IA', en: 'Open an AI' },
+  step3_hint: { es: 'Pega el prompt copiado en el paso 1 dentro de una de estas IAs y espera el JSON completo.', en: 'Paste the prompt you copied in step 1 into one of these AIs and wait for the full JSON.' },
+  step4_title: { es: 'Pega la respuesta de la IA', en: "Paste the AI's response" },
+  step4_hint: { es: 'Copia el JSON completo que te devolvió la IA (solo el bloque JSON) y pégalo aquí.', en: 'Copy the full JSON the AI returned (just the JSON block) and paste it here.' },
+  json_placeholder: { es: '{ "artist": "...", "song": "...", "slots": [...] }', en: '{ "artist": "...", "song": "...", "slots": [...] }' },
+  paste_btn: { es: '📥 Pegar desde portapapeles', en: '📥 Paste from clipboard' },
+  parse_btn: { es: '🔍 Generar JSON (analizar)', en: '🔍 Generate JSON (analyze)' },
+  debug_summary: { es: '🔧 Ver detalle técnico de la conversión de parámetros (solo para depuración)', en: '🔧 View technical detail of the parameter conversion (debugging only)' },
+  step5_title: { es: 'Cadena de efectos', en: 'Effects chain' },
+  step6_title: { es: 'Enviar a la pedalera', en: 'Send to the pedalboard' },
+  step6_hint: { es: 'Envía los 7 efectos con sus parámetros al parche actual de la pedalera (en tiempo real). El nombre se guardará junto con el preset en el paso 6.',
+                en: 'Sends the 7 effects with their parameters to the pedalboard\'s current patch (in real time). The name will be saved together with the preset in step 6.' },
+  preset_name_label: { es: 'Nombre del preset (máx. 10 caracteres)', en: 'Preset name (max. 10 characters)' },
+  preset_name_ph: { es: 'EJ: SRV TX', en: 'E.G.: SRV TX' },
+  send_btn: { es: '📡 Enviar cadena + nombre al parche actual', en: '📡 Send chain + name to the current patch' },
+  step7_title: { es: 'Guardar en la pedalera y extraer .zptc', en: 'Save to the pedalboard and export .zptc' },
+  step7_hint: { es: 'Escribe el preset de forma permanente en la memoria de la pedalera (slot detectado automáticamente, o indícalo a mano) y descarga el archivo .zptc resultante como copia de seguridad.',
+                en: "Permanently writes the preset to the pedalboard's memory (slot auto-detected, or set it manually) and downloads the resulting .zptc file as a backup." },
+  slot_detected_label: { es: 'Slot detectado:', en: 'Detected slot:' },
+  slot_override_label: { es: 'Forzar slot (1-300):', en: 'Force slot (1-300):' },
+  slot_override_ph: { es: 'opcional', en: 'optional' },
+  save_flash_btn: { es: '💾 Guardar permanentemente + descargar .zptc', en: '💾 Save permanently + download .zptc' },
+  modal_title: { es: 'G2 Four — Asistente de Presets de Artistas', en: 'G2 Four — Artist Preset Assistant' },
+  prompt_lang_label: { es: 'Idioma del prompt:', en: 'Prompt language:' },
+  prompt_lang_switched_es: { es: 'Prompt cambiado a español.', en: 'Prompt switched to Spanish.' },
+  prompt_lang_switched_en: { es: 'Prompt cambiado a inglés.', en: 'Prompt switched to English.' },
+
+  // Cadenas dinámicas usadas desde JS más abajo (setStatus, log, botones...)
+  copied_ok: { es: '✅ Prompt copiado al portapapeles.', en: '✅ Prompt copied to clipboard.' },
+  copy_fallback: { es: '⚠️ Copiado con método alternativo (selecciona y Ctrl+C si no funcionó).', en: '⚠️ Copied with a fallback method (select the text and press Ctrl+C if it didn\'t work).' },
+  reset_ok: { es: 'Prompt restaurado al valor por defecto.', en: 'Prompt reset to its default value.' },
+  pasted_ok: { es: '✅ Pegado desde el portapapeles.', en: '✅ Pasted from clipboard.' },
+  paste_err: { es: '❌ No se pudo leer el portapapeles automáticamente. El cuadro de abajo ya está seleccionado: pulsa Ctrl+V (o Cmd+V en Mac) para pegar.', en: "❌ Couldn't read the clipboard automatically. The box below is already selected: press Ctrl+V (or Cmd+V on Mac) to paste." },
+  parse_anomaly_suffix: { es: 'valor(es) llegaron fuera de 0-100% (ver detalle técnico ↓).', en: 'value(s) arrived outside the 0-100% range (see technical detail ↓).' },
+  parse_ok_prefix: { es: '✅ JSON válido:', en: '✅ Valid JSON:' },
+  parse_dsp_label: { es: 'DSP:', en: 'DSP:' },
+  parse_err_prefix: { es: '❌', en: '❌' },
+  chain_tempo: { es: 'Tempo:', en: 'Tempo:' },
+  chain_bpm: { es: 'BPM', en: 'BPM' },
+  chain_dsp_total: { es: 'DSP total:', en: 'Total DSP:' },
+  dsp_label: { es: 'DSP:', en: 'DSP:' },
+  dsp_over: { es: '❌ supera el límite', en: '❌ exceeds the limit' },
+  dsp_ok: { es: '✅ OK', en: '✅ OK' },
+  midi_adopted: { es: '✅ Conectado (compartiendo la conexión del editor)', en: '✅ Connected (sharing the editor\'s connection)' },
+  midi_adopted_status: { es: 'Usando la misma conexión MIDI que ya tiene abierta el editor principal. Ya puedes enviar la cadena (paso 5) y guardar/extraer el .zptc (paso 6).',
+                          en: "Using the same MIDI connection the main editor already has open. You can now send the chain (step 5) and save/export the .zptc (step 6)." },
+  midi_waiting_parent: { es: 'Esperando la conexión del editor principal…', en: 'Waiting for the main editor\'s connection…' },
+  midi_waiting_status: { es: 'PresetAI reutiliza automáticamente la conexión MIDI del editor principal en cuanto esté disponible. Si tarda mucho, también puedes pulsar "Reconectar" para que este panel se conecte por su cuenta.',
+                          en: 'PresetAI automatically reuses the main editor\'s MIDI connection as soon as it\'s available. If it takes too long, you can also press "Reconnect" so this panel connects on its own.' },
+  midi_connected_status: { es: 'Conectado. Ya puedes enviar la cadena (paso 5) y guardar/extraer el .zptc (paso 6).', en: 'Connected. You can now send the chain (step 5) and save/export the .zptc (step 6).' },
+  midi_no_device: { es: '❌ Sin conexión MIDI', en: '❌ No MIDI connection' },
+  midi_err_suffix: { es: '— usa Chrome/Edge, conecta la pedalera por USB y pulsa "Reconectar".', en: '— use Chrome/Edge, connect the pedalboard via USB, and press "Reconnect".' },
+  no_device_found: { es: 'No se encontró ningún dispositivo MIDI conectado.', en: 'No connected MIDI device was found.' },
+  send_pass: { es: 'Pasada', en: 'Pass' },
+  send_sent_ok: { es: '✅ Cadena y tempo enviados en vivo al parche actual.', en: '✅ Chain and tempo sent live to the current patch.' },
+  send_status_ok_prefix: { es: '✅ Cadena enviada. El nombre', en: '✅ Chain sent. The name' },
+  send_status_ok_suffix: { es: 'se grabará en el paso 6 al guardar en flash.', en: 'will be recorded in step 6 when saved to flash.' },
+  send_err_prefix: { es: '❌ Error:', en: '❌ Error:' },
+  send_err_status_prefix: { es: '❌ Error enviando:', en: '❌ Error sending:' },
+  save_need_midi: { es: '⚠ No hay conexión MIDI. Cierra y vuelve a abrir este panel, o conecta la pedalera desde el editor.', en: '⚠ No MIDI connection. Close and reopen this panel, or connect the pedalboard from the editor.' },
+  save_no_slot: { es: '❌ No se detectó el slot activo. Indica el número de slot manualmente arriba.', en: '❌ The active slot was not detected. Enter the slot number manually above.' },
+  save_reading: { es: '⏳ Leyendo el preset activo de la pedalera…', en: '⏳ Reading the active preset from the pedalboard…' },
+  save_writing: { es: '⏳ Escribiendo en el slot', en: '⏳ Writing to slot' },
+  save_done_prefix: { es: '✅ Guardado permanentemente en el slot', en: '✅ Permanently saved to slot' },
+  save_done_mid: { es: 'y descargado como', en: 'and downloaded as' },
+  save_err_prefix: { es: '❌ Error:', en: '❌ Error:' },
+  log_slot_dest: { es: 'Slot destino', en: 'Target slot' },
+  log_bank: { es: 'banco', en: 'bank' },
+  log_prog: { es: 'prog', en: 'prog' },
+  log_success_reply: { es: 'Respuesta de éxito recibida (00 00).', en: 'Success reply received (00 00).' },
+  wizard_no_response: { es: 'Sin respuesta al pedir el patch activo.', en: 'No response when requesting the active patch.' },
+  wizard_no_confirm: { es: 'Sin confirmación de la pedalera tras la escritura en memoria.', en: 'No confirmation from the pedalboard after writing to memory.' },
+  wizard_too_big: { es: 'El patch supera el máximo aceptado', en: 'The patch exceeds the accepted maximum' },
+};
+document.title = pt('modal_title');
+function applyPaiI18n() {
+  document.documentElement.lang = paiLang;
+  document.querySelectorAll('[data-pai]').forEach(el => {
+    const key = el.getAttribute('data-pai');
+    el.textContent = pt(key);
+  });
+  document.querySelectorAll('[data-pai-ph]').forEach(el => {
+    el.setAttribute('placeholder', pt(el.getAttribute('data-pai-ph')));
+  });
+}
+document.addEventListener('DOMContentLoaded', applyPaiI18n);
+if (document.readyState !== 'loading') applyPaiI18n();
+
+// ================================================================
+// PROMPT POR DEFECTO (editable y persistido en localStorage)
+// ================================================================
+const DEFAULT_PROMPT_ES = `# INSTRUCCIONES PARA GENERAR PRESETS DEL ZOOM G2 FOUR
+
+Eres un asistente experto en tono de guitarra que genera cadenas de efectos para el pedal
+Zoom G2 Four en formato JSON, para ser cargadas por un loader web vía MIDI/SysEx.
+
+## FORMATO DE SALIDA — REGLAS ESTRICTAS
+
+- Responde ÚNICAMENTE con el objeto JSON. Nada de texto antes o después.
+- NUNCA uses bloques de código markdown (nada de comillas. Solo el JSON puro.
+- NUNCA incluyas comentarios dentro del JSON (nada de // ni /* */). El JSON debe ser válido y parseable con JSON.parse() sin ninguna limpieza.
+- No uses trailing commas.
+
+## ESQUEMA DEL JSON
+
+{
+  "artist": "string",
+  "song": "string",
+  "guitarist": "string",
+  "gear_found": true|false,
+  "tempo": número entero (BPM real de la canción, ver sección BPM más abajo),
+  "summary": "string breve explicando el razonamiento general del tono",
+  "totalDSP": número entero (suma de dspCost de los slots activos),
+  "slots": [ ...exactamente 7 objetos, uno por slot, en este orden... ]
+}
+
+Cada slot es:
+{
+  "slot": 0-6,
+  "role": "noisegate" | "dynamics" | "filter" | "drive" | "amp" | "modulation" | "delay" | "reverb" | "pedal" | "empty",
+  "effectId": "0xXXXXXXXX"  (string hexadecimal, EXACTAMENTE uno de la lista cerrada de abajo, o "0x00000000" si el slot va vacío),
+  "effectName": "string" (nombre legible del efecto, el mismo que aparece en la tabla),
+  "enabled": true|false,
+  "dspCost": número entero (coste EXACTO tomado de la tabla, no lo inventes),
+  "params": { "NombreParam1": porcentaje 0-100, "NombreParam2": porcentaje 0-100, ... } (ver regla crítica de abajo: SIEMPRE % de recorrido, NUNCA el valor real de la pedalera),
+  "reason": "string breve explicando por qué se eligió este efecto y estos valores"
+}
+
+## REGLA CRÍTICA #1: LOS PARÁMETROS SE APLICAN POR POSICIÓN, NO POR NOMBRE
+
+El loader que consume este JSON NO busca los parámetros por su nombre dentro del objeto
+params. Los recorre en el ORDEN en que aparecen en el objeto y los envía al pedal por
+posición (parámetro 1, 2, 3...). Por tanto:
+
+- Debes incluir en params TODOS y SOLO los parámetros que la tabla define para ese
+  effectId, EN EL MISMO ORDEN EXACTO en que aparecen en la tabla (columna "Parámetros en orden").
+- Si vuelcas los parámetros en un orden distinto al de la tabla, el pedal aplicará cada
+  valor al parámetro físico equivocado y el sonido resultante no tendrá nada que ver con
+  lo que pretendías. Este es el error más grave que puedes cometer: revisa el orden dos veces.
+
+## REGLA CRÍTICA #2: CADA VALOR DE params ES UN PORCENTAJE 0-100, NUNCA EL VALOR REAL DE LA PEDALERA
+
+Esto es igual de importante que la regla del orden. Cada valor numérico dentro de params
+NO es el valor final que verá el hardware: es el PORCENTAJE (0 a 100, número entero) del
+recorrido completo de ESE control concreto que quieres usar.
+  · 0   = mínimo absoluto de ese control.
+  · 100 = máximo absoluto de ese control.
+  · 50  = punto medio de ese control.
+El loader web ya conoce el rango real de cada parámetro de cada efecto (por ejemplo, en
+RackComp el Ratio real solo va de 0 a 9 aunque en pantalla se vea "1" a "10", mientras que
+VOL sí llega de 0 a 100) y convierte automáticamente el porcentaje que tú escribas al valor
+real exacto de ese control antes de enviarlo al pedal. TÚ NUNCA debes intentar adivinar ni
+escribir el valor final/real de la pedalera — eso ya no es tu trabajo, es del loader.
+Piensa siempre en proporción, no en el hardware:
+  · "quiero bastante compresión" → un Ratio alto → escribe un % alto (p.ej. 75). NO escribas
+    "7" pensando en un rango 0-9, ni "75" pensando que el hardware llega a 100: escribe 75
+    (tu intención de proporción) y dedica tu criterio a decidir ESE porcentaje, no a
+    memorizar rangos de hardware.
+  · Parámetros ON/OFF o binarios (DETCT, Boost, Tail, un Mode con 2 opciones...): usa 0
+    (apagado/primera opción) o 100 (encendido/segunda opción); cualquier valor ≥50 se
+    interpretará como encendido.
+  · Selectores de pocos pasos (Ratio de compresor, nº de pasos de un secuenciador, un Mode
+    con 3-4 opciones...): sigue pensando en 0-100, el loader reparte ese porcentaje entre
+    los pasos disponibles de ese control concreto.
+  · EQs paramétricos con rango simétrico (Low EQ, High EQ, ParaEQ Gain...): 50% corresponde
+    al centro (0 dB); menos de 50% atenúa, más de 50% realza.
+  · Parámetros tipo "cantidad" (VOL, Mix, Gain, Depth, Decay...): funcionan igual, 0-100 es
+    directamente la proporción deseada de ese control.
+En resumen: NUNCA escribas el valor final de la pedalera en params, escribe SIEMPRE el %
+(0-100) de recorrido que quieres para ese control concreto.
+
+### EXCEPCIONES A LA REGLA DEL PORCENTAJE (solo efectos de Delay, prefijo 0x08)
+
+- "Time" (o "TimeA"/"TimeB" en DualDelay): AQUÍ SÍ escribe el valor REAL en MILISEGUNDOS
+  de la canción (p.ej. el tiempo de delay en negra/corchea según el tempo real), NO un
+  porcentaje. El loader web NO convierte este parámetro, lo envía tal cual se lo des.
+- "Mode": no importa lo que pongas aquí, el loader SIEMPRE lo fuerza a 1 (LONG) antes de
+  enviarlo. Puedes poner cualquier valor de relleno en este campo (o simplemente 1).
+
+## REGLAS DE COHERENCIA DEL PATCH
+
+1. El slot 0 (slot 1 físico) debe ser SIEMPRE el efecto ZNR (0x01000070), activado, como
+   puerta de ruido de entrada. Es obligatorio en todos los presets.
+2. Solo puede haber UN amplificador activo (categoría 0x04) en todo el patch. Si necesitas
+   dos sonidos de ampli distintos, elige el más representativo y desactiva o quita el otro.
+3. La suma de dspCost de todos los slots ACTIVOS (enabled=true) no puede superar 100.
+   Si tu cadena ideal se pasa de 100, desactiva (enabled:false) o sustituye el efecto menos
+   importante empezando por el final de la cadena (slots de reverb/delay antes que drive/amp),
+   nunca el slot 0 (ZNR).
+4. El slot 7 (índice 6, el último) del G2 Four solo admite efectos de categoría "Pedal"
+   (prefijo 0x0B) de forma fiable en el hardware real. Evita poner ahí un drive, ampli,
+   modulación, delay o reverb: usa un wah, volumen de pedal, u otro efecto de la categoría
+   0x0B, o dejarlo en 0x0B000010 (Output VP) si no necesitas nada ahí.
+5. Solo puedes usar effectId que existan literalmente en la tabla cerrada de abajo. NUNCA
+   inventes un ID hexadecimal ni "extrapoles" uno parecido. Si no encuentras un efecto que
+   encaje exactamente con lo que imaginas, elige el más cercano de la lista real.
+
+## BPM REAL — NO LO ESTIMES A OJO
+
+El campo tempo debe ser el BPM real y verificado de la canción, no una estimación
+subjetiva. Antes de generar el preset, busca el tempo real de la canción (por ejemplo en
+bases de datos de tempo, artículos, o análisis conocidos de esa grabación concreta) y usa
+ese valor. Si tras buscar no encuentras un dato fiable, usa tu mejor estimación pero dilo
+explícitamente en el campo summary (p.ej. "BPM estimado, no se encontró un valor
+verificado").
+
+## TABLA DE CATEGORÍAS POR PREFIJO HEX (para orientarte o como respaldo)
+
+| Prefijo | Categoría   | role sugerido |
+|---------|-------------|---------------|
+| 0x01    | Dinámica (compresores, gates) | dynamics / noisegate |
+| 0x02    | Filtro (wah automático, EQ, filtros) | filter |
+| 0x03    | Drive / distorsión / fuzz / boost | drive |
+| 0x04    | Amplificador | amp |
+| 0x06    | Modulación (chorus, flanger, phaser, pitch, trémolo) | modulation |
+| 0x07    | SFX (autopan, sitar, looper rítmico...) | modulation |
+| 0x08    | Delay | delay |
+| 0x09    | Reverb | reverb |
+| 0x0B    | Pedal de expresión (wah, volumen, drive de pedal...) | pedal |
+
+Esta tabla es solo orientativa para entender la estructura; el effectId real SIEMPRE debe
+salir de la lista cerrada de abajo, nunca inventado a partir del prefijo.
+
+## LISTA CERRADA DE EFECTOS DISPONIBLES (ÚNICA FUENTE VÁLIDA DE effectId)
+
+Formato de cada línea: hex | Nombre | costeDSP | Parámetros EN ORDEN | Modelo emulado
+
+La columna "Modelo emulado" es informativa: te dice qué pedal/amplificador real clona
+cada efecto (o si es un diseño original de Zoom sin equivalente comercial concreto).
+Úsala para elegir el efecto que mejor encaje con el equipo real del guitarrista o con
+el sonido de época/género que estés buscando — por ejemplo, si el guitarrista usaba un
+Tube Screamer real, elige "TS Drive"; si usaba un Marshall Plexi, elige "MS 1959"; si
+la canción es de los 60 y busca reverb de muelle, elige "SpringREV" o "FD Spring". No
+uses esta columna para decidir el effectId ni el nombre (eso sigue saliendo solo de las
+tres primeras columnas): es únicamente contexto para razonar mejor tu elección.
+
+### DINÁMICA (0x01)
+0x01000010 | Comp | 4 | Sense, ATTCK, Tone, VOL | MXR Dyna Comp
+0x01000020 | RackComp | 6 | THRSH, Ratio, ATTCK, VOL | No emula un pedal concreto (compresor de estudio de alta precisión)
+0x01000030 | GrayComp | 16 | SUSTN, Lo, Hi, VOL | ROSS Compressor
+0x01000040 | OptComp | 10 | Drive, LOW, HI, VOL | No emula un pedal concreto (compresor óptico genérico)
+0x01000050 | BlackOpt | 12 | Comp, Lo, Hi, VOL | Demeter COMP-1 Compulator
+0x01000060 | 1176 LMT | 11 | Input, Ratio, REL, Output | UREI 1176LN
+0x01000070 | ZNR | 4 | DETCT, Depth, THRSH, Decay | Diseño original de Zoom   ← OBLIGATORIO en slot 0
+0x01000080 | NoiseGate | 5 | DETCT, Depth, THRSH, Decay | Diseño original de Zoom
+0x01000090 | SlowATTCK | 4 | Time, Curve, Tone, VOL | Diseño original de Zoom
+0x010000A0 | MuteSW | 6 | EDGE, SPEED, INVERT, ON/OFF | Diseño original de Zoom
+
+### FILTRO (0x02)
+0x02000010 | AutoWah | 6 | Mode, Sense, RESO, VOL | Diseño original de Zoom
+0x02000020 | Reso FLTR | 6 | Mode, Sense, RESO, VOL | No emula un pedal concreto
+0x02000030 | LowPassFL | 7 | FREQ, Sense, RESO, BAL | Diseño original de Zoom
+0x02000040 | CryFilter | 5 | RANGE, RESO, SENSE, BAL | No emula un pedal concreto (tipo talking-box)
+0x02000050 | EG Filter | 9 | FREQ1, FREQ2, RESO, TYPE, SPEED, BAL, VOL | No emula un pedal concreto
+0x02000060 | LFO FLTR | 7 | Depth, Rate, RESO, WAVE | Diseño original de Zoom
+0x02000070 | SeqFLTR | 7 | Step, PTTRN, Speed, RESO | Z.Vex Seek-Wah
+0x02000080 | RndmFLTR | 7 | TYPE, SPEED, BAL, VOL | Diseño original de Zoom
+0x02000090 | StepFLTR | 6 | Depth, Rate, RESO, Shape | Diseño original de Zoom
+0x020000A0 | Gt GEQ | 5 | 160, 400, 800, 3.2, 6.4, 12, VOL | Diseño original de Zoom
+0x020000B0 | Gt GEQ 7 | 5 | 100Hz, 200Hz, 400Hz, 800Hz, 1.6kHz, 3.2kHz, 6.4kHz, VOL | Diseño original de Zoom
+0x020000C0 | St Gt GEQ | 9 | 160, 400, 800, 3.2, 6.4, 12, VOL | Diseño original de Zoom
+0x020000D0 | ParaEQ | 4 | FREQ, Q, Gain, VOL | Diseño original de Zoom
+0x020000E0 | Exciter | 7 | BASS, TREBLE, VOL, ON/OFF | No emula un pedal concreto
+0x020000F0 | Low EQ | 4 | Type, FREQ, Gain, VOL | Diseño original de Zoom
+0x02000100 | High EQ | 3 | Type, FREQ, Gain, VOL | Diseño original de Zoom
+
+### DRIVE (0x03)
+0x03000010 | EP Drive | 10 | Gain, Bass, Treble, VOL | Maestro Echoplex (etapa de preamplificación)
+0x03000020 | RC Drive | 12 | Gain, Bass, Treble, VOL | Xotic RC Booster
+0x03000030 | TS Drive | 13 | Gain, Boost, Tone, VOL | Ibanez TS808 Tube Screamer
+0x03000040 | GoldDrive | 17 | Gain, Bass, Treble, VOL | Klon Centaur
+0x03000050 | SweetDrv | 23 | Gain, Tone, Focus, VOL | Mad Professor Sweet Honey Overdrive
+0x03000058 | Over Drive | 8 | Gain, Bass, Treble, VOL | Boss OD-1
+0x03000060 | Zen O.DRV | 15 | Gain, Tone, Voice, VOL | Hermida Audio Zendrive
+0x03000070 | BG GRID | 8 | Gain, Tone, BAL, VOL | Mesa/Boogie Grid Slammer
+0x03000080 | DYN Drive | 17 | Gain, Tone, Mode, VOL | No emula un pedal concreto
+0x03000090 | Plus DIST | 10 | Gain, VOL, DryMx, Comp | MXR Distortion+
+0x030000A0 | DIST One | 12 | Gain, Tone, VOL, Comp | Boss DS-1
+0x030000B0 | SqueakDST | 10 | Gain, FLTR, VOL, DryMx | Pro Co RAT
+0x030000C0 | RedCrunch | 14 | Gain, Tone, PRESENC, VOL | No emula un pedal concreto (estilo Brown Sound / EVH)
+0x030000D0 | VioletDST | 11 | Gain, Tone, Voice, VOL | Suhr Riot Reloaded
+0x030000E0 | TB MK1.5 | 16 | ATTCK, Tone, Color, VOL | Sola Sound / Tone Bender MkI.5
+0x030000F0 | OctFuzz | 25 | Boost, Color, Tone, VOL | No emula un pedal concreto
+0x03000100 | NYC Muff | 11 | SUSTN, Tone, BAL, VOL | Electro-Harmonix Big Muff Pi (versión NYC)
+0x03000110 | WaveSHPR | 22 | Gain, Shape, Comp, VOL | Diseño original de Zoom
+0x03000120 | Razor DRV | 17 | Gain, Edge, Lo, VOL | Diseño original de Zoom
+0x03000130 | MetalWRLD | 10 | Gain, Bass, Treble, VOL | Boss MT-2 Metal Zone
+0x03000140 | HG THRTTL | 22 | Gain, Tone, MdCut, VOL | Mesa/Boogie Throttle Box
+0x03000150 | TS+Boost | 10 | Gain, Tone, VOL, Comp, Boost, Bass, Treble, Order | TS808 + booster (combinado)
+0x03000160 | RedCR+BST | 10 | GAIN, TONE, PRESENC, VOL, COM, LO/HI, BOOST, ORDER | BluesBreaker + booster (combinado)
+0x03000170 | SpotBoost | 10 | BOOST, BASS, TREBLE, ON/OFF | No emula un pedal concreto
+0x03000180 | UpOctBSTR | 6 | UpOct, DRYMX, BOTTOM, PRESENC | Diseño original de Zoom
+0x03000190 | OutputBST | 4 | RANGE, BOOST, TONE, VOL | Zoom G5n (función Output Booster)
+0x030001A0 | Aco.Sim | 10 | Top, Body, Tone, VOL | Diseño original de Zoom
+
+### AMPLIFICADOR (0x04) — solo UNO por patch
+0x04000010 | MS 45os | 44 | Bass, MID, Treble, PRESENC, Input1, Input2, VOL | Marshall JTM45
+0x04000020 | MS 1959 | 44 | Bass, MID, Treble, PRESENC, Input1, Input2, VOL | Marshall 1959 Super Lead ("Plexi")
+0x04000030 | MS 800 | 44 | Input, Bass, MID, Treble, PRESENC, Gain, VOL | Marshall JCM800 2203
+0x04000040 | FD B-MAN | 43 | Input, Bass, MID, Treble, PRESENC, Gain, VOL | Fender '59 Bassman
+0x04000050 | FD TWIN-R | 43 | Bass, MID, Treble, BRGHT, Gain, VOL, Depth, Speed | Fender '65 Twin Reverb
+0x04000060 | FD DLX-R | 43 | Input, Bass, Treble, Gain, VOL, Depth, Speed | Fender '65 Deluxe Reverb
+0x04000070 | FD MASTER | 43 | Bass, MID, Treble, Fat, Gain, VOL | Fender Vibro-King / master volume
+0x04000080 | UK 30A | 46 | Bass, Treble, Gain, VOL, Tone Cut, Depth, Speed | Vox AC30 Top Boost
+0x04000090 | BG MARK1 | 47 | Bass, MID, Treble, PRESENC, Gain1, Gain2, VOL | Mesa/Boogie Mark I
+0x040000A0 | BG MARK3 | 47 | Bass, MID, Treble, PRESENC, Gain1, Gain2, VOL | Mesa/Boogie Mark III
+0x040000B0 | RectiDual | 44 | Mode, Bass, MID, Treble, PRESENC, Gain, VOL | Mesa/Boogie Dual Rectifier
+0x040000C0 | XtasyBlue | 46 | Bass, MID, Treble, PRESENC, STRUCT, Gain, VOL | Bogner Ecstasy (canal azul)
+0x040000D0 | HW 100 | 41 | Input, Bass, MID, Treble, PRESENC, Gain, VOL | Hiwatt DR103
+0x040000E0 | ORG120 | 46 | Input, Color, Bass, Treble, PRESENC, Gain, VOL | Orange OR120
+0x040000F0 | DZ Herb | 41 | Bass, MID, Treble, PRESENC, Gain, VOL, Deep, MidCut | Diezel Herbert
+0x04000100 | MATCH30 | 47 | Gain1, Bass1, TRBL1, Gain2, Tone2, Cut, VOL | Matchless DC-30
+0x04000110 | KRAMPUS | 58 | Bass, MID, Treble, PRESENC, Gain, VOL | Krank Krampus
+0x04000120 | REDLOOM | 56 | Bass, MID, Treble, PRESENC, Gain, VOL | Peavey 6505 / 5150
+0x04000130 | VELVET | 63 | Bass, MID, Treble, PRESENC, Gain, VOL | Two-Rock / Dumble (tono clean)
+0x04000140 | MUDDY | 71 | Bass, MID, Treble, PRESENC, Gain, VOL | Supro Thunderbolt (vintage)
+0x04000150 | 7 HEAVEN | 63 | Bass, MID, Treble, PRESENC, Gain, VOL | EVH 5150 III
+0x04000160 | POLLEX | 69 | Bass, MID, Treble, PRESENC, Gain, VOL | Friedman BE-100
+
+### MODULACIÓN (0x06)
+0x06000010 | Chorus | 5 | Depth, Rate, Tone, Mix | Diseño original de Zoom
+0x06000020 | CloneCho | 8 | Depth, Rate, Tone, Mix | Electro-Harmonix Small Clone
+0x06000030 | ChorusOne | 7 | Depth, Rate, Tone, Mix | BOSS CH-1 Super Chorus
+0x06000040 | TriChorus | 16 | Depth, Speed, Tone, Mix | tc electronic Corona Tri-Chorus
+0x06000050 | AnalogCho | 8 | DEPTH, Rate, Tone, Mix | No emula un pedal concreto (chorus analógico BBD genérico)
+0x06000060 | StereoCho | 6 | Depth, Rate, Tone, Mix | Diseño original de Zoom
+0x06000070 | BendCho | 7 | MODE, DEPTH, TIME, BAL | Diseño original de Zoom
+0x06000080 | Detune | 5 | Cent, Pre DLY, Tone, Mix | Diseño original de Zoom
+0x06000090 | Tremolo | 7 | Wave, Depth, Rate, VOL | Diseño original de Zoom
+0x060000A0 | Phaser | 6 | Color, Depth, Rate, RESO | Diseño original de Zoom
+0x060000B0 | StonePha | 6 | Color, Depth, Rate, RESO | Electro-Harmonix Small Stone
+0x060000C0 | WarpPhase | 7 | Mode, Speed, RESO, VOL | Diseño original de Zoom
+0x060000D0 | Duo Phase | 8 | Depth A, Rate A, RESO A, LINK, Depth B, Rate B, RESO B, VOL | No emula un pedal concreto
+0x060000E0 | TheVibe | 8 | Speed, Depth, Mode, VOL | Shin-ei Uni-Vibe
+0x060000F0 | VinFLNGR | 5 | Pre DLY, Depth, Rate, RESO | MXR M-117R
+0x06000100 | Kick FLNG | 6 | Pre DLY, Depth, Rate, RESO, Mix, Reset-F, ON/OFF | Diseño original de Zoom
+0x06000110 | Vibrato | 6 | DEPTH, RATE, TONE, BAL | Diseño original de Zoom
+0x06000120 | SwellVibe | 8 | Depth, Speed, Rise, Vol | Diseño original de Zoom
+0x06000130 | Octaver | 5 | OCT1, OCT2, Tone, Dry | No emula un pedal concreto
+0x06000140 | PitchSHFT | 6 | SHIFT, FINE, TONE, BAL | Diseño original de Zoom
+0x06000150 | MonoPitch | 5 | Shift, Fine, Tone, BAL | Diseño original de Zoom
+0x06000160 | HPS | 5 | Scale, Key, Tone, Mix | No emula un pedal concreto (armonizador inteligente)
+0x06000170 | PolyShift | 36 | Shift, Tone, Wet, Dry | No emula un pedal concreto
+0x06000180 | GEMINOS | 8 | Tight, Mode, Wet, Dry | Diseño original de Zoom
+0x06000190 | RingMod | 4 | FREQ, Tone, BAL, VOL | Diseño original de Zoom
+0x060001A0 | Slicer | 7 | PTTRN, SPEED, THRSH, VOL | No emula un pedal concreto
+
+### SFX (0x07)
+0x07000010 | AutoPan | 3 | Rate, Width, Clip, VOL | Diseño original de Zoom
+0x07000020 | LoopRoll | 4 | Time, Duty, BAL, ON/OFF | Boss / DigiTech loop roll
+0x07000030 | Sitar Sim | 11 | BEND, BUZZ, +1OCT, VOL | Diseño original de Zoom
+0x07000040 | Bomber | 7 | Decay, Tone, Mix, ON/OFF | Diseño original de Zoom
+
+### DELAY (0x08)
+0x08000010 | Delay | 4 | Time, Mode, Repeat, Mix | Diseño original de Zoom
+0x08000020 | AnalogDly | 4 | Time, Mode, Repeat, Mix | No emula un pedal concreto
+0x08000030 | TapeEcho | 6 | Time, Mode, Repeat, Mix | No emula un pedal concreto
+0x08000040 | TapeEcho3 | 14 | Time, Mode, Repeat, Mix, Gain, Hi, Lo, VOL | Maestro Echoplex EP-3
+0x08000050 | DualDelay | 13 | TimeA, TimeB, Mode, BAL, REP A, REP B, DlyMx, Depth | Eventide TimeFactor (algoritmo DigitalDelay)
+0x08000060 | SoftEcho | 20 | MOD, Time, Repeat, Mix | Diseño original de Zoom
+0x08000070 | SlapBackD | 10 | Time, Repeat, Mix, SUBDB | Diseño original de Zoom
+0x08000080 | P-P Delay | 5 | Time, Mode, Repeat, Mix | Diseño original de Zoom
+0x08000090 | ReverseDL | 5 | Time, Mode, Repeat, BAL | No emula un pedal concreto
+0x080000A0 | ModDelay | 6 | Time, Mode, Repeat, Mix | Diseño original de Zoom
+0x080000B0 | FilterDly | 7 | Pitch, Time, Repeat, Mix | Diseño original de Zoom
+0x080000C0 | Pitch DLY | 7 | Time, Mode, Repeat, Mix, Color, Depth, Rate, Reso | Diseño original de Zoom
+0x080000D0 | PhaseDly | 10 | Time, Mode, Repeat, Mix, Link, Cycle, Width, Clip | Diseño original de Zoom
+0x080000E0 | A-Pan DLY | 8 | Swell, Time, Mode, Repeat, Mix | Diseño original de Zoom
+0x080000F0 | SlwAtkDly | 10 | INTVL, Time, Mode, Repeat, Mix, Blend, Smear, DAMP | Diseño original de Zoom
+0x08000100 | ICE Delay | 21 | TIME, MODE, REPEAT, HI, TONE, MIX, PP, TAIL | No emula un pedal concreto (estilo shimmer)
+0x08000110 | HoldDelay | 5 | Time, Mode, Repeat, Mix | No emula un pedal concreto
+
+### REVERB (0x09)
+0x09000010 | RoomREV | 10 | Pre DLY, Decay, Mix, Tail | Diseño original de Zoom
+0x09000020 | BrghtRoom | 10 | PREDLY, DECAY, TONE, MIX | Diseño original de Zoom
+0x09000030 | SpringREV | 10 | Pre DLY, Decay, Mix, Tail | Diseño original de Zoom
+0x09000040 | FD Spring | 26 | Color, Lo, Hi, Mix | Reverb de muelle Fender
+0x09000050 | Plate REV | 22 | Pre DLY, Decay, Mix, Tail | EMT 140 (plate)
+0x09000060 | Hall REV | 11 | Pre DLY, Decay, Mix, Tail | Diseño original de Zoom
+0x09000070 | BrghtHall | 11 | PREDLY, DECAY, TONE, MIX | Diseño original de Zoom
+0x09000080 | HD Hall | 27 | Pre DLY, Decay, Mix, Tail | Diseño original de Zoom
+0x09000090 | ChurchREV | 31 | Pre DLY, Decay, Mix, Tail | Diseño original de Zoom
+0x090000A0 | Ambience | 30 | PREDLY, DECAY, MIX, TAIL | Diseño original de Zoom
+0x090000B0 | Chamber | 24 | PREDLY, DECAY, MIX, TAIL | Diseño original de Zoom
+0x090000C0 | AirReverb | 7 | Size, Reflect, Mix, Tail | Diseño original de Zoom
+0x090000D0 | EarlyRef | 10 | Decay, Shape, Tone, Mix | Diseño original de Zoom
+0x090000E0 | GateRevrb | 21 | Color, Decay, Tone, BAL | Reverb con gate estilo AMS (años 80)
+0x090000F0 | HoldRevrb | 23 | Pre DLY, Decay, Mix, Tail, Color, LO, HI | Diseño original de Zoom
+0x09000100 | SpaceHole | 31 | Pre DLY, Decay, Repeat, Mix, Depth, Speed, Size | Diseño original de Zoom
+0x09000110 | ParticleR | 40 | Mode, Decay, Mix, Tail | Red Panda Particle
+
+### PEDAL / EXPRESIÓN (0x0B) — el único tipo permitido de forma fiable en el slot 7
+0x0B000010 | Output VP | 0 | (sin parámetros) | Diseño original de Zoom
+0x0B000020 | Pedal VOL | 3 | VOL, Min, Max, Curve | Diseño original de Zoom
+0x0B000030 | BlackWah | 6 | FREQ, Range, Dry, VOL | Vox V846
+0x0B000040 | ChromeWah | 6 | FREQ, Range, Dry, VOL | Dunlop Cry Baby GCB-95
+0x0B000050 | WAH100 | 5 | FREQ, Depth, Dry, VOL | Wah estilo Morley / Dunlop 100
+0x0B000060 | VoiceWah | 10 | Vowel, PTTRN, Voice, Mode | Wah estilo talk-box
+0x0B000070 | PDL Pitch | 6 | BEND, COLOR, TONE, MODE | DigiTech Whammy
+0x0B000080 | PDL MnPit | 6 | Bend, Color, Tone, Mode | Diseño original de Zoom
+0x0B000090 | PDL Roto | 10 | Mode, Drive, BAL, VOL | Altavoz rotativo Leslie 122
+0x0B0000A0 | PDL FLNGR | 5 | P freq, Reso, Hi-DMP, Mix | Diseño original de Zoom
+0x0B0000B0 | PDL Vibe | 8 | SPEED, DEPTH, MODE, VOL | Uni-Vibe en formato pedal de expresión
+0x0B0000C0 | PDL Drive | 14 | GAIN, TONE, PRESENC, VOL | Diseño original de Zoom
+0x0B0000D0 | PDL PHSR | 5 | P Rate, Depth, Reso, Color | Diseño original de Zoom
+0x0B0000E0 | PDL Delay | 5 | Input, Time, Repeat, Mix | Diseño original de Zoom
+0x0B0000F0 | OSC Echo | 14 | P OSC, T-min, T-max, Mix | Diseño original de Zoom
+0x0B000100 | PDL Rev | 9 | P in LVL, Pre DLY, Decay, Mix | Diseño original de Zoom
+0x0B000110 | PDL Reso | 5 | P Freq, Reso, Dry, VOL | Diseño original de Zoom
+0x0B000120 | P-BitCRSH | 4 | P Sample, Bit, Tone, BAL | Bit-crusher en formato pedal de expresión
+
+### VACÍO
+0x00000000 | Empty | 0 | (sin parámetros) — usar cuando un slot no necesita efecto (enabled:false) | —
+
+## PROCESO A SEGUIR
+
+1. Identifica artista, canción y guitarrista/equipo real si es posible (gear_found:true) o
+   aproxima por estilo si no (gear_found:false), explicándolo en summary.
+2. Busca el BPM real de la canción antes de rellenar tempo.
+3. Diseña la cadena de 7 slots respetando: ZNR obligatorio en slot 0, un solo ampli activo,
+   slot 7 solo con efectos 0x0B, presupuesto de DSP ≤100 sumando solo los activos.
+4. Para cada slot elegido, copia el effectId, el effectName y el dspCost EXACTAMENTE como
+   aparecen en la tabla, y construye params con los nombres de esa misma fila EN ESE ORDEN,
+   con cada valor expresado como PORCENTAJE 0-100 del recorrido de ese control (ver Regla
+   Crítica #2) — nunca como el valor real/final de la pedalera.
+5. Verifica el JSON final: sin markdown, sin comentarios, totalDSP coincide con la suma
+   real de los dspCost activos, y no hay ningún effectId fuera de la lista cerrada.
+6. Devuelve solo el JSON.`;
+
+const DEFAULT_PROMPT_EN = `# INSTRUCTIONS FOR GENERATING ZOOM G2 FOUR PRESETS
+
+You are an expert guitar-tone assistant that generates effect chains for the
+Zoom G2 Four pedal as JSON, to be loaded by a web loader via MIDI/SysEx.
+
+## OUTPUT FORMAT — STRICT RULES
+
+- Reply ONLY with the JSON object. No text before or after it.
+- NEVER use markdown code fences (no backticks). Just the raw JSON.
+- NEVER include comments inside the JSON (no // or /* */). The JSON must be valid and parseable with JSON.parse() with no cleanup needed.
+- No trailing commas.
+
+## JSON SCHEMA
+
+{
+  "artist": "string",
+  "song": "string",
+  "guitarist": "string",
+  "gear_found": true|false,
+  "tempo": integer number (the song's real BPM, see the BPM section below),
+  "summary": "short string explaining the overall tone reasoning",
+  "totalDSP": integer number (sum of dspCost for the active slots),
+  "slots": [ ...exactly 7 objects, one per slot, in this order... ]
+}
+
+Each slot is:
+{
+  "slot": 0-6,
+  "role": "noisegate" | "dynamics" | "filter" | "drive" | "amp" | "modulation" | "delay" | "reverb" | "pedal" | "empty",
+  "effectId": "0xXXXXXXXX"  (hex string, EXACTLY one from the closed list below, or "0x00000000" if the slot is empty),
+  "effectName": "string" (readable effect name, the same one shown in the table),
+  "enabled": true|false,
+  "dspCost": integer number (the EXACT cost taken from the table, don't make it up),
+  "params": { "ParamName1": percentage 0-100, "ParamName2": percentage 0-100, ... } (see the critical rule below: ALWAYS a % of travel, NEVER the pedal's real value),
+  "reason": "short string explaining why this effect and these values were chosen"
+}
+
+## CRITICAL RULE #1: PARAMETERS ARE APPLIED BY POSITION, NOT BY NAME
+
+The loader that consumes this JSON does NOT look up parameters by their name
+inside the params object. It walks them in the ORDER they appear in the
+object and sends them to the pedal by position (parameter 1, 2, 3...). So:
+
+- You must include in params ALL and ONLY the parameters the table defines for
+  that effectId, IN THE EXACT SAME ORDER they appear in the table (the "Parameters in order" column).
+- If you dump the parameters in a different order than the table, the pedal
+  will apply each value to the wrong physical parameter and the resulting
+  sound will have nothing to do with what you intended. This is the most
+  serious mistake you can make: double-check the order.
+
+## CRITICAL RULE #2: EVERY VALUE IN params IS A 0-100 PERCENTAGE, NEVER THE PEDAL'S REAL VALUE
+
+This is just as important as the ordering rule. Every numeric value inside
+params is NOT the final value the hardware will see: it is the PERCENTAGE
+(0 to 100, integer) of that specific control's full travel that you want to use.
+  · 0   = that control's absolute minimum.
+  · 100 = that control's absolute maximum.
+  · 50  = that control's midpoint.
+The web loader already knows the real range of every parameter of every
+effect (for example, in RackComp the real Ratio only goes from 0 to 9 even
+though the screen shows "1" to "10", while VOL does go from 0 to 100) and it
+automatically converts the percentage you write into that control's exact
+real value before sending it to the pedal. YOU should NEVER try to guess or
+write the pedal's final/real value — that is no longer your job, it's the
+loader's job. Always think in terms of proportion, not hardware:
+  · "I want quite a bit of compression" → a high Ratio → write a high %
+    (e.g. 75). DON'T write "7" thinking in a 0-9 range, nor "75" thinking the
+    hardware goes up to 100: write 75 (your intended proportion) and spend
+    your judgment on deciding THAT percentage, not on memorizing hardware ranges.
+  · ON/OFF or binary parameters (DETCT, Boost, Tail, a Mode with 2 options...):
+    use 0 (off/first option) or 100 (on/second option); any value ≥50 will be
+    interpreted as "on".
+  · Few-step selectors (compressor Ratio, number of steps in a sequencer, a
+    Mode with 3-4 options...): keep thinking in 0-100, the loader distributes
+    that percentage across that control's available steps.
+  · Parametric EQs with a symmetric range (Low EQ, High EQ, ParaEQ Gain...):
+    50% corresponds to the center (0 dB); below 50% attenuates, above 50% boosts.
+  · "Amount"-type parameters (VOL, Mix, Gain, Depth, Decay...): work the same
+    way, 0-100 is directly the desired proportion of that control.
+In short: NEVER write the pedal's final value in params, ALWAYS write the %
+(0-100) of travel you want for that specific control.
+
+### EXCEPTIONS TO THE PERCENTAGE RULE (Delay effects only, prefix 0x08)
+
+- "Time" (or "TimeA"/"TimeB" in DualDelay): HERE you DO write the song's REAL
+  value in MILLISECONDS (e.g. the delay time in quarter/eighth notes based on
+  the real tempo), NOT a percentage. The web loader does NOT convert this
+  parameter, it sends it exactly as given.
+- "Mode": whatever you put here doesn't matter, the loader ALWAYS forces it to
+  1 (LONG) before sending it. You can put any filler value in this field (or simply 1).
+
+## PATCH CONSISTENCY RULES
+
+1. Slot 0 (physical slot 1) must ALWAYS be the ZNR effect (0x01000070), enabled,
+   as the input noise gate. It is mandatory in every preset.
+2. There can only be ONE active amplifier (category 0x04) in the whole patch.
+   If you need two different amp sounds, pick the most representative one and
+   disable or remove the other.
+3. The sum of dspCost of all ACTIVE slots (enabled=true) cannot exceed 100.
+   If your ideal chain goes over 100, disable (enabled:false) or replace the
+   least important effect starting from the end of the chain (reverb/delay
+   slots before drive/amp), never slot 0 (ZNR).
+4. Slot 7 (index 6, the last one) on the G2 Four only reliably accepts effects
+   from the "Pedal" category (prefix 0x0B) on the real hardware. Avoid putting
+   a drive, amp, modulation, delay or reverb there: use a wah, expression
+   volume, or another effect from category 0x0B, or leave it at 0x0B000010
+   (Output VP) if you don't need anything there.
+5. You can only use effectId values that literally exist in the closed list
+   below. NEVER make up a hex ID nor "extrapolate" a similar one. If you can't
+   find an effect that exactly matches what you have in mind, pick the closest
+   one from the real list.
+
+## REAL BPM — DON'T ESTIMATE IT BY EAR
+
+The tempo field must be the song's real, verified BPM, not a subjective
+guess. Before generating the preset, look up the song's real tempo (for
+example in tempo databases, articles, or known analyses of that specific
+recording) and use that value. If after searching you can't find a reliable
+figure, use your best estimate but say so explicitly in the summary field
+(e.g. "Estimated BPM, no verified value found").
+
+## CATEGORY TABLE BY HEX PREFIX (for orientation or as a fallback)
+
+| Prefix | Category    | suggested role |
+|--------|-------------|-----------------|
+| 0x01   | Dynamics (compressors, gates) | dynamics / noisegate |
+| 0x02   | Filter (auto-wah, EQ, filters) | filter |
+| 0x03   | Drive / distortion / fuzz / boost | drive |
+| 0x04   | Amplifier | amp |
+| 0x06   | Modulation (chorus, flanger, phaser, pitch, tremolo) | modulation |
+| 0x07   | SFX (autopan, sitar, rhythmic looper...) | modulation |
+| 0x08   | Delay | delay |
+| 0x09   | Reverb | reverb |
+| 0x0B   | Expression pedal (wah, volume, pedal drive...) | pedal |
+
+This table is only for orientation to understand the structure; the real
+effectId must ALWAYS come from the closed list below, never made up from the prefix.
+
+## CLOSED LIST OF AVAILABLE EFFECTS (THE ONLY VALID SOURCE FOR effectId)
+
+Format of each line: hex | Name | dspCost | Parameters IN ORDER | Emulated model
+
+The "Emulated model" column is informational: it tells you which real
+pedal/amplifier each effect models (or if it's an original Zoom design with
+no specific commercial equivalent). Use it to pick the effect that best
+matches the guitarist's real gear or the era/genre sound you're going
+for — for example, if the guitarist used a real Tube Screamer, pick "TS
+Drive"; if they used a Marshall Plexi, pick "MS 1959"; if the song is from
+the 60s and wants spring reverb, pick "SpringREV" or "FD Spring". Don't use
+this column to decide the effectId or the name (those still only come from
+the first three columns): it's purely context to help you reason about your choice.
+
+### DYNAMICS (0x01)
+0x01000010 | Comp | 4 | Sense, ATTCK, Tone, VOL | MXR Dyna Comp
+0x01000020 | RackComp | 6 | THRSH, Ratio, ATTCK, VOL | Doesn't emulate a specific pedal (high-precision studio compressor)
+0x01000030 | GrayComp | 16 | SUSTN, Lo, Hi, VOL | ROSS Compressor
+0x01000040 | OptComp | 10 | Drive, LOW, HI, VOL | Doesn't emulate a specific pedal (generic optical compressor)
+0x01000050 | BlackOpt | 12 | Comp, Lo, Hi, VOL | Demeter COMP-1 Compulator
+0x01000060 | 1176 LMT | 11 | Input, Ratio, REL, Output | UREI 1176LN
+0x01000070 | ZNR | 4 | DETCT, Depth, THRSH, Decay | Original Zoom design   ← MANDATORY in slot 0
+0x01000080 | NoiseGate | 5 | DETCT, Depth, THRSH, Decay | Original Zoom design
+0x01000090 | SlowATTCK | 4 | Time, Curve, Tone, VOL | Original Zoom design
+0x010000A0 | MuteSW | 6 | EDGE, SPEED, INVERT, ON/OFF | Original Zoom design
+
+### FILTER (0x02)
+0x02000010 | AutoWah | 6 | Mode, Sense, RESO, VOL | Original Zoom design
+0x02000020 | Reso FLTR | 6 | Mode, Sense, RESO, VOL | Doesn't emulate a specific pedal
+0x02000030 | LowPassFL | 7 | FREQ, Sense, RESO, BAL | Original Zoom design
+0x02000040 | CryFilter | 5 | RANGE, RESO, SENSE, BAL | Doesn't emulate a specific pedal (talking-box style)
+0x02000050 | EG Filter | 9 | FREQ1, FREQ2, RESO, TYPE, SPEED, BAL, VOL | Doesn't emulate a specific pedal
+0x02000060 | LFO FLTR | 7 | Depth, Rate, RESO, WAVE | Original Zoom design
+0x02000070 | SeqFLTR | 7 | Step, PTTRN, Speed, RESO | Z.Vex Seek-Wah
+0x02000080 | RndmFLTR | 7 | TYPE, SPEED, BAL, VOL | Original Zoom design
+0x02000090 | StepFLTR | 6 | Depth, Rate, RESO, Shape | Original Zoom design
+0x020000A0 | Gt GEQ | 5 | 160, 400, 800, 3.2, 6.4, 12, VOL | Original Zoom design
+0x020000B0 | Gt GEQ 7 | 5 | 100Hz, 200Hz, 400Hz, 800Hz, 1.6kHz, 3.2kHz, 6.4kHz, VOL | Original Zoom design
+0x020000C0 | St Gt GEQ | 9 | 160, 400, 800, 3.2, 6.4, 12, VOL | Original Zoom design
+0x020000D0 | ParaEQ | 4 | FREQ, Q, Gain, VOL | Original Zoom design
+0x020000E0 | Exciter | 7 | BASS, TREBLE, VOL, ON/OFF | Doesn't emulate a specific pedal
+0x020000F0 | Low EQ | 4 | Type, FREQ, Gain, VOL | Original Zoom design
+0x02000100 | High EQ | 3 | Type, FREQ, Gain, VOL | Original Zoom design
+
+### DRIVE (0x03)
+0x03000010 | EP Drive | 10 | Gain, Bass, Treble, VOL | Maestro Echoplex (preamp stage)
+0x03000020 | RC Drive | 12 | Gain, Bass, Treble, VOL | Xotic RC Booster
+0x03000030 | TS Drive | 13 | Gain, Boost, Tone, VOL | Ibanez TS808 Tube Screamer
+0x03000040 | GoldDrive | 17 | Gain, Bass, Treble, VOL | Klon Centaur
+0x03000050 | SweetDrv | 23 | Gain, Tone, Focus, VOL | Mad Professor Sweet Honey Overdrive
+0x03000058 | Over Drive | 8 | Gain, Bass, Treble, VOL | Boss OD-1
+0x03000060 | Zen O.DRV | 15 | Gain, Tone, Voice, VOL | Hermida Audio Zendrive
+0x03000070 | BG GRID | 8 | Gain, Tone, BAL, VOL | Mesa/Boogie Grid Slammer
+0x03000080 | DYN Drive | 17 | Gain, Tone, Mode, VOL | Doesn't emulate a specific pedal
+0x03000090 | Plus DIST | 10 | Gain, VOL, DryMx, Comp | MXR Distortion+
+0x030000A0 | DIST One | 12 | Gain, Tone, VOL, Comp | Boss DS-1
+0x030000B0 | SqueakDST | 10 | Gain, FLTR, VOL, DryMx | Pro Co RAT
+0x030000C0 | RedCrunch | 14 | Gain, Tone, PRESENC, VOL | Doesn't emulate a specific pedal (Brown Sound / EVH style)
+0x030000D0 | VioletDST | 11 | Gain, Tone, Voice, VOL | Suhr Riot Reloaded
+0x030000E0 | TB MK1.5 | 16 | ATTCK, Tone, Color, VOL | Sola Sound / Tone Bender MkI.5
+0x030000F0 | OctFuzz | 25 | Boost, Color, Tone, VOL | Doesn't emulate a specific pedal
+0x03000100 | NYC Muff | 11 | SUSTN, Tone, BAL, VOL | Electro-Harmonix Big Muff Pi (NYC version)
+0x03000110 | WaveSHPR | 22 | Gain, Shape, Comp, VOL | Original Zoom design
+0x03000120 | Razor DRV | 17 | Gain, Edge, Lo, VOL | Original Zoom design
+0x03000130 | MetalWRLD | 10 | Gain, Bass, Treble, VOL | Boss MT-2 Metal Zone
+0x03000140 | HG THRTTL | 22 | Gain, Tone, MdCut, VOL | Mesa/Boogie Throttle Box
+0x03000150 | TS+Boost | 10 | Gain, Tone, VOL, Comp, Boost, Bass, Treble, Order | TS808 + booster (combined)
+0x03000160 | RedCR+BST | 10 | GAIN, TONE, PRESENC, VOL, COM, LO/HI, BOOST, ORDER | BluesBreaker + booster (combined)
+0x03000170 | SpotBoost | 10 | BOOST, BASS, TREBLE, ON/OFF | Doesn't emulate a specific pedal
+0x03000180 | UpOctBSTR | 6 | UpOct, DRYMX, BOTTOM, PRESENC | Original Zoom design
+0x03000190 | OutputBST | 4 | RANGE, BOOST, TONE, VOL | Zoom G5n (Output Booster function)
+0x030001A0 | Aco.Sim | 10 | Top, Body, Tone, VOL | Original Zoom design
+
+### AMPLIFIER (0x04) — only ONE per patch
+0x04000010 | MS 45os | 44 | Bass, MID, Treble, PRESENC, Input1, Input2, VOL | Marshall JTM45
+0x04000020 | MS 1959 | 44 | Bass, MID, Treble, PRESENC, Input1, Input2, VOL | Marshall 1959 Super Lead ("Plexi")
+0x04000030 | MS 800 | 44 | Input, Bass, MID, Treble, PRESENC, Gain, VOL | Marshall JCM800 2203
+0x04000040 | FD B-MAN | 43 | Input, Bass, MID, Treble, PRESENC, Gain, VOL | Fender '59 Bassman
+0x04000050 | FD TWIN-R | 43 | Bass, MID, Treble, BRGHT, Gain, VOL, Depth, Speed | Fender '65 Twin Reverb
+0x04000060 | FD DLX-R | 43 | Input, Bass, Treble, Gain, VOL, Depth, Speed | Fender '65 Deluxe Reverb
+0x04000070 | FD MASTER | 43 | Bass, MID, Treble, Fat, Gain, VOL | Fender Vibro-King / master volume
+0x04000080 | UK 30A | 46 | Bass, Treble, Gain, VOL, Tone Cut, Depth, Speed | Vox AC30 Top Boost
+0x04000090 | BG MARK1 | 47 | Bass, MID, Treble, PRESENC, Gain1, Gain2, VOL | Mesa/Boogie Mark I
+0x040000A0 | BG MARK3 | 47 | Bass, MID, Treble, PRESENC, Gain1, Gain2, VOL | Mesa/Boogie Mark III
+0x040000B0 | RectiDual | 44 | Mode, Bass, MID, Treble, PRESENC, Gain, VOL | Mesa/Boogie Dual Rectifier
+0x040000C0 | XtasyBlue | 46 | Bass, MID, Treble, PRESENC, STRUCT, Gain, VOL | Bogner Ecstasy (blue channel)
+0x040000D0 | HW 100 | 41 | Input, Bass, MID, Treble, PRESENC, Gain, VOL | Hiwatt DR103
+0x040000E0 | ORG120 | 46 | Input, Color, Bass, Treble, PRESENC, Gain, VOL | Orange OR120
+0x040000F0 | DZ Herb | 41 | Bass, MID, Treble, PRESENC, Gain, VOL, Deep, MidCut | Diezel Herbert
+0x04000100 | MATCH30 | 47 | Gain1, Bass1, TRBL1, Gain2, Tone2, Cut, VOL | Matchless DC-30
+0x04000110 | KRAMPUS | 58 | Bass, MID, Treble, PRESENC, Gain, VOL | Krank Krampus
+0x04000120 | REDLOOM | 56 | Bass, MID, Treble, PRESENC, Gain, VOL | Peavey 6505 / 5150
+0x04000130 | VELVET | 63 | Bass, MID, Treble, PRESENC, Gain, VOL | Two-Rock / Dumble (clean tone)
+0x04000140 | MUDDY | 71 | Bass, MID, Treble, PRESENC, Gain, VOL | Supro Thunderbolt (vintage)
+0x04000150 | 7 HEAVEN | 63 | Bass, MID, Treble, PRESENC, Gain, VOL | EVH 5150 III
+0x04000160 | POLLEX | 69 | Bass, MID, Treble, PRESENC, Gain, VOL | Friedman BE-100
+
+### MODULATION (0x06)
+0x06000010 | Chorus | 5 | Depth, Rate, Tone, Mix | Original Zoom design
+0x06000020 | CloneCho | 8 | Depth, Rate, Tone, Mix | Electro-Harmonix Small Clone
+0x06000030 | ChorusOne | 7 | Depth, Rate, Tone, Mix | BOSS CH-1 Super Chorus
+0x06000040 | TriChorus | 16 | Depth, Speed, Tone, Mix | tc electronic Corona Tri-Chorus
+0x06000050 | AnalogCho | 8 | DEPTH, Rate, Tone, Mix | Doesn't emulate a specific pedal (generic BBD analog chorus)
+0x06000060 | StereoCho | 6 | Depth, Rate, Tone, Mix | Original Zoom design
+0x06000070 | BendCho | 7 | MODE, DEPTH, TIME, BAL | Original Zoom design
+0x06000080 | Detune | 5 | Cent, Pre DLY, Tone, Mix | Original Zoom design
+0x06000090 | Tremolo | 7 | Wave, Depth, Rate, VOL | Original Zoom design
+0x060000A0 | Phaser | 6 | Color, Depth, Rate, RESO | Original Zoom design
+0x060000B0 | StonePha | 6 | Color, Depth, Rate, RESO | Electro-Harmonix Small Stone
+0x060000C0 | WarpPhase | 7 | Mode, Speed, RESO, VOL | Original Zoom design
+0x060000D0 | Duo Phase | 8 | Depth A, Rate A, RESO A, LINK, Depth B, Rate B, RESO B, VOL | Doesn't emulate a specific pedal
+0x060000E0 | TheVibe | 8 | Speed, Depth, Mode, VOL | Shin-ei Uni-Vibe
+0x060000F0 | VinFLNGR | 5 | Pre DLY, Depth, Rate, RESO | MXR M-117R
+0x06000100 | Kick FLNG | 6 | Pre DLY, Depth, Rate, RESO, Mix, Reset-F, ON/OFF | Original Zoom design
+0x06000110 | Vibrato | 6 | DEPTH, RATE, TONE, BAL | Original Zoom design
+0x06000120 | SwellVibe | 8 | Depth, Speed, Rise, Vol | Original Zoom design
+0x06000130 | Octaver | 5 | OCT1, OCT2, Tone, Dry | Doesn't emulate a specific pedal
+0x06000140 | PitchSHFT | 6 | SHIFT, FINE, TONE, BAL | Original Zoom design
+0x06000150 | MonoPitch | 5 | Shift, Fine, Tone, BAL | Original Zoom design
+0x06000160 | HPS | 5 | Scale, Key, Tone, Mix | Doesn't emulate a specific pedal (intelligent harmonizer)
+0x06000170 | PolyShift | 36 | Shift, Tone, Wet, Dry | Doesn't emulate a specific pedal
+0x06000180 | GEMINOS | 8 | Tight, Mode, Wet, Dry | Original Zoom design
+0x06000190 | RingMod | 4 | FREQ, Tone, BAL, VOL | Original Zoom design
+0x060001A0 | Slicer | 7 | PTTRN, SPEED, THRSH, VOL | Doesn't emulate a specific pedal
+
+### SFX (0x07)
+0x07000010 | AutoPan | 3 | Rate, Width, Clip, VOL | Original Zoom design
+0x07000020 | LoopRoll | 4 | Time, Duty, BAL, ON/OFF | Boss / DigiTech loop roll
+0x07000030 | Sitar Sim | 11 | BEND, BUZZ, +1OCT, VOL | Original Zoom design
+0x07000040 | Bomber | 7 | Decay, Tone, Mix, ON/OFF | Original Zoom design
+
+### DELAY (0x08)
+0x08000010 | Delay | 4 | Time, Mode, Repeat, Mix | Original Zoom design
+0x08000020 | AnalogDly | 4 | Time, Mode, Repeat, Mix | Doesn't emulate a specific pedal
+0x08000030 | TapeEcho | 6 | Time, Mode, Repeat, Mix | Doesn't emulate a specific pedal
+0x08000040 | TapeEcho3 | 14 | Time, Mode, Repeat, Mix, Gain, Hi, Lo, VOL | Maestro Echoplex EP-3
+0x08000050 | DualDelay | 13 | TimeA, TimeB, Mode, BAL, REP A, REP B, DlyMx, Depth | Eventide TimeFactor (DigitalDelay algorithm)
+0x08000060 | SoftEcho | 20 | MOD, Time, Repeat, Mix | Original Zoom design
+0x08000070 | SlapBackD | 10 | Time, Repeat, Mix, SUBDB | Original Zoom design
+0x08000080 | P-P Delay | 5 | Time, Mode, Repeat, Mix | Original Zoom design
+0x08000090 | ReverseDL | 5 | Time, Mode, Repeat, BAL | Doesn't emulate a specific pedal
+0x080000A0 | ModDelay | 6 | Time, Mode, Repeat, Mix | Original Zoom design
+0x080000B0 | FilterDly | 7 | Pitch, Time, Repeat, Mix | Original Zoom design
+0x080000C0 | Pitch DLY | 7 | Time, Mode, Repeat, Mix, Color, Depth, Rate, Reso | Original Zoom design
+0x080000D0 | PhaseDly | 10 | Time, Mode, Repeat, Mix, Link, Cycle, Width, Clip | Original Zoom design
+0x080000E0 | A-Pan DLY | 8 | Swell, Time, Mode, Repeat, Mix | Original Zoom design
+0x080000F0 | SlwAtkDly | 10 | INTVL, Time, Mode, Repeat, Mix, Blend, Smear, DAMP | Original Zoom design
+0x08000100 | ICE Delay | 21 | TIME, MODE, REPEAT, HI, TONE, MIX, PP, TAIL | Doesn't emulate a specific pedal (shimmer style)
+0x08000110 | HoldDelay | 5 | Time, Mode, Repeat, Mix | Doesn't emulate a specific pedal
+
+### REVERB (0x09)
+0x09000010 | RoomREV | 10 | Pre DLY, Decay, Mix, Tail | Original Zoom design
+0x09000020 | BrghtRoom | 10 | PREDLY, DECAY, TONE, MIX | Original Zoom design
+0x09000030 | SpringREV | 10 | Pre DLY, Decay, Mix, Tail | Original Zoom design
+0x09000040 | FD Spring | 26 | Color, Lo, Hi, Mix | Fender spring reverb
+0x09000050 | Plate REV | 22 | Pre DLY, Decay, Mix, Tail | EMT 140 (plate)
+0x09000060 | Hall REV | 11 | Pre DLY, Decay, Mix, Tail | Original Zoom design
+0x09000070 | BrghtHall | 11 | PREDLY, DECAY, TONE, MIX | Original Zoom design
+0x09000080 | HD Hall | 27 | Pre DLY, Decay, Mix, Tail | Original Zoom design
+0x09000090 | ChurchREV | 31 | Pre DLY, Decay, Mix, Tail | Original Zoom design
+0x090000A0 | Ambience | 30 | PREDLY, DECAY, MIX, TAIL | Original Zoom design
+0x090000B0 | Chamber | 24 | PREDLY, DECAY, MIX, TAIL | Original Zoom design
+0x090000C0 | AirReverb | 7 | Size, Reflect, Mix, Tail | Original Zoom design
+0x090000D0 | EarlyRef | 10 | Decay, Shape, Tone, Mix | Original Zoom design
+0x090000E0 | GateRevrb | 21 | Color, Decay, Tone, BAL | 80s-style gated reverb (AMS style)
+0x090000F0 | HoldRevrb | 23 | Pre DLY, Decay, Mix, Tail, Color, LO, HI | Original Zoom design
+0x09000100 | SpaceHole | 31 | Pre DLY, Decay, Repeat, Mix, Depth, Speed, Size | Original Zoom design
+0x09000110 | ParticleR | 40 | Mode, Decay, Mix, Tail | Red Panda Particle
+
+### PEDAL / EXPRESSION (0x0B) — the only type reliably allowed in slot 7
+0x0B000010 | Output VP | 0 | (no parameters) | Original Zoom design
+0x0B000020 | Pedal VOL | 3 | VOL, Min, Max, Curve | Original Zoom design
+0x0B000030 | BlackWah | 6 | FREQ, Range, Dry, VOL | Vox V846
+0x0B000040 | ChromeWah | 6 | FREQ, Range, Dry, VOL | Dunlop Cry Baby GCB-95
+0x0B000050 | WAH100 | 5 | FREQ, Depth, Dry, VOL | Morley / Dunlop 100 style wah
+0x0B000060 | VoiceWah | 10 | Vowel, PTTRN, Voice, Mode | Talk-box style wah
+0x0B000070 | PDL Pitch | 6 | BEND, COLOR, TONE, MODE | DigiTech Whammy
+0x0B000080 | PDL MnPit | 6 | Bend, Color, Tone, Mode | Original Zoom design
+0x0B000090 | PDL Roto | 10 | Mode, Drive, BAL, VOL | Leslie 122 rotary speaker
+0x0B0000A0 | PDL FLNGR | 5 | P freq, Reso, Hi-DMP, Mix | Original Zoom design
+0x0B0000B0 | PDL Vibe | 8 | SPEED, DEPTH, MODE, VOL | Uni-Vibe in expression-pedal form
+0x0B0000C0 | PDL Drive | 14 | GAIN, TONE, PRESENC, VOL | Original Zoom design
+0x0B0000D0 | PDL PHSR | 5 | P Rate, Depth, Reso, Color | Original Zoom design
+0x0B0000E0 | PDL Delay | 5 | Input, Time, Repeat, Mix | Original Zoom design
+0x0B0000F0 | OSC Echo | 14 | P OSC, T-min, T-max, Mix | Original Zoom design
+0x0B000100 | PDL Rev | 9 | P in LVL, Pre DLY, Decay, Mix | Original Zoom design
+0x0B000110 | PDL Reso | 5 | P Freq, Reso, Dry, VOL | Original Zoom design
+0x0B000120 | P-BitCRSH | 4 | P Sample, Bit, Tone, BAL | Bit-crusher in expression-pedal form
+
+### EMPTY
+0x00000000 | Empty | 0 | (no parameters) — use when a slot doesn't need an effect (enabled:false) | —
+
+## PROCESS TO FOLLOW
+
+1. Identify the artist, song, and real guitarist/gear if possible (gear_found:true)
+   or approximate by style if not (gear_found:false), explaining it in summary.
+2. Look up the song's real BPM before filling in tempo.
+3. Design the 7-slot chain respecting: ZNR mandatory in slot 0, only one active
+   amp, slot 7 only with 0x0B effects, DSP budget ≤100 summing only the active ones.
+4. For each chosen slot, copy the effectId, effectName, and dspCost EXACTLY as
+   they appear in the table, and build params with that same row's names IN
+   THAT ORDER, with each value expressed as a 0-100 PERCENTAGE of that
+   control's travel (see Critical Rule #2) — never as the pedal's final/real value.
+5. Check the final JSON: no markdown, no comments, totalDSP matches the real
+   sum of the active dspCost values, and there is no effectId outside the closed list.
+6. Return only the JSON.`;
+
+// ================================================================
+// PROMPT — idioma independiente del idioma del editor, elegible a mano
+// ================================================================
+// El prompt (lo que se pega en otra IA) puede quedarse en un idioma
+// distinto al de la interfaz de este panel: el usuario lo elige con los
+// botones ES/EN del paso 1. Se guardan choices y ediciones por separado
+// para cada idioma, para no perder el uno al tocar el otro.
+const PROMPT_DEFAULTS = { es: DEFAULT_PROMPT_ES, en: DEFAULT_PROMPT_EN };
+const PROMPT_LANG_KEY = 'g2four_wizard_prompt_lang';
+let promptLang = (function () {
+  try {
+    const saved = localStorage.getItem(PROMPT_LANG_KEY);
+    if (saved === 'es' || saved === 'en') return saved;
+  } catch (e) {}
+  return paiLang; // por defecto, el mismo idioma que tenga el editor
+})();
+
+function loadPromptFor(lang) {
+  try {
+    const saved = localStorage.getItem('g2four_wizard_prompt_' + lang);
+    if (saved) return saved;
+    // Migración suave: si viene de una versión anterior con un único
+    // prompt guardado (sin distinguir idioma) y era español, reutilízalo.
+    if (lang === 'es') {
+      const legacy = localStorage.getItem('g2four_wizard_prompt');
+      if (legacy) return legacy;
+    }
+  } catch (e) {}
+  return PROMPT_DEFAULTS[lang];
+}
+function savePromptFor(lang, text) {
+  try { localStorage.setItem('g2four_wizard_prompt_' + lang, text); } catch (e) {}
+}
+function savePromptLang(lang) {
+  try { localStorage.setItem(PROMPT_LANG_KEY, lang); } catch (e) {}
+}
+
+const promptEl = document.getElementById('promptText');
+const promptLangEsBtn = document.getElementById('promptLangEsBtn');
+const promptLangEnBtn = document.getElementById('promptLangEnBtn');
+function updatePromptLangButtons() {
+  promptLangEsBtn.classList.toggle('active', promptLang === 'es');
+  promptLangEnBtn.classList.toggle('active', promptLang === 'en');
+}
+function setPromptLang(lang, opts) {
+  opts = opts || {};
+  promptLang = lang;
+  savePromptLang(lang);
+  updatePromptLangButtons();
+  promptEl.value = loadPromptFor(lang);
+  if (opts.announce) setStatus('promptStatus', 'info', pt(lang === 'en' ? 'prompt_lang_switched_en' : 'prompt_lang_switched_es'));
+}
+promptEl.value = loadPromptFor(promptLang);
+updatePromptLangButtons();
+promptEl.addEventListener('input', () => savePromptFor(promptLang, promptEl.value));
+promptLangEsBtn.addEventListener('click', () => setPromptLang('es', { announce: true }));
+promptLangEnBtn.addEventListener('click', () => setPromptLang('en', { announce: true }));
+
+function setStatus(id, cls, msg) {
+  const el = document.getElementById(id);
+  el.className = 'status ' + cls;
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+function escapeHtml(str) {
+  return String(str ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+document.getElementById('copyPromptBtn').addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText(promptEl.value);
+    setStatus('promptStatus', 'ok', pt('copied_ok'));
+  } catch(e) {
+    promptEl.select();
+    document.execCommand('copy');
+    setStatus('promptStatus', 'warn', pt('copy_fallback'));
+  }
+});
+document.getElementById('resetPromptBtn').addEventListener('click', () => {
+  const def = PROMPT_DEFAULTS[promptLang];
+  promptEl.value = def;
+  savePromptFor(promptLang, def);
+  setStatus('promptStatus', 'info', pt('reset_ok'));
+});
+
+function unlock(id) { document.getElementById(id).classList.remove('locked'); }
+
+// ================================================================
+// PASO 4: analizar JSON
+// ================================================================
+// ================================================================
+// TABLA DE VALORES MÁXIMOS REALES POR PARÁMETRO (extraída de la base de
+// datos oficial de la pedalera, la misma que usa el editor completo).
+// Formato: "effectIdHex8": [maxParam1, maxParam2, ...] en el MISMO orden
+// posicional en que aparecen los parámetros de ese efecto en la tabla
+// cerrada del prompt. Cada valor real va SIEMPRE de 0 a ese máximo (nunca
+// negativo, nunca genérico 0-127): p.ej. RackComp es [50,9,9,100]
+// (THRSH 0-50, Ratio 0-9, ATTCK 0-9, VOL 0-100), no 0-127 para los cuatro.
+//
+// La IA externa NUNCA entrega el valor real: entrega un PORCENTAJE 0-100
+// de recorrido para cada parámetro (ver Regla Crítica #2 del prompt). Esta
+// tabla es la que permite convertir ese porcentaje al valor real exacto que
+// hay que enviar por SysEx: real = round(porcentaje/100 * max). Así, un
+// Ratio de RackComp al 40% se traduce a round(0.40*9) = 4, no se pone al
+// máximo del control ni se envía el 40 en crudo.
+// ================================================================
+const PARAM_MAX_TABLE = {"01000010":[10,1,10,100],"01000020":[50,9,9,100],"01000030":[100,100,100,100],"01000040":[10,100,100,100],"01000050":[100,100,100,100],"01000060":[80,3,60,80],"01000070":[1,100,100,100],"02000010":[1,9,10,100],"02000030":[100,201,21,100],"02000040":[9,10,19,100],"02000070":[6,7,77,10],"02000090":[100,78,10,10],"020000a0":[48,48,48,48,48,48,100,1,1],"020000b0":[48,48,48,48,48,48,48,100,1],"020000c0":[48,48,48,48,48,48,100,1,1],"020000d0":[30,67,48,100],"03000010":[100,20,20,100],"03000020":[100,100,100,100],"03000030":[100,1,100,100],"03000040":[100,100,100,100],"03000050":[100,100,100,100],"03000060":[100,100,100,100],"03000070":[100,100,100,100],"03000080":[100,100,1,100],"03000090":[100,100,100,2],"030000a0":[100,100,100,1],"030000b0":[100,100,100,100],"030000c0":[100,100,100,100],"030000d0":[100,100,2,100],"030000e0":[100,100,1,100],"030000f0":[100,1,100,100],"03000100":[100,100,100,100],"03000110":[100,100,100,100],"03000120":[100,100,100,100],"03000130":[100,100,100,100],"03000140":[100,100,100,100],"03000150":[100,100,100,2,100,100,100,1,1],"03000160":[100,100,100,100,2,1,100,1,1],"03000170":[100,20,20,1],"03000190":[9,100,100,100],"04000010":[100,100,100,100,101,101,100,8,1],"04000020":[100,100,100,100,101,101,100,8,1],"04000030":[1,100,100,100,100,100,100,8,1],"04000040":[1,110,110,110,110,110,110,8,1],"04000050":[90,90,90,1,90,90,90,100,1],"04000060":[1,90,90,90,90,90,100,9,1],"04000070":[90,90,90,1,90,90,8,1],"04000080":[100,100,100,100,100,100,110,8,1],"04000090":[100,100,100,100,100,100,100,8,1],"040000a0":[100,100,100,100,100,100,100,8,1],"06000010":[100,49,10,100],"06000020":[1,100,100,100],"06000030":[100,100,100,100],"06000040":[100,100,100,100],"06000050":[100,100,100,100],"06000060":[100,49,10,100],"06000070":[1,100,50,100],"06000080":[50,50,10,100],"06000090":[2,100,110,100],"060000a0":[3,100,77,100],"060000b0":[1,100,100,100],"060000e0":[50,100,1,100],"060000f0":[50,100,78,20],"06000110":[100,78,10,100],"06000120":[100,128,100,100],"06000130":[100,100,10,100],"06000140":[25,50,10,100],"06000150":[25,50,10,100],"06000160":[9,11,10,100],"06000170":[25,100,100,100],"06000180":[100,5,100,100],"07000020":[4006,75,100,1],"07000040":[99,10,100,1],"08000010":[962,2,100,100],"08000020":[962,2,100,100],"08000030":[762,2,100,100],"08000040":[835,2,100,100,100,100,100,100,1],"08000050":[702,702,1,100,110,110,100,101,1],"08000060":[1,562,100,100],"08000080":[962,2,100,100],"08000090":[745,2,100,100],"080000a0":[754,2,100,100],"080000b0":[762,2,100,100],"080000e0":[712,2,100,100,1,52,50,10,1,1],"08000100":[30,625,2,100,100,20,20,10,1],"09000010":[99,29,100,1],"09000020":[99,29,10,100],"09000030":[99,29,100,1],"09000050":[199,100,100,1],"09000060":[99,29,100,1],"09000070":[99,29,10,100],"09000080":[199,100,100,1],"09000090":[200,100,100,1],"090000a0":[200,100,100,1],"090000c0":[99,10,100,1],"090000d0":[29,20,10,100],"090000f0":[199,100,100,1,100,100,100,1],"0b000020":[100,100,100,1],"0b000030":[100,100,100,100],"0b000040":[100,100,100,100],"0b000050":[50,100,100,100],"0b000060":[100,2,100,1],"0b000070":[100,8,10,1],"0b000080":[100,8,10,1],"0b000090":[1,100,100,100],"0b0000c0":[100,100,100,100]};
+
+// Convierte in-place los valores de params de "% de recorrido" (0-100, tal
+// como los entrega la IA según la Regla Crítica #2 del prompt) al valor
+// real que hay que enviar por SysEx a ese parámetro concreto, usando el
+// máximo real de PARAM_MAX_TABLE: real = round(porcentaje/100 * max).
+// Si el efecto no está en la tabla (cobertura parcial), el valor se deja
+// tal cual llegó, por si ya fuera un valor utilizable.
+//
+// EXCEPCIONES (solo en efectos de Delay, prefijo hex "08"):
+//  - "Time" (o cualquier param cuyo nombre contenga "time", p.ej. TimeA/TimeB
+//    de DualDelay): la IA ya da el valor real en MILISEGUNDOS, no un %. Aquí
+//    NO se convierte, solo se recorta al máximo real del control por si acaso.
+//  - "Mode": se fuerza SIEMPRE a 1 (LONG), ignorando lo que haya puesto la
+//    IA y sin pasar por la conversión de %. Es una preferencia fija del
+//    usuario para que el delay use el modo de tiempo largo, no el modo BPM.
+function convertPercentParamsToReal(data) {
+  const conversions = [];
+  const anomalies = [];
+  for (const s of data.slots) {
+    const id = (s.effectId || '').toLowerCase().replace(/^0x/, '').padStart(8, '0');
+    const maxes = PARAM_MAX_TABLE[id];
+    if (!maxes || typeof s.params !== 'object' || s.params === null) continue;
+    const isDelayEffect = id.startsWith('08');
+    const paramNames = Object.keys(s.params);
+    paramNames.forEach((name, i) => {
+      if (i >= maxes.length) return;
+      const max = maxes[i];
+      const lowerName = (name || '').trim().toLowerCase();
+
+      // Excepción: Mode de un delay siempre fijo a 1 (LONG), nunca se toca.
+      if (isDelayEffect && lowerName === 'mode') {
+        const original = s.params[name];
+        if (Number(original) !== 1) {
+          conversions.push(`Slot ${s.slot} (${s.effectName || s.effectId}) · ${name}: ${original} → 1 (Mode de delay fijado siempre a LONG)`);
+        }
+        s.params[name] = 1;
+        return;
+      }
+
+      // Excepción: Time (o TimeA/TimeB) de un delay ya viene en ms reales.
+      if (isDelayEffect && lowerName.includes('time')) {
+        const original = s.params[name];
+        const ms = Number(original);
+        if (!Number.isFinite(ms)) return;
+        const clampedMs = Math.min(max, Math.max(0, Math.round(ms)));
+        s.params[name] = clampedMs;
+        if (clampedMs !== ms) {
+          conversions.push(`Slot ${s.slot} (${s.effectName || s.effectId}) · ${name}: ${ms}ms recortado a ${clampedMs}ms (máximo real ${max})`);
+        }
+        return;
+      }
+
+      // Caso general: valor entregado como % 0-100 → convertir a valor real.
+      const original = s.params[name];
+      const percent = Number(original);
+      if (!Number.isFinite(percent)) return;
+      if (percent < 0 || percent > 100) {
+        anomalies.push(`Slot ${s.slot} (${s.effectName || s.effectId}) · ${name}: ${percent} está fuera de 0-100%, se ajusta antes de convertir`);
+      }
+      const clampedPercent = Math.min(100, Math.max(0, percent));
+      const real = Math.round((clampedPercent / 100) * max);
+      s.params[name] = real;
+      conversions.push(`Slot ${s.slot} (${s.effectName || s.effectId}) · ${name}: ${percent}% → ${real} (rango real 0-${max})`);
+    });
+  }
+  return { conversions, anomalies };
+}
+
+let parsedJSON = null;
+
+document.getElementById('parseBtn').addEventListener('click', () => {
+  const raw = document.getElementById('jsonInput').value.trim();
+  try {
+    let text = raw.replace(/^```json\s*/i,'').replace(/^```\s*/,'').replace(/\s*```$/,'').trim();
+    const firstBrace = text.indexOf('{');
+    const lastBrace = text.lastIndexOf('}');
+    if (firstBrace >= 0 && lastBrace > firstBrace) text = text.slice(firstBrace, lastBrace+1);
+    const data = JSON.parse(text);
+    if (!data.slots || !Array.isArray(data.slots) || data.slots.length !== 7)
+      throw new Error('El JSON debe tener exactamente 7 slots (índices 0-6).');
+    for (const s of data.slots) {
+      if (typeof s.effectId !== 'string' || !s.effectId.startsWith('0x'))
+        throw new Error(`Slot ${s.slot}: effectId inválido "${s.effectId}"`);
+      if (typeof s.params !== 'object' || s.params === null)
+        throw new Error(`Slot ${s.slot}: params debe ser un objeto.`);
+    }
+    const { conversions, anomalies } = convertPercentParamsToReal(data);
+    parsedJSON = data;
+    renderChain(data);
+    unlock('step5'); unlock('step6');
+    const nameInput = document.getElementById('presetNameInput');
+    nameInput.value = ((data.artist||'').slice(0,6) + (data.song||'').slice(0,4)).toUpperCase().trim();
+    updateSendEnabled();
+
+    // Log técnico de la conversión %→valor real: útil para depurar, pero no
+    // para el uso normal de la herramienta, así que va en un <details> cerrado.
+    const debugDetails = document.getElementById('paramConversionLog');
+    const debugBody = document.getElementById('paramConversionLogBody');
+    if (conversions.length || anomalies.length) {
+      const anomalyLines = anomalies.map(a => '⚠️ ' + escapeHtml(a));
+      const conversionLines = conversions.map(c => escapeHtml(c));
+      debugBody.innerHTML = [...anomalyLines, ...conversionLines].join('<br>');
+      debugDetails.style.display = 'block';
+      debugDetails.open = false; // siempre cerrado por defecto al analizar
+    } else {
+      debugDetails.style.display = 'none';
+      debugBody.innerHTML = '';
+    }
+
+    const baseMsg = `✅ ${pt('parse_ok_prefix')} ${data.artist||'?'} — ${data.song||'?'} (${data.guitarist||''}). ${pt('parse_dsp_label')} ${data.totalDSP||'?'}%.`;
+    if (anomalies.length) {
+      setStatus('parseStatus', 'warn', `${baseMsg} ⚠️ ${anomalies.length} ${pt('parse_anomaly_suffix')}`);
+    } else {
+      setStatus('parseStatus', 'ok', baseMsg);
+    }
+  } catch(e) {
+    parsedJSON = null;
+    document.getElementById('step5').classList.add('locked');
+    document.getElementById('step6').classList.add('locked');
+    document.getElementById('paramConversionLog').style.display = 'none';
+    setStatus('parseStatus', 'err', `${pt('parse_err_prefix')} ` + e.message);
+  }
+});
+
+function renderChain(data) {
+  document.getElementById('chainMeta').textContent =
+    `${data.artist||'?'} · ${data.song||'?'} · ${data.guitarist||''} · ${pt('chain_tempo')} ${data.tempo||'?'} ${pt('chain_bpm')} · ${pt('chain_dsp_total')} ${data.totalDSP||'?'}%`;
+  let html = '';
+  let totalDSP = 0;
+  data.slots.forEach((s, i) => {
+    const enabled = !!s.enabled;
+    if (enabled) totalDSP += (s.dspCost||0);
+    const badge = enabled ? '<span class="badge on">ON</span>' : '<span class="badge off">OFF</span>';
+    const params = (s.params && typeof s.params === 'object') ? s.params : {};
+    const chips = Object.keys(params).map(name =>
+      `<span class="param-chip"><b>${escapeHtml(name)}</b>: ${escapeHtml(params[name])}</span>`
+    ).join('');
+    html += `<div class="chain-card${enabled?'':' off'}">
+      <div class="chain-card-head">
+        <span class="chain-card-slot">${(s.slot ?? i)+1}</span>
+        <span class="chain-card-name">${escapeHtml(s.effectName||s.effectId)}</span>
+        <span class="chain-card-role">${escapeHtml(s.role||'')}</span>
+        ${badge}
+        <span class="chain-card-dsp">${enabled?(s.dspCost||'?')+'%':'0%'} DSP</span>
+      </div>
+      ${chips ? `<div class="chain-params">${chips}</div>` : ''}
+      ${s.reason ? `<div class="chain-card-reason">${escapeHtml(s.reason)}</div>` : ''}
+    </div>`;
+  });
+  document.getElementById('chainTable').innerHTML = html;
+  const pct = Math.min(100, totalDSP);
+  document.getElementById('dspFill').style.width = pct + '%';
+  document.getElementById('dspFill').className = 'dsp-fill' + (totalDSP>100?' over':'');
+  document.getElementById('dspLabel').textContent = `${pt('dsp_label')} ${totalDSP}% / 100% ${totalDSP>100?pt('dsp_over'):pt('dsp_ok')}`;
+}
+
+// ================================================================
+// MIDI — conexión automática al cargar la página
+// ================================================================
+let midiAccess=null, midiOut=null, midiIn=null;
+let currentPresetSlot = -1;
+let g2Protocol = 'v2', g2PatchesPerBank = 10, g2NumPatches = 300, g2PatchLength = -1;
+window._g2PCIgnore = false;
+
+function log(elId, msg) {
+  const el = document.getElementById(elId);
+  el.style.display = 'block';
+  el.innerHTML += msg + '<br>';
+  el.scrollTop = el.scrollHeight;
+}
+function clearLog(elId) { const el=document.getElementById(elId); el.innerHTML=''; el.style.display='none'; }
+
+// ------------------------------------------------------------
+// Reutilización de la conexión MIDI del editor principal
+// ------------------------------------------------------------
+// Este panel vive dentro de un <iframe srcdoc> incrustado en el editor
+// principal (G2FOUR_EDITOR). Como srcdoc hereda el mismo origen que el
+// documento que lo contiene, podemos leer directamente window.parent._g2
+// (el objeto que el editor expone a propósito para esto) y reutilizar el
+// MISMO MIDIOutput/MIDIInput que ya tiene abiertos, sin pedir permiso
+// MIDI por segunda vez ni depender de que este panel logre su propia
+// conexión independiente.
+//
+// Importante: nunca pisamos midiIn.onmidimessage con nuestro propio
+// handler, porque esa propiedad le pertenece al editor principal (la
+// necesita para su propio funcionamiento en tiempo real). En su lugar
+// añadimos nuestro handler con addEventListener('midimessage', ...), que
+// convive sin problema con el handler del editor: ambos se ejecutan para
+// cada mensaje MIDI entrante.
+let _parentMIDIAdopted = false;
+
+function tryAdoptParentMIDI() {
+  try {
+    const pg2 = window.parent && window.parent._g2;
+    if (pg2 && pg2.midiOut && pg2.midiIn) {
+      if (midiOut !== pg2.midiOut || midiIn !== pg2.midiIn) {
+        midiOut = pg2.midiOut;
+        midiIn = pg2.midiIn;
+        midiIn.addEventListener('midimessage', onMidiMessage);
+      }
+      const dot = document.getElementById('midiDot');
+      dot.className = 'dot on';
+      document.getElementById('midiLabel').textContent = pt('midi_adopted');
+      setStatus('midiStatus', 'ok', pt('midi_adopted_status'));
+      updateSendEnabled();
+      if (!_parentMIDIAdopted) {
+        _parentMIDIAdopted = true;
+        midiOut.send([0xF0,0x52,0x00,0x6E,0x50,0xF7]); // edit enable
+        setTimeout(() => midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x13,0x00,0xF7]), 200); // pide patch activo
+        detectProtocol().catch(()=>{});
+      }
+      return true;
+    }
+  } catch(e) {
+    // window.parent inaccesible (origen distinto, iframe sandboxed, etc.):
+    // seguimos con la conexión independiente de más abajo.
+  }
+  return false;
+}
+
+function initMIDIConnection() {
+  if (tryAdoptParentMIDI()) return;
+  const dot = document.getElementById('midiDot');
+  dot.className = 'dot pending';
+  document.getElementById('midiLabel').textContent = pt('midi_waiting_parent');
+  setStatus('midiStatus', 'info', pt('midi_waiting_status'));
+  let attempts = 0;
+  const poll = setInterval(() => {
+    attempts++;
+    if (tryAdoptParentMIDI() || attempts > 40) clearInterval(poll);
+  }, 1500);
+}
+
+// Conexión independiente (fallback manual): pide su propio acceso MIDI
+// desde dentro del iframe, exactamente como hacía este panel antes de
+// integrarse en el editor. Solo se usa si el usuario pulsa "Reconectar"
+// explícitamente (por ejemplo, si el editor principal no está conectado).
+async function requestMIDIIndependent() {
+  const dot = document.getElementById('midiDot');
+  dot.className = 'dot pending';
+  document.getElementById('midiLabel').textContent = pt('midi_requesting');
+  try {
+    midiAccess = await navigator.requestMIDIAccess({ sysex: true });
+    let out=null, inp=null;
+    for (const [,p] of midiAccess.outputs) if (p.name && /g2|zoom/i.test(p.name)) { out=p; break; }
+    for (const [,p] of midiAccess.inputs) if (p.name && /g2|zoom/i.test(p.name)) { inp=p; break; }
+    if (!out) out = midiAccess.outputs.values().next().value;
+    if (!inp) inp = midiAccess.inputs.values().next().value;
+    if (!out || !inp) throw new Error(pt('no_device_found'));
+    midiOut = out; midiIn = inp;
+    midiIn.onmidimessage = onMidiMessage;
+    dot.className = 'dot on';
+    document.getElementById('midiLabel').textContent = '✅ ' + (out.name || 'Zoom G2 Four');
+    setStatus('midiStatus', 'ok', pt('midi_connected_status'));
+    updateSendEnabled(); // por si el JSON ya se había analizado antes de conectar
+    midiOut.send([0xF0,0x52,0x00,0x6E,0x50,0xF7]); // edit enable
+    setTimeout(() => midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x13,0x00,0xF7]), 200); // pide patch activo
+    detectProtocol().catch(()=>{});
+  } catch(e) {
+    dot.className = 'dot';
+    document.getElementById('midiLabel').textContent = pt('midi_no_device');
+    setStatus('midiStatus', 'err', `${pt('parse_err_prefix')} ` + e.message + ` ${pt('midi_err_suffix')}`);
+  }
+}
+document.getElementById('midiReconnectBtn').addEventListener('click', requestMIDIIndependent);
+window.addEventListener('DOMContentLoaded', initMIDIConnection);
+
+function onMidiMessage(msg) {
+  const data = msg.data;
+  if (data.length>=3 && (data[0]&0xF0)===0xB0) {
+    if (data[1]===0) window._g2BankMSB = data[2];
+    if (data[1]===32) window._g2BankLSB = data[2];
+    return;
+  }
+  if (data.length>=2 && (data[0]&0xF0)===0xC0 && !window._g2PCIgnore) {
+    const prog = data[1] & 0x7F;
+    const bankMSB = window._g2BankMSB ?? 0, bankLSB = window._g2BankLSB ?? 0;
+    const bank = (bankMSB<<7)|bankLSB;
+    if (g2PatchesPerBank>0) {
+      currentPresetSlot = bank*g2PatchesPerBank + prog;
+      updateSlotDisplay();
+    }
+    return;
+  }
+  if (data[0]===0xF0 && data[1]===0x52 && data[2]===0x00 && data[3]===0x6E && data[4]===0x64 && data[5]===0x26 && data.length>=12) {
+    const bank = data[8] + (data[9]<<7), prog = data[10] + (data[11]<<7);
+    if (g2PatchesPerBank>0) { currentPresetSlot = bank*g2PatchesPerBank + prog; updateSlotDisplay(); }
+    return;
+  }
+}
+function updateSlotDisplay() {
+  const el = document.getElementById('slotDetected');
+  el.textContent = currentPresetSlot>=0 ? String(currentPresetSlot+1) : '—';
+}
+
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+function fmWaitSysex(matchFn, timeoutMs) {
+  return new Promise(resolve => {
+    let done=false;
+    const t=setTimeout(()=>{ if(!done){done=true; midiIn.removeEventListener('midimessage',h); resolve(null);} }, timeoutMs);
+    function h(msg){ if(!done && matchFn(msg.data)){ done=true; clearTimeout(t); midiIn.removeEventListener('midimessage',h); resolve(msg.data);} }
+    midiIn.addEventListener('midimessage', h);
+  });
+}
+async function detectProtocol() {
+  if (!midiOut || !midiIn) return;
+  midiOut.send([0xF0,0x52,0x00,0x6E,0x44,0xF7]);
+  const r2 = await fmWaitSysex(d=>d.length>13&&d[0]===0xF0&&d[1]===0x52&&d[2]===0x00&&d[3]===0x6E&&d[4]===0x43, 600);
+  if (r2) {
+    g2Protocol='v2'; g2NumPatches=r2[5]+(r2[6]<<7); g2PatchLength=r2[7]+(r2[8]<<7); g2PatchesPerBank=r2[11]+(r2[12]<<7);
+    return;
+  }
+  midiOut.send([0xF0,0x52,0x00,0x6E,0x07,0xF7]);
+  const r1 = await fmWaitSysex(d=>d.length>5&&d[0]===0xF0&&d[1]===0x52&&d[2]===0x00&&d[3]===0x6E&&d[4]===0x06, 600);
+  if (r1) { g2Protocol='v1'; g2NumPatches=r1[5]+(r1[6]<<7); g2PatchLength=r1.length>8?(r1[7]+(r1[8]<<7)):-1; g2PatchesPerBank=-1; }
+}
+
+function updateSendEnabled() {
+  document.getElementById('sendBtn').disabled = !(midiOut && parsedJSON);
+}
+
+// ================================================================
+// PASO 6: enviar cadena de efectos en vivo
+// ================================================================
+function changeEffectType(slot, effectId) {
+  const id = effectId>>>0;
+  const b0=id&0x7F, b1=(id>>7)&0x7F, b2=(id>>14)&0x7F, b3=(id>>21)&0x7F, b4=(id>>28)&0x0F;
+  midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x20,0x00,slot,0x01,b0,b1,b2,b3,b4,0xF7]);
+}
+function setParam(slot, paramIdx, value) {
+  const raw = Math.min(4095, Math.max(0, Math.round(value)));
+  midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x20,0x00,slot,paramIdx, raw&0x7F, (raw>>7)&0x7F, 0,0,0,0xF7]);
+}
+function toggleSlot(slot, enable) {
+  midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x20,0x00,slot,0x00, enable?1:0, 0,0,0,0,0xF7]);
+}
+function syncPatch() { midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x13,0x00,0xF7]); }
+
+document.getElementById('sendBtn').addEventListener('click', async () => {
+  if (!midiOut || !parsedJSON) return;
+  const btn = document.getElementById('sendBtn');
+  btn.disabled = true;
+  document.getElementById('sendStatus').style.display='none';
+  clearLog('sendLog');
+  document.getElementById('progressWrap').style.display='block';
+  const slots = parsedJSON.slots;
+  const TOTAL_PASSES = 2; // Se envía la cadena completa 2 veces seguidas para que la G2 Four
+                          // asiente bien todos los parámetros (a veces la 1ª pasada no los aplica todos).
+  try {
+    for (let pass=1; pass<=TOTAL_PASSES; pass++) {
+      log('sendLog', `— ${pt('send_pass')} ${pass}/${TOTAL_PASSES} —`);
+      for (let i=0;i<slots.length;i++) {
+        const s = slots[i];
+        const id = parseInt(s.effectId,16)>>>0;
+        const paramNames = Object.keys(s.params||{});
+        const overallIndex = (pass-1)*slots.length + i;
+        const overallTotal = TOTAL_PASSES*slots.length;
+        document.getElementById('progressBar').style.width = Math.round((overallIndex/overallTotal)*100)+'%';
+        log('sendLog', `⬡ Slot ${(s.slot??i)+1} [${s.role||''}] → ${s.effectName||s.effectId} (${s.enabled?'ON':'OFF'})`);
+        changeEffectType(i, id);
+        await sleep(120);
+        for (let p=0;p<paramNames.length;p++) {
+          const val = s.params[paramNames[p]];
+          if (val!==undefined) { setParam(i, p+2, val); await sleep(30); }
+        }
+        toggleSlot(i, !!s.enabled);
+        await sleep(60);
+        log('sendLog', `  ✓ ${paramNames.map(n=>`${n}=${s.params[n]}`).join(', ')}`);
+      }
+      if (pass < TOTAL_PASSES) await sleep(200);
+    }
+    document.getElementById('progressBar').style.width='100%';
+    await sleep(150);
+    syncPatch();
+    if (parsedJSON.tempo) {
+      const bpm = Math.max(40, Math.min(250, parsedJSON.tempo|0));
+      midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x20,0x00,0x64,0x02, bpm&0x7F, (bpm>>7)&0x7F, 0,0,0,0xF7]);
+    }
+    log('sendLog', pt('send_sent_ok'));
+    setStatus('sendStatus', 'ok', `${pt('send_status_ok_prefix')} "`+document.getElementById('presetNameInput').value+`" ${pt('send_status_ok_suffix')}`);
+    unlock('step7');
+    updateSlotDisplay();
+  } catch(e) {
+    log('sendLog', `${pt('send_err_prefix')} ` + e.message);
+    setStatus('sendStatus', 'err', `${pt('send_err_status_prefix')} ` + e.message);
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+// ================================================================
+// PASO 7: escritura directa a flash + descarga .zptc
+// (mismo mecanismo SysEx 0x45 validado en el editor completo)
+// ================================================================
+function readI32LE(d,o){ return (d[o]|(d[o+1]<<8)|(d[o+2]<<16)|(d[o+3]<<24))>>>0; }
+function seven2eight(data,start,end){
+  const len=end-start+1, rem=len%8;
+  const out=new Uint8Array(Math.floor(len/8)*7+(rem<2?0:rem-1));
+  let idx=0, hi=0;
+  for(let i=start;i<=end;i++){
+    const b=data[i], bit=7-(i-start)%8;
+    if(bit===7) hi=b; else out[idx++]=b+(((hi>>bit)&1)<<7);
+  }
+  return out;
+}
+function eight2seven(d,start,end){
+  if(start===undefined) start=0;
+  if(end===undefined) end=d.length-1;
+  const out=new Uint8Array((end-start+1)+Math.ceil((end-start+1)/7));
+  let i=start,o=0,s=0,c=0;
+  for(;i<=end;){
+    s=(i-start)%7;
+    if(s===0) c=o++;
+    const a=d[i];
+    out[c]|=(a&0x80)>>(s+1);
+    out[o]=a&0x7F;
+    o++; i++;
+  }
+  return out.slice(0,o);
+}
+let _crcTable=null;
+function crc32(data){
+  if(!_crcTable){ _crcTable=new Uint32Array(256);
+    for(let i=0;i<256;i++){ let c=i; for(let k=0;k<8;k++) c=(c&1)?(0xEDB88320^(c>>>1)):(c>>>1); _crcTable[i]=c>>>0; } }
+  let crc=0^(-1);
+  for(let i=0;i<data.length;i++) crc=(crc>>>8)^_crcTable[(crc^data[i])&0xFF];
+  return ((crc^(-1))>>>0);
+}
+function getSevenBitCRC(data){
+  let crc = crc32(data) ^ 0xFFFFFFFF; crc = crc>>>0;
+  return new Uint8Array([crc&0x7F,(crc>>>7)&0x7F,(crc>>>14)&0x7F,(crc>>>21)&0x7F,(crc>>>28)&0x0F]);
+}
+
+async function fetchCurrentPatch() {
+  midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x13,0x00,0xF7]);
+  const reply = await fmWaitSysex(d=>d.length>50&&d[0]===0xF0&&d[1]===0x52&&d[2]===0x00&&d[3]===0x6E&&d[4]===0x64&&d[5]===0x12, 4000);
+  if (!reply) return null;
+  let raw = Array.from(reply);
+  const endIdx = raw.indexOf(0xF7);
+  if (endIdx>=0) raw = raw.slice(0, endIdx+1);
+  let decoded = seven2eight(raw, 9, raw.length-1-5-1);
+  if (decoded.length>=8 && decoded[0]===0x50 && decoded[1]===0x54 && decoded[2]===0x43 && decoded[3]===0x46) {
+    const sz = decoded[4]|(decoded[5]<<8)|(decoded[6]<<16)|(decoded[7]<<24);
+    if (sz>0 && sz<=decoded.length) decoded = decoded.slice(0, sz);
+  }
+  return decoded;
+}
+
+function injectPresetName(decoded, name) {
+  if (!name) return decoded;
+  const numEffects = readI32LE(decoded, 12);
+  let off = 36 + numEffects*4, nameOffset=-1, nameLen=-1;
+  while (off+8<=decoded.length) {
+    const cid = String.fromCharCode(decoded[off],decoded[off+1],decoded[off+2],decoded[off+3]);
+    const len = readI32LE(decoded, off+4);
+    if (len<0 || off+8+len>decoded.length) break;
+    if (cid==='NAME') { nameOffset=off+8; nameLen=len; break; }
+    off += 8+len;
+  }
+  if (nameOffset<0 || nameLen<=0) return decoded;
+  const bytes = new Uint8Array(nameLen);
+  const str = name.slice(0, nameLen).toUpperCase();
+  for (let i=0;i<str.length;i++) bytes[i] = str.charCodeAt(i)&0x7F;
+  decoded.set(bytes, nameOffset);
+  return decoded;
+}
+
+function extractPatchName(eight) {
+  let ptcfOff=-1;
+  for (let i=0;i<eight.length-3;i++) if (eight[i]===0x50&&eight[i+1]===0x54&&eight[i+2]===0x43&&eight[i+3]===0x46) { ptcfOff=i; break; }
+  if (ptcfOff<0) return 'preset';
+  const numEffects = readI32LE(eight, ptcfOff+12);
+  let off = ptcfOff+36+numEffects*4;
+  while (off+8<=eight.length) {
+    const id = String.fromCharCode(eight[off],eight[off+1],eight[off+2],eight[off+3]);
+    const len = readI32LE(eight, off+4);
+    if (len<0||off+8+len>eight.length) break;
+    if (id==='NAME') { let n=''; for(let b=0;b<len;b++){ if(eight[off+8+b]===0) break; n+=String.fromCharCode(eight[off+8+b]); } return n.trim()||'preset'; }
+    off += 8+len;
+  }
+  return 'preset';
+}
+
+async function writeRawPatchToSlot(patchBytes, slot, logId) {
+  await detectProtocol();
+  const ppb = (g2Protocol==='v2' && g2PatchesPerBank>0) ? g2PatchesPerBank : 10;
+  const bank = Math.floor(slot/ppb), prog = slot%ppb;
+  let patchData = patchBytes;
+  if (g2PatchLength>0) {
+    if (patchData.length>g2PatchLength) throw new Error(`${pt('wizard_too_big')} (${patchData.length}B / ${g2PatchLength}B).`);
+    if (patchData.length<g2PatchLength) { const p=new Uint8Array(g2PatchLength); p.set(patchData); patchData=p; }
+  }
+  const len = patchData.length;
+  const sevenData = eight2seven(patchData);
+  const crc = getSevenBitCRC(patchData);
+  const header = [0xF0,0x52,0x00,0x6E,0x45,0x00,0x00, bank&0x7F,(bank>>7)&0x7F, prog&0x7F,(prog>>7)&0x7F, len&0x7F,(len>>7)&0x7F];
+  const msg = new Uint8Array(header.length+sevenData.length+crc.length+1);
+  msg.set(header,0); msg.set(sevenData,header.length); msg.set(crc,header.length+sevenData.length);
+  msg[msg.length-1]=0xF7;
+  log(logId, `${pt('log_slot_dest')} ${slot+1} → ${pt('log_bank')} ${bank}, ${pt('log_prog')} ${prog} (ppb=${ppb})`);
+  log(logId, `PTCF=${len}B, SysEx total=${msg.length}B`);
+  const replyPromise = fmWaitSysex(d=>d.length>=6&&d[0]===0xF0&&d[1]===0x52&&d[2]===0x00&&d[3]===0x6E&&d[4]===0x00&&d[5]===0x00, 4000);
+  window._g2PCIgnore = true;
+  midiOut.send(Array.from(msg));
+  const reply = await replyPromise;
+  window._g2PCIgnore = false;
+  if (!reply) throw new Error(pt('wizard_no_confirm'));
+  log(logId, pt('log_success_reply'));
+  // Refresca el buffer activo yendo a un slot vecino y volviendo
+  const neighbor = slot<299 ? slot+1 : slot-1;
+  if (ppb>0) {
+    const nb=Math.floor(neighbor/ppb), np=neighbor%ppb;
+    midiOut.send([0xB0,0x00,(nb>>7)&0x7F]); midiOut.send([0xB0,0x20,nb&0x7F]); midiOut.send([0xC0,np&0x7F]);
+    await sleep(250);
+    midiOut.send([0xB0,0x00,(bank>>7)&0x7F]); midiOut.send([0xB0,0x20,bank&0x7F]); midiOut.send([0xC0,prog&0x7F]);
+  } else {
+    midiOut.send([0xC0, neighbor&0x7F]); await sleep(250); midiOut.send([0xC0, slot&0x7F]);
+  }
+  await sleep(250);
+  return patchData;
+}
+
+function safeName(name) { return (name||'preset').replace(/[^a-zA-Z0-9_\-áéíóúüñÁÉÍÓÚÜÑ ]/g,'_').trim() || 'preset'; }
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download=filename; a.click();
+  setTimeout(()=>URL.revokeObjectURL(url), 2000);
+}
+
+document.getElementById('saveFlashBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('saveFlashBtn');
+  if (!midiOut || !midiIn) { setStatus('saveStatus','warn', pt('save_need_midi')); return; }
+  const override = parseInt(document.getElementById('slotOverride').value, 10);
+  let slot;
+  if (Number.isFinite(override) && override>=1 && override<=300) slot = override-1;
+  else if (currentPresetSlot>=0) slot = currentPresetSlot;
+  else { setStatus('saveStatus','err', pt('save_no_slot')); return; }
+
+  btn.disabled = true;
+  clearLog('saveLog');
+  try {
+    setStatus('saveStatus','info', pt('save_reading'));
+    let decoded = await fetchCurrentPatch();
+    if (!decoded) throw new Error(pt('wizard_no_response'));
+    const presetName = (document.getElementById('presetNameInput').value || (parsedJSON ? ((parsedJSON.artist||'').slice(0,6)+(parsedJSON.song||'').slice(0,4)) : 'PRESET'));
+    decoded = injectPresetName(decoded, presetName);
+    setStatus('saveStatus','info',`${pt('save_writing')} ${slot+1}…`);
+    const written = await writeRawPatchToSlot(decoded, slot, 'saveLog');
+    const name = extractPatchName(written);
+    const filename = String(slot+1).padStart(3,'0') + ' ' + safeName(name) + '.zptc';
+    downloadBlob(new Blob([written], { type:'application/octet-stream' }), filename);
+    setStatus('saveStatus','ok', `${pt('save_done_prefix')} ${slot+1} ${pt('save_done_mid')} "${filename}".`);
+  } catch(e) {
+    console.error(e);
+    setStatus('saveStatus','err', `${pt('save_err_prefix')} ` + e.message);
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+})();
+</script>
+</body>
+</html>
+
+</template>
+
+<script>
+(function() {
+  var btn = document.getElementById('presetAiBtn');
+  var modal = document.getElementById('presetAiModal');
+  var closeBtn = document.getElementById('presetAiCloseBtn');
+  var frame = document.getElementById('presetAiFrame');
+  var tpl = document.getElementById('presetAiTemplate');
+  var loaded = false;
+
+  function openPresetAI() {
+    if (!loaded) {
+      frame.srcdoc = tpl.innerHTML;
+      loaded = true;
+    }
+    modal.classList.add('open');
+  }
+  function closePresetAI() {
+    modal.classList.remove('open');
+  }
+
+  btn.addEventListener('click', openPresetAI);
+  closeBtn.addEventListener('click', closePresetAI);
+  modal.addEventListener('click', function(e) { if (e.target === modal) closePresetAI(); });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && modal.classList.contains('open')) closePresetAI();
+  });
+})();
 </script>
 </body>
 </html>
