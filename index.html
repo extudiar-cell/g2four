@@ -63375,6 +63375,15 @@ function tryAdoptParentMIDI() {
         midiIn = pg2.midiIn;
         midiIn.addEventListener('midimessage', onMidiMessage);
       }
+      // El editor principal puede llevar rato con un preset ya detectado
+      // (currentPresetSlot) antes de que este panel exista siquiera: los
+      // mensajes MIDI que lo revelaron ya pasaron y nunca los vimos. Al
+      // adoptar su conexión, tiramos también de ese valor ya conocido en
+      // vez de esperar a que el usuario cambie de preset otra vez.
+      if (typeof pg2.currentPresetSlot === 'number' && pg2.currentPresetSlot >= 0 && currentPresetSlot < 0) {
+        currentPresetSlot = pg2.currentPresetSlot;
+        updateSlotDisplay();
+      }
       const dot = document.getElementById('midiDot');
       dot.className = 'dot on';
       document.getElementById('midiLabel').textContent = pt('midi_adopted');
