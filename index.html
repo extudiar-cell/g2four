@@ -32,32 +32,32 @@
     .concert-header {
       background: #141a28;
       border-radius: 28px;
-      padding: 14px 24px;
+      padding: 10px 16px;
       margin-bottom: 22px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 8px;
       border: 1px solid #3f4f66;
       box-shadow: 0 8px 30px rgba(0,0,0,0.6);
     }
     .header-left {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 10px;
       flex-wrap: wrap;
     }
     .preset-number {
-      font-size: 2.1rem;
+      font-size: 1.7rem;
       font-weight: 700;
       color: #f0c040;
       background: #0a0e18;
-      padding: 0 5px;
+      padding: 0 12px;
       border-radius: 40px;
       border: 2px solid #3f4f66;
       line-height: 1.4;
-      min-width: 84px;
+      min-width: 62px;
       text-align: center;
     }
     .preset-name-wrapper {
@@ -66,7 +66,7 @@
       gap: 6px;
     }
     .preset-name {
-      font-size: 2.1rem;
+      font-size: 1.45rem;
       font-weight: 700;
       background: linear-gradient(135deg, #c0f0e4, #6bc9b0);
       -webkit-background-clip: text;
@@ -77,19 +77,19 @@
     .preset-name.modified::after {
       content: '*';
       color: #f0c040;
-      font-size: 1.9rem;
+      font-size: 1.3rem;
       -webkit-text-fill-color: #f0c040;
       margin-left: 4px;
     }
     .dsp-usage-badge {
-      font-size: 0.78rem;
+      font-size: 0.68rem;
       font-weight: 700;
       font-family: monospace;
       color: #6bc9b0;
       background: #0a0e18;
       border: 1px solid #3f4f66;
       border-radius: 20px;
-      padding: 3px 12px;
+      padding: 2px 10px;
       margin-left: 4px;
       white-space: nowrap;
     }
@@ -98,21 +98,21 @@
     .header-right {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 6px;
       flex-wrap: wrap;
     }
     .nav-btn {
       background: #1a2a3c;
       border: 1px solid #3f5270;
       border-radius: 40px;
-      padding: 2px 3px;
-      font-size: 0.72rem;
+      padding: 5px 10px;
+      font-size: 0.7rem;
       font-weight: 600;
       color: #f0f4ff;
       cursor: pointer;
       transition: 0.15s;
       touch-action: manipulation;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.2px;
     }
     .nav-btn:hover:not(:disabled) {
       border-color: #6bc9b0;
@@ -125,12 +125,12 @@
     .save-btn { background: #1a3a2c; border: 1px solid #2c6e5c; color: #6bc9b0; }
     .save-btn:hover:not(:disabled) { background: #1e4a38; border-color: #6bc9b0; box-shadow: 0 0 16px rgba(107,201,176,0.15); }
     .goto-input {
-      width: 70px;
+      width: 54px;
       background: #0a0e18;
       border: 1px solid #3f5270;
       border-radius: 40px;
-      padding: 6px 10px;
-      font-size: 0.9rem;
+      padding: 5px 8px;
+      font-size: 0.78rem;
       font-weight: 600;
       color: #ffffff;
       text-align: center;
@@ -142,38 +142,38 @@
       background: #1a2a3c;
       border: 1px solid #3f5270;
       border-radius: 40px;
-      padding: 6px 14px;
-      font-size: 0.82rem;
+      padding: 5px 10px;
+      font-size: 0.7rem;
       font-weight: 600;
       color: #f0f4ff;
       cursor: pointer;
       transition: 0.15s;
     }
     .goto-btn:hover:not(:disabled) { border-color: #6bc9b0; color: #6bc9b0; background: #0f1a2a; }
-    .midi-indicator { display: flex; align-items: center; gap: 6px; font-size: 0.78rem; color: #f0f4ff; }
-    .midi-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #f0f4ff; transition: background 0.3s, box-shadow 0.3s; }
+    .midi-indicator { display: flex; align-items: center; gap: 4px; font-size: 0.68rem; color: #f0f4ff; }
+    .midi-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #f0f4ff; transition: background 0.3s, box-shadow 0.3s; }
     .midi-dot.on { background: #2ecc71; box-shadow: 0 0 16px rgba(46,204,113,0.6); }
     .midi-label { color: #f0f4ff; }
 
     .bpm-wrapper {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       background: #0a0e18;
       border: 1px solid #3f4f66;
       border-radius: 24px;
-      padding: 5px 12px;
+      padding: 4px 10px;
     }
     .tap-group { display: flex; flex-direction: column; align-items: center; gap: 0; line-height: 1.1; }
-    .tap-bpm-display { font-size: 1rem; font-weight: 700; color: #6bc9b0; font-family: monospace; letter-spacing: 1px; }
-    .tap-bpm-label { font-size: 0.55rem; color: #f0f4ff; text-transform: uppercase; letter-spacing: 1px; }
+    .tap-bpm-display { font-size: 0.85rem; font-weight: 700; color: #6bc9b0; font-family: monospace; letter-spacing: 1px; }
+    .tap-bpm-label { font-size: 0.5rem; color: #f0f4ff; text-transform: uppercase; letter-spacing: 1px; }
     button.tap-tempo, button.tuner-btn {
       background: #1a2a3c;
       border: 1px solid #3f5270;
       color: #f0f4ff;
-      font-size: 0.74rem;
+      font-size: 0.65rem;
       font-weight: 600;
-      padding: 7px 12px;
+      padding: 5px 9px;
       border-radius: 30px;
       cursor: pointer;
       transition: 0.15s;
@@ -931,15 +931,15 @@
       .pedalboard { gap: 8px; padding: 16px 10px; flex-wrap: wrap; }
       .pedal { flex: 1 1 30%; min-width: 140px; }
       .pedal .name { font-size: 1rem; }
-      .preset-number { font-size: 2rem; min-width: 70px; }
-      .preset-name { font-size: 1.8rem; }
+      .preset-number { font-size: 1.5rem; min-width: 54px; }
+      .preset-name { font-size: 1.3rem; }
     }
     @media (max-width: 700px) {
       .pedalboard { padding: 12px 8px; }
       .pedal { flex: 1 1 45%; }
-      .concert-header { padding: 10px 14px; }
-      .preset-number { font-size: 1.6rem; min-width: 60px; }
-      .preset-name { font-size: 1.4rem; }
+      .concert-header { padding: 8px 10px; }
+      .preset-number { font-size: 1.25rem; min-width: 48px; }
+      .preset-name { font-size: 1.05rem; }
       .audio-main-row { flex-direction: column; gap: 14px; }
       .audio-divider { width: 100%; height: 1px; }
       .audio-right-col { flex-direction: row; justify-content: center; }
@@ -953,14 +953,14 @@
       border: 1px solid #3f5270;
       border-radius: 40px;
       padding: 2px;
-      margin-left: 10px;
+      margin-left: 6px;
     }
     .lang-btn {
       background: transparent;
       border: none;
       color: #f0f4ff;
-      padding: 4px 10px;
-      font-size: 0.75rem;
+      padding: 3px 8px;
+      font-size: 0.68rem;
       font-weight: 700;
       cursor: pointer;
       border-radius: 40px;
@@ -998,12 +998,12 @@
     
     /* Ajuste para botones de navegación solo con flechas */
     #prevBtn, #nextBtn, #presetPrevBtn, #presetNextBtn {
-      min-width: 44px;
-      padding: 6px 0;
+      min-width: 34px;
+      padding: 5px 0;
       display: inline-flex;
       justify-content: center;
       align-items: center;
-      font-size: 1.1rem;
+      font-size: 0.95rem;
     }
 
     
