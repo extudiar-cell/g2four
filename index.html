@@ -62145,13 +62145,13 @@ details.param-debug .debug-log-box{background:#080c14;border:1px solid #1a2030;b
 <body>
 <div class="wrap">
   <h1 data-pai="h1">🎸 G2 Four — Asistente de Presets de Artistas</h1>
-  <p class="sub" data-pai="sub">Puedes preparar el prompt, generar la respuesta de la IA y analizar el JSON (pasos 1-3) sin la pedalera conectada. Solo necesitas la conexión MIDI activa para enviar la cadena (paso 5) y guardar/extraer el .zptc (paso 6).</p>
+  <p class="sub" data-pai="sub">Puedes preparar el prompt, generar la respuesta de la IA y analizar el JSON (pasos 1-3) sin la pedalera conectada. Solo necesitas la conexión MIDI activa para enviar la cadena (paso 4) y guardar/extraer el .zptc (paso 5).</p>
 
   <!-- PASO MIDI (oculto): sigue funcionando en segundo plano (adopta la conexión
        del editor principal), pero ya no se muestra como paso visible del asistente. -->
   <div class="card" id="step1" style="display:none;">
     <h2><span class="step-num">1</span> <span data-pai="step1_title">Conexión MIDI</span></h2>
-    <p class="hint" data-pai="step1_hint">Al abrir esta página, Chrome te pedirá permiso MIDI/SysEx automáticamente. Si lo rechazaste o cambiaste de pedalera, usa "Reconectar". Puedes seguir sin conectar hasta que llegues al paso 6 (enviar) o al 7 (guardar/.zptc): ahí sí hace falta la pedalera conectada.</p>
+    <p class="hint" data-pai="step1_hint">Al abrir esta página, Chrome te pedirá permiso MIDI/SysEx automáticamente. Si lo rechazaste o cambiaste de pedalera, usa "Reconectar". Puedes seguir sin conectar hasta que llegues al paso 4 (enviar) o al 5 (guardar/.zptc): ahí sí hace falta la pedalera conectada.</p>
     <div class="midi-row">
       <span class="dot" id="midiDot"></span>
       <span id="midiLabel" data-pai="midi_requesting">Solicitando acceso MIDI…</span>
@@ -62190,61 +62190,41 @@ details.param-debug .debug-log-box{background:#080c14;border:1px solid #1a2030;b
       <a class="ai-btn" target="_blank" rel="noopener" href="https://copilot.microsoft.com/">🟣 Copilot</a>
       <a class="ai-btn" target="_blank" rel="noopener" href="https://www.perplexity.ai/">⚪ Perplexity</a>
       <a class="ai-btn" target="_blank" rel="noopener" href="https://chat.mistral.ai/">🟡 Le Chat</a>
-      <a class="ai-btn" target="_blank" rel="noopener" href="https://lovable.dev/dashboard/">🟠 Lovable</a>
-      <a class="ai-btn" target="_blank" rel="noopener" href="https://chat.qwen.ai//">🟢 Qwen</a>
+      <a class="ai-btn" target="_blank" rel="noopener" href="https://chat.qwen.ai/">🟢 Qwen</a>
       <a class="ai-btn" target="_blank" rel="noopener" href="https://chat.deepseek.com/">🔵 Deepseek</a>
-      <a class="ai-btn" target="_blank" rel="noopener" href="https://manus.im/">🟣 Manus</a>
-      <a class="ai-btn" target="_blank" rel="noopener" href="https://bolt.new/">⚪ Bolt</a>
-      <a class="ai-btn" target="_blank" rel="noopener" href="https://replit.com/">🟡 Replit</a>
 
 
     </div>
   </div>
 
-  <!-- PASO 3: JSON -->
+  <!-- PASO 3: JSON + ENVIAR (fusionados) -->
   <div class="card" id="step4">
-    <h2><span class="step-num">3</span> <span data-pai="step4_title">Pega la respuesta de la IA</span></h2>
-    <p class="hint" data-pai="step4_hint">Copia el JSON completo que te devolvió la IA (solo el bloque JSON) y pégalo aquí.</p>
+    <h2><span class="step-num">3</span> <span data-pai="step4_title">Pega la respuesta de la IA y envíala</span></h2>
+    <p class="hint" data-pai="step4_hint">Copia el JSON completo que te devolvió la IA (solo el bloque JSON) y pégalo aquí. Al analizarlo, si la pedalera está conectada por MIDI, la cadena se envía automáticamente al parche actual.</p>
     <textarea id="jsonInput" placeholder='{ "artist": "...", "song": "...", "slots": [...] }' data-pai-ph="json_placeholder"></textarea>
     <div class="btn-row">
-      <button class="btn-primary" id="parseBtn" data-pai="parse_btn">🔍 Generar JSON (analizar)</button>
+      <button class="btn-primary" id="parseBtn" data-pai="parse_btn">🔍📡 Generar y enviar a la pedalera</button>
     </div>
     <div id="parseStatus" class="status info" style="display:none;"></div>
+    <div class="progress-bar-wrap" id="progressWrap" style="display:none;">
+      <div class="progress-bar" id="progressBar" style="width:0%"></div>
+    </div>
+    <details id="sendLogDetails" class="param-debug" style="display:none;">
+      <summary data-pai="send_log_summary">🔧 Ver registro del envío (opcional)</summary>
+      <div class="debug-log-box" id="sendLog"></div>
+    </details>
     <details id="paramConversionLog" class="param-debug" style="display:none;">
       <summary data-pai="debug_summary">🔧 Ver detalle técnico de la conversión de parámetros (solo para depuración)</summary>
       <div class="debug-log-box" id="paramConversionLogBody"></div>
     </details>
   </div>
 
-  <!-- PASO 4: CADENA -->
-  <div class="card locked" id="step5">
-    <h2><span class="step-num">4</span> <span data-pai="step5_title">Cadena de efectos</span></h2>
-    <div id="chainMeta" style="font-size:.84rem;color:#8f9bb5;margin-bottom:8px;"></div>
-    <div id="chainTable" class="chain-cards"></div>
-    <div class="dsp-wrap"><div class="dsp-fill" id="dspFill" style="width:0%"></div></div>
-    <div class="dsp-label" id="dspLabel"></div>
-  </div>
-
-  <!-- PASO 5: ENVIAR -->
-  <div class="card locked" id="step6">
-    <h2><span class="step-num">5</span> <span data-pai="step6_title">Enviar a la pedalera</span></h2>
-    <p class="hint" data-pai="step6_hint">Envía los 7 efectos con sus parámetros al parche actual de la pedalera (en tiempo real). El nombre se guardará junto con el preset en el paso 6.</p>
+  <!-- PASO 4: GUARDAR EN FLASH -->
+  <div class="card locked" id="step7">
+    <h2><span class="step-num">4</span> <span data-pai="step7_title">Guardar en la pedalera y extraer .zptc</span></h2>
+    <p class="hint" data-pai="step7_hint">Escribe el preset de forma permanente en la memoria de la pedalera (slot detectado automáticamente, o indícalo a mano) y descarga el archivo .zptc resultante como copia de seguridad.</p>
     <label data-pai="preset_name_label">Nombre del preset (máx. 10 caracteres)</label>
     <input type="text" id="presetNameInput" maxlength="10" placeholder="EJ: SRV TX" data-pai-ph="preset_name_ph">
-    <div class="btn-row">
-      <button class="btn-primary" id="sendBtn" data-pai="send_btn">📡 Enviar cadena + nombre al parche actual</button>
-    </div>
-    <div class="progress-bar-wrap" id="progressWrap" style="display:none;">
-      <div class="progress-bar" id="progressBar" style="width:0%"></div>
-    </div>
-    <div class="log" id="sendLog" style="display:none;"></div>
-    <div id="sendStatus" class="status" style="display:none;"></div>
-  </div>
-
-  <!-- PASO 6: GUARDAR EN FLASH -->
-  <div class="card locked" id="step7">
-    <h2><span class="step-num">6</span> <span data-pai="step7_title">Guardar en la pedalera y extraer .zptc</span></h2>
-    <p class="hint" data-pai="step7_hint">Escribe el preset de forma permanente en la memoria de la pedalera (slot detectado automáticamente, o indícalo a mano) y descarga el archivo .zptc resultante como copia de seguridad.</p>
     <div class="slot-row">
       <label style="margin:0;" data-pai="slot_detected_label">Slot detectado:</label>
       <span id="slotDetected" style="font-weight:700;color:#6bc9b0;">—</span>
@@ -62256,6 +62236,16 @@ details.param-debug .debug-log-box{background:#080c14;border:1px solid #1a2030;b
     </div>
     <div id="saveStatus" class="status" style="display:none;"></div>
     <div class="log" id="saveLog" style="display:none;"></div>
+  </div>
+
+  <!-- PASO 5: CADENA (solo consulta/referencia, al final) -->
+  <div class="card locked" id="step5">
+    <h2><span class="step-num">5</span> <span data-pai="step5_title">Cadena de efectos</span></h2>
+    <div id="chainSummary" style="font-size:.86rem;color:#c8d4ea;margin-bottom:12px;font-style:italic;"></div>
+    <div id="chainMeta" style="font-size:.84rem;color:#8f9bb5;margin-bottom:8px;"></div>
+    <div id="chainTable" class="chain-cards"></div>
+    <div class="dsp-wrap"><div class="dsp-fill" id="dspFill" style="width:0%"></div></div>
+    <div class="dsp-label" id="dspLabel"></div>
   </div>
 
 </div>
@@ -62282,11 +62272,11 @@ function pt(key) {
 }
 const PAI_I18N = {
   h1: { es: '🎸 G2 Four — Asistente de Presets de Artistas', en: '🎸 G2 Four — Artist Preset Assistant' },
-  sub: { es: 'Puedes preparar el prompt, generar la respuesta de la IA y analizar el JSON (pasos 1-3) sin la pedalera conectada. Solo necesitas la conexión MIDI activa para enviar la cadena (paso 5) y guardar/extraer el .zptc (paso 6).',
-         en: 'You can prepare the prompt, generate the AI response, and analyze the JSON (steps 1-3) without the pedalboard connected. You only need an active MIDI connection to send the chain (step 5) and save/export the .zptc (step 6).' },
+  sub: { es: 'Puedes preparar el prompt, generar la respuesta de la IA y analizar el JSON (pasos 1-3) sin la pedalera conectada. Solo necesitas la conexión MIDI activa para enviar la cadena (paso 4) y guardar/extraer el .zptc (paso 5).',
+         en: 'You can prepare the prompt, generate the AI response, and analyze the JSON (steps 1-3) without the pedalboard connected. You only need an active MIDI connection to send the chain (step 4) and save/export the .zptc (step 5).' },
   step1_title: { es: 'Conexión MIDI', en: 'MIDI connection' },
-  step1_hint: { es: 'Al abrir esta página, Chrome te pedirá permiso MIDI/SysEx automáticamente. Si lo rechazaste o cambiaste de pedalera, usa "Reconectar". Puedes seguir sin conectar hasta que llegues al paso 5 (enviar) o al 6 (guardar/.zptc): ahí sí hace falta la pedalera conectada.',
-              en: 'When you open this page, Chrome will ask for MIDI/SysEx permission automatically. If you declined it or switched pedalboards, use "Reconnect". You can keep going without a connection until you reach step 5 (send) or step 6 (save/.zptc): those do need the pedalboard connected.' },
+  step1_hint: { es: 'Al abrir esta página, Chrome te pedirá permiso MIDI/SysEx automáticamente. Si lo rechazaste o cambiaste de pedalera, usa "Reconectar". Puedes seguir sin conectar hasta que llegues al paso 4 (enviar) o al 5 (guardar/.zptc): ahí sí hace falta la pedalera conectada.',
+              en: 'When you open this page, Chrome will ask for MIDI/SysEx permission automatically. If you declined it or switched pedalboards, use "Reconnect". You can keep going without a connection until you reach step 4 (send) or step 5 (save/.zptc): those do need the pedalboard connected.' },
   midi_requesting: { es: 'Solicitando acceso MIDI…', en: 'Requesting MIDI access…' },
   midi_reconnect: { es: '🔌 Reconectar', en: '🔌 Reconnect' },
   step2_title: { es: 'Prompt para la IA', en: 'Prompt for the AI' },
@@ -62296,19 +62286,18 @@ const PAI_I18N = {
   reset_prompt: { es: '↺ Restaurar prompt por defecto', en: '↺ Reset to default prompt' },
   step3_title: { es: 'Abrir una IA', en: 'Open an AI' },
   step3_hint: { es: 'Pega el prompt copiado en el paso 1 dentro de una de estas IAs y espera el JSON completo.', en: 'Paste the prompt you copied in step 1 into one of these AIs and wait for the full JSON.' },
-  step4_title: { es: 'Pega la respuesta de la IA', en: "Paste the AI's response" },
-  step4_hint: { es: 'Copia el JSON completo que te devolvió la IA (solo el bloque JSON) y pégalo aquí.', en: 'Copy the full JSON the AI returned (just the JSON block) and paste it here.' },
+  step4_title: { es: 'Pega la respuesta de la IA y envíala', en: "Paste the AI's response and send it" },
+  step4_hint: { es: 'Copia el JSON completo que te devolvió la IA (solo el bloque JSON) y pégalo aquí. Al analizarlo, si la pedalera está conectada por MIDI, la cadena se envía automáticamente al parche actual.',
+                en: 'Copy the full JSON the AI returned (just the JSON block) and paste it here. Once analyzed, if the pedalboard is connected via MIDI, the chain is sent automatically to the current patch.' },
   json_placeholder: { es: '{ "artist": "...", "song": "...", "slots": [...] }', en: '{ "artist": "...", "song": "...", "slots": [...] }' },
   paste_btn: { es: '📥 Pegar desde portapapeles', en: '📥 Paste from clipboard' },
-  parse_btn: { es: '🔍 Generar JSON (analizar)', en: '🔍 Generate JSON (analyze)' },
+  parse_btn: { es: '🔍📡 Generar y enviar a la pedalera', en: '🔍📡 Generate and send to the pedalboard' },
   debug_summary: { es: '🔧 Ver detalle técnico de la conversión de parámetros (solo para depuración)', en: '🔧 View technical detail of the parameter conversion (debugging only)' },
+  send_log_summary: { es: '🔧 Ver registro del envío (opcional)', en: '🔧 View the send log (optional)' },
+  send_need_midi_hint: { es: 'Conecta MIDI para enviarla automáticamente a la pedalera.', en: 'Connect MIDI to send it to the pedalboard automatically.' },
   step5_title: { es: 'Cadena de efectos', en: 'Effects chain' },
-  step6_title: { es: 'Enviar a la pedalera', en: 'Send to the pedalboard' },
-  step6_hint: { es: 'Envía los 7 efectos con sus parámetros al parche actual de la pedalera (en tiempo real). El nombre se guardará junto con el preset en el paso 6.',
-                en: 'Sends the 7 effects with their parameters to the pedalboard\'s current patch (in real time). The name will be saved together with the preset in step 6.' },
   preset_name_label: { es: 'Nombre del preset (máx. 10 caracteres)', en: 'Preset name (max. 10 characters)' },
   preset_name_ph: { es: 'EJ: SRV TX', en: 'E.G.: SRV TX' },
-  send_btn: { es: '📡 Enviar cadena + nombre al parche actual', en: '📡 Send chain + name to the current patch' },
   step7_title: { es: 'Guardar en la pedalera y extraer .zptc', en: 'Save to the pedalboard and export .zptc' },
   step7_hint: { es: 'Escribe el preset de forma permanente en la memoria de la pedalera (slot detectado automáticamente, o indícalo a mano) y descarga el archivo .zptc resultante como copia de seguridad.',
                 en: "Permanently writes the preset to the pedalboard's memory (slot auto-detected, or set it manually) and downloads the resulting .zptc file as a backup." },
@@ -62338,19 +62327,19 @@ const PAI_I18N = {
   dsp_over: { es: '❌ supera el límite', en: '❌ exceeds the limit' },
   dsp_ok: { es: '✅ OK', en: '✅ OK' },
   midi_adopted: { es: '✅ Conectado (compartiendo la conexión del editor)', en: '✅ Connected (sharing the editor\'s connection)' },
-  midi_adopted_status: { es: 'Usando la misma conexión MIDI que ya tiene abierta el editor principal. Ya puedes enviar la cadena (paso 5) y guardar/extraer el .zptc (paso 6).',
-                          en: "Using the same MIDI connection the main editor already has open. You can now send the chain (step 5) and save/export the .zptc (step 6)." },
+  midi_adopted_status: { es: 'Usando la misma conexión MIDI que ya tiene abierta el editor principal. Ya puedes enviar la cadena (paso 4) y guardar/extraer el .zptc (paso 5).',
+                          en: "Using the same MIDI connection the main editor already has open. You can now send the chain (step 4) and save/export the .zptc (step 5)." },
   midi_waiting_parent: { es: 'Esperando la conexión del editor principal…', en: 'Waiting for the main editor\'s connection…' },
   midi_waiting_status: { es: 'PresetAI reutiliza automáticamente la conexión MIDI del editor principal en cuanto esté disponible. Si tarda mucho, también puedes pulsar "Reconectar" para que este panel se conecte por su cuenta.',
                           en: 'PresetAI automatically reuses the main editor\'s MIDI connection as soon as it\'s available. If it takes too long, you can also press "Reconnect" so this panel connects on its own.' },
-  midi_connected_status: { es: 'Conectado. Ya puedes enviar la cadena (paso 5) y guardar/extraer el .zptc (paso 6).', en: 'Connected. You can now send the chain (step 5) and save/export the .zptc (step 6).' },
+  midi_connected_status: { es: 'Conectado. Ya puedes enviar la cadena (paso 4) y guardar/extraer el .zptc (paso 5).', en: 'Connected. You can now send the chain (step 4) and save/export the .zptc (step 5).' },
   midi_no_device: { es: '❌ Sin conexión MIDI', en: '❌ No MIDI connection' },
   midi_err_suffix: { es: '— usa Chrome/Edge, conecta la pedalera por USB y pulsa "Reconectar".', en: '— use Chrome/Edge, connect the pedalboard via USB, and press "Reconnect".' },
   no_device_found: { es: 'No se encontró ningún dispositivo MIDI conectado.', en: 'No connected MIDI device was found.' },
   send_pass: { es: 'Pasada', en: 'Pass' },
   send_sent_ok: { es: '✅ Cadena y tempo enviados en vivo al parche actual.', en: '✅ Chain and tempo sent live to the current patch.' },
   send_status_ok_prefix: { es: '✅ Cadena enviada. El nombre', en: '✅ Chain sent. The name' },
-  send_status_ok_suffix: { es: 'se grabará en el paso 6 al guardar en flash.', en: 'will be recorded in step 6 when saved to flash.' },
+  send_status_ok_suffix: { es: 'se grabará en el paso 5 al guardar en flash.', en: 'will be recorded in step 5 when saved to flash.' },
   send_err_prefix: { es: '❌ Error:', en: '❌ Error:' },
   send_err_status_prefix: { es: '❌ Error enviando:', en: '❌ Error sending:' },
   save_need_midi: { es: '⚠ No hay conexión MIDI. Cierra y vuelve a abrir este panel, o conecta la pedalera desde el editor.', en: '⚠ No MIDI connection. Close and reopen this panel, or connect the pedalboard from the editor.' },
@@ -63245,8 +63234,9 @@ function convertPercentParamsToReal(data) {
 
 let parsedJSON = null;
 
-document.getElementById('parseBtn').addEventListener('click', () => {
+document.getElementById('parseBtn').addEventListener('click', async () => {
   const raw = document.getElementById('jsonInput').value.trim();
+  const btn = document.getElementById('parseBtn');
   try {
     let text = raw.replace(/^```json\s*/i,'').replace(/^```\s*/,'').replace(/\s*```$/,'').trim();
     const firstBrace = text.indexOf('{');
@@ -63264,10 +63254,9 @@ document.getElementById('parseBtn').addEventListener('click', () => {
     const { conversions, anomalies } = convertPercentParamsToReal(data);
     parsedJSON = data;
     renderChain(data);
-    unlock('step5'); unlock('step6');
+    unlock('step5');
     const nameInput = document.getElementById('presetNameInput');
     nameInput.value = ((data.artist||'').slice(0,6) + (data.song||'').slice(0,4)).toUpperCase().trim();
-    updateSendEnabled();
 
     // Log técnico de la conversión %→valor real: útil para depurar, pero no
     // para el uso normal de la herramienta, así que va en un <details> cerrado.
@@ -63290,16 +63279,24 @@ document.getElementById('parseBtn').addEventListener('click', () => {
     } else {
       setStatus('parseStatus', 'ok', baseMsg);
     }
+
+    // Envío automático a la pedalera, si ya hay conexión MIDI activa.
+    if (midiOut && midiIn) {
+      btn.disabled = true;
+      try { await sendChainToPedal(data); } finally { btn.disabled = false; }
+    } else {
+      setStatus('parseStatus', 'warn', `${baseMsg} ⚠ ${pt('send_need_midi_hint')}`);
+    }
   } catch(e) {
     parsedJSON = null;
     document.getElementById('step5').classList.add('locked');
-    document.getElementById('step6').classList.add('locked');
     document.getElementById('paramConversionLog').style.display = 'none';
     setStatus('parseStatus', 'err', `${pt('parse_err_prefix')} ` + e.message);
   }
 });
 
 function renderChain(data) {
+  document.getElementById('chainSummary').textContent = data.summary || '';
   document.getElementById('chainMeta').textContent =
     `${data.artist||'?'} · ${data.song||'?'} · ${data.guitarist||''} · ${pt('chain_tempo')} ${data.tempo||'?'} ${pt('chain_bpm')} · ${pt('chain_dsp_total')} ${data.totalDSP||'?'}%`;
   let html = '';
@@ -63388,7 +63385,6 @@ function tryAdoptParentMIDI() {
       dot.className = 'dot on';
       document.getElementById('midiLabel').textContent = pt('midi_adopted');
       setStatus('midiStatus', 'ok', pt('midi_adopted_status'));
-      updateSendEnabled();
       if (!_parentMIDIAdopted) {
         _parentMIDIAdopted = true;
         midiOut.send([0xF0,0x52,0x00,0x6E,0x50,0xF7]); // edit enable
@@ -63438,7 +63434,6 @@ async function requestMIDIIndependent() {
     dot.className = 'dot on';
     document.getElementById('midiLabel').textContent = '✅ ' + (out.name || 'Zoom G2 Four');
     setStatus('midiStatus', 'ok', pt('midi_connected_status'));
-    updateSendEnabled(); // por si el JSON ya se había analizado antes de conectar
     midiOut.send([0xF0,0x52,0x00,0x6E,0x50,0xF7]); // edit enable
     setTimeout(() => midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x13,0x00,0xF7]), 200); // pide patch activo
     detectProtocol().catch(()=>{});
@@ -63501,8 +63496,18 @@ async function detectProtocol() {
   if (r1) { g2Protocol='v1'; g2NumPatches=r1[5]+(r1[6]<<7); g2PatchLength=r1.length>8?(r1[7]+(r1[8]<<7)):-1; g2PatchesPerBank=-1; }
 }
 
-function updateSendEnabled() {
-  document.getElementById('sendBtn').disabled = !(midiOut && parsedJSON);
+function sendLogClear() {
+  const el = document.getElementById('sendLog');
+  const details = document.getElementById('sendLogDetails');
+  el.textContent = '';
+  details.style.display = 'none';
+  details.open = false;
+}
+function sendLogAppend(msg) {
+  const el = document.getElementById('sendLog');
+  const details = document.getElementById('sendLogDetails');
+  details.style.display = 'block';
+  el.textContent += (el.textContent ? '\n' : '') + msg;
 }
 
 // ================================================================
@@ -63522,19 +63527,15 @@ function toggleSlot(slot, enable) {
 }
 function syncPatch() { midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x13,0x00,0xF7]); }
 
-document.getElementById('sendBtn').addEventListener('click', async () => {
-  if (!midiOut || !parsedJSON) return;
-  const btn = document.getElementById('sendBtn');
-  btn.disabled = true;
-  document.getElementById('sendStatus').style.display='none';
-  clearLog('sendLog');
+async function sendChainToPedal(data) {
+  sendLogClear();
   document.getElementById('progressWrap').style.display='block';
-  const slots = parsedJSON.slots;
+  const slots = data.slots;
   const TOTAL_PASSES = 2; // Se envía la cadena completa 2 veces seguidas para que la G2 Four
                           // asiente bien todos los parámetros (a veces la 1ª pasada no los aplica todos).
   try {
     for (let pass=1; pass<=TOTAL_PASSES; pass++) {
-      log('sendLog', `— ${pt('send_pass')} ${pass}/${TOTAL_PASSES} —`);
+      sendLogAppend(`${pt('send_pass')} ${pass}/${TOTAL_PASSES}…`);
       for (let i=0;i<slots.length;i++) {
         const s = slots[i];
         const id = parseInt(s.effectId,16)>>>0;
@@ -63542,7 +63543,6 @@ document.getElementById('sendBtn').addEventListener('click', async () => {
         const overallIndex = (pass-1)*slots.length + i;
         const overallTotal = TOTAL_PASSES*slots.length;
         document.getElementById('progressBar').style.width = Math.round((overallIndex/overallTotal)*100)+'%';
-        log('sendLog', `⬡ Slot ${(s.slot??i)+1} [${s.role||''}] → ${s.effectName||s.effectId} (${s.enabled?'ON':'OFF'})`);
         changeEffectType(i, id);
         await sleep(120);
         for (let p=0;p<paramNames.length;p++) {
@@ -63551,28 +63551,25 @@ document.getElementById('sendBtn').addEventListener('click', async () => {
         }
         toggleSlot(i, !!s.enabled);
         await sleep(60);
-        log('sendLog', `  ✓ ${paramNames.map(n=>`${n}=${s.params[n]}`).join(', ')}`);
       }
       if (pass < TOTAL_PASSES) await sleep(200);
     }
     document.getElementById('progressBar').style.width='100%';
     await sleep(150);
     syncPatch();
-    if (parsedJSON.tempo) {
-      const bpm = Math.max(40, Math.min(250, parsedJSON.tempo|0));
+    if (data.tempo) {
+      const bpm = Math.max(40, Math.min(250, data.tempo|0));
       midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x20,0x00,0x64,0x02, bpm&0x7F, (bpm>>7)&0x7F, 0,0,0,0xF7]);
     }
-    log('sendLog', pt('send_sent_ok'));
-    setStatus('sendStatus', 'ok', `${pt('send_status_ok_prefix')} "`+document.getElementById('presetNameInput').value+`" ${pt('send_status_ok_suffix')}`);
+    sendLogAppend(pt('send_sent_ok'));
+    setStatus('parseStatus', 'ok', `${pt('send_status_ok_prefix')} "`+document.getElementById('presetNameInput').value+`" ${pt('send_status_ok_suffix')}`);
     unlock('step7');
     updateSlotDisplay();
   } catch(e) {
-    log('sendLog', `${pt('send_err_prefix')} ` + e.message);
-    setStatus('sendStatus', 'err', `${pt('send_err_status_prefix')} ` + e.message);
-  } finally {
-    btn.disabled = false;
+    sendLogAppend(`${pt('send_err_prefix')} ` + e.message);
+    setStatus('parseStatus', 'err', `${pt('send_err_status_prefix')} ` + e.message);
   }
-});
+}
 
 // ================================================================
 // PASO 7: escritura directa a flash + descarga .zptc
