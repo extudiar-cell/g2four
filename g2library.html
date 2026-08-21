@@ -399,6 +399,28 @@ function jsdelivrCdnUrl(owner, repo, branch, path) {
   const encodedPath = cleanPath.split('/').map(encodeURIComponent).join('/');
   return `https://cdn.jsdelivr.net/gh/${owner}/${repo}@${branch}/${encodedPath}`;
 }
+function rawGithubUrl(owner, repo, branch, path) {
+  const cleanPath = path.replace(/^\/+/, '');
+  const encodedPath = cleanPath.split('/').map(encodeURIComponent).join('/');
+  return `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${encodedPath}`;
+}
+// Descarga los bytes probando primero raw.githubusercontent.com (siempre al día,
+// sin caché de terceros) y, si por lo que sea fallara, cae en jsDelivr como
+// alternativa. Evita el 404 típico de jsDelivr con archivos recién subidos,
+// cuyo CDN de descarga tarda más en "resolver" el archivo que su listado.
+async function fetchFileBytes(owner, repo, branch, path) {
+  const urls = [rawGithubUrl(owner, repo, branch, path), jsdelivrCdnUrl(owner, repo, branch, path)];
+  let lastErr = null;
+  for (const url of urls) {
+    logAppend(`GET ${url}`);
+    try {
+      const resp = await fetch(url, { cache: 'no-store' });
+      if (resp.ok) return new Uint8Array(await resp.arrayBuffer());
+      lastErr = new Error(`HTTP ${resp.status}`);
+    } catch (e) { lastErr = e; }
+  }
+  throw new Error(`No se pudo descargar el archivo (${lastErr ? lastErr.message : 'error desconocido'}).`);
+}
 
 // El API de listado de jsDelivr devuelve un árbol anidado de carpetas/archivos;
 // lo aplanamos a una lista simple de rutas completas.
@@ -533,12 +555,8 @@ async function loadFileToSlot(fileEntry, nodeEl) {
   try {
     const cfg = loadCfg();
     const branch = cfg.branch || 'main';
-    const url = jsdelivrCdnUrl(cfg.owner, cfg.repo, branch, fileEntry.path);
     setStatus('loadStatus', 'info', `⏳ Descargando "${fileEntry.path}"…`);
-    logAppend(`GET ${url}`);
-    const resp = await fetch(url, { cache: 'no-store' });
-    if (!resp.ok) throw new Error(`No se pudo descargar el archivo (HTTP ${resp.status}).`);
-    const buf = new Uint8Array(await resp.arrayBuffer());
+    const buf = await fetchFileBytes(cfg.owner, cfg.repo, branch, fileEntry.path);
     if (buf.length < 12 || buf[0]!==0x50 || buf[1]!==0x54 || buf[2]!==0x43 || buf[3]!==0x46) {
       throw new Error('El archivo no parece un .zptc válido (falta cabecera PTCF).');
     }
@@ -580,7 +598,7 @@ document.getElementById('cfgLoadBtn').addEventListener('click', () => {
 });
 
 initCfgInputs();
-/// La lista se carga sola al abrir la página, con el repo por defecto
+// La lista se carga sola al abrir la página, con el repo por defecto
 // (o el que hayas guardado manualmente si lo cambiaste alguna vez).
 fetchLibraryList();
 </script>
