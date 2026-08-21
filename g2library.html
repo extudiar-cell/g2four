@@ -71,6 +71,11 @@
   .file-status { font-size: 1.1rem; width: 22px; text-align: center; }
   .empty-msg { color: #6f7fa3; font-size: .86rem; padding: 20px; text-align: center; }
   .folder-path { font-size: .78rem; color: #6f7fa3; margin-bottom: 8px; }
+  .folder-group-header {
+    font-size: .82rem; font-weight: 700; color: #9fb0d0; margin: 14px 0 4px;
+    padding-bottom: 4px; border-bottom: 1px solid #232d47;
+  }
+  .folder-group-header:first-child { margin-top: 0; }
   a.jsdelivr-link { color: #6bc9b0; }
 </style>
 </head>
@@ -388,7 +393,11 @@ async function writeRawPatchToSlot(patchBytes, slot) {
 let libraryFiles = []; // [{ path, name, size }]
 
 function jsdelivrCdnUrl(owner, repo, branch, path) {
-  return `https://cdn.jsdelivr.net/gh/${owner}/${repo}@${branch}/${path.replace(/^\/+/, '')}`;
+  // Cada segmento de la ruta se codifica por separado (para espacios, tildes,
+  // paréntesis, etc.) sin tocar las barras "/" que separan carpetas.
+  const cleanPath = path.replace(/^\/+/, '');
+  const encodedPath = cleanPath.split('/').map(encodeURIComponent).join('/');
+  return `https://cdn.jsdelivr.net/gh/${owner}/${repo}@${branch}/${encodedPath}`;
 }
 
 // El API de listado de jsDelivr devuelve un árbol anidado de carpetas/archivos;
@@ -444,20 +453,49 @@ function renderFileGrid(filterText) {
     grid.innerHTML = `<div class="empty-msg">${libraryFiles.length===0 ? 'No hay archivos .zptc en este repositorio/carpeta.' : 'Sin resultados para esa búsqueda.'}</div>`;
     return;
   }
-  grid.innerHTML = '';
+
+  // Agrupa por subcarpeta relativa a la carpeta base configurada (ej. "presets"),
+  // para que blues/, rock/, propios/... se vean como bloques separados.
+  const cfg = loadCfg();
+  const base = (cfg.folder || '').replace(/^\/+|\/+$/g, '');
+  const groups = new Map();
   for (const f of list) {
-    const displayName = f.path.split('/').pop().replace(/\.zptc$/i, '');
-    const el = document.createElement('div');
-    el.className = 'file-item';
-    el.innerHTML = `
-      <span class="file-icon">🎸</span>
-      <div class="file-info">
-        <div class="file-name">${escapeHtml(displayName)}</div>
-        <div class="file-path">${escapeHtml(f.path)} · ${fmtBytes(f.size)}</div>
-      </div>
-      <span class="file-status"></span>`;
-    el.addEventListener('click', () => loadFileToSlot(f, el));
-    grid.appendChild(el);
+    let rel = f.path;
+    if (base && rel.startsWith(base + '/')) rel = rel.slice(base.length + 1);
+    const parts = rel.split('/');
+    const groupLabel = parts.length > 1 ? parts.slice(0, -1).join('/') : '(sin carpeta)';
+    if (!groups.has(groupLabel)) groups.set(groupLabel, []);
+    groups.get(groupLabel).push(f);
+  }
+  const sortedGroupNames = Array.from(groups.keys()).sort((a, b) => {
+    if (a === '(sin carpeta)') return -1;
+    if (b === '(sin carpeta)') return 1;
+    return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+  });
+
+  grid.innerHTML = '';
+  for (const groupName of sortedGroupNames) {
+    const files = groups.get(groupName);
+    if (sortedGroupNames.length > 1) {
+      const header = document.createElement('div');
+      header.className = 'folder-group-header';
+      header.textContent = `📁 ${groupName === '(sin carpeta)' ? 'Sin carpeta' : groupName} (${files.length})`;
+      grid.appendChild(header);
+    }
+    for (const f of files) {
+      const displayName = f.path.split('/').pop().replace(/\.zptc$/i, '');
+      const el = document.createElement('div');
+      el.className = 'file-item';
+      el.innerHTML = `
+        <span class="file-icon">🎸</span>
+        <div class="file-info">
+          <div class="file-name">${escapeHtml(displayName)}</div>
+          <div class="file-path">${escapeHtml(f.path)} · ${fmtBytes(f.size)}</div>
+        </div>
+        <span class="file-status"></span>`;
+      el.addEventListener('click', () => loadFileToSlot(f, el));
+      grid.appendChild(el);
+    }
   }
 }
 
