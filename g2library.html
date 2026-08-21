@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>G2 Four — Librería Web de Presets (.zptc)</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0a0e18; color: #dbe4f5; min-height: 100vh;
+  }
+  header {
+    padding: 18px 20px 14px; border-bottom: 1px solid #1e2740; background: #0d1220;
+    position: sticky; top: 0; z-index: 10;
+  }
+  h1 { margin: 0 0 4px; font-size: 1.25rem; }
+  .sub { margin: 0; color: #8f9bb5; font-size: .86rem; }
+  main { max-width: 980px; margin: 0 auto; padding: 18px 16px 60px; }
+  .card {
+    background: #141a28; border: 1px solid #232d47; border-radius: 12px;
+    padding: 16px 18px; margin-bottom: 16px;
+  }
+  .card h2 { margin: 0 0 10px; font-size: 1.02rem; display: flex; align-items: center; gap: 8px; }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  label { display: block; font-size: .8rem; color: #9fb0d0; margin: 8px 0 4px; }
+  input[type=text], input[type=number] {
+    background: #0d1220; border: 1px solid #2a3454; color: #dbe4f5;
+    border-radius: 8px; padding: 8px 10px; font-size: .88rem; width: 100%;
+  }
+  input[type=checkbox] { width: 16px; height: 16px; accent-color: #6bc9b0; }
+  .btn {
+    background: #1c2540; border: 1px solid #33406b; color: #dbe4f5;
+    border-radius: 8px; padding: 9px 14px; font-size: .86rem; cursor: pointer;
+  }
+  .btn:hover { background: #24304f; }
+  .btn.primary { background: #1a6b57; border-color: #238f74; color: #fff; }
+  .btn.primary:hover { background: #1f8068; }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; background: #555; }
+  .dot.pending { background: #d9a441; }
+  .dot.on { background: #4fd18b; }
+  .status {
+    margin-top: 10px; padding: 8px 12px; border-radius: 8px; font-size: .84rem; display: none;
+  }
+  .status.info { display: block; background: #16213a; color: #9fc4ff; }
+  .status.ok { display: block; background: #123626; color: #6bc9b0; }
+  .status.warn { display: block; background: #3a2f14; color: #e8c468; }
+  .status.err { display: block; background: #3a1620; color: #ff8fa3; }
+  details.debug { margin-top: 10px; }
+  details.debug summary { cursor: pointer; color: #8f9bb5; font-size: .8rem; }
+  .debug-log-box {
+    margin-top: 6px; background: #0a0e18; border: 1px solid #232d47; border-radius: 8px;
+    padding: 8px 10px; font-family: ui-monospace, monospace; font-size: .76rem;
+    white-space: pre-wrap; max-height: 180px; overflow-y: auto; color: #9fb0d0;
+  }
+  .search-bar { margin-bottom: 12px; }
+  .file-grid { display: grid; grid-template-columns: 1fr; gap: 8px; }
+  .file-item {
+    display: flex; align-items: center; gap: 10px; background: #0d1220;
+    border: 1px solid #232d47; border-radius: 10px; padding: 10px 12px; cursor: pointer;
+  }
+  .file-item:hover { border-color: #6bc9b0; }
+  .file-item.loading { opacity: .6; pointer-events: none; }
+  .file-item.done { border-color: #4fd18b; }
+  .file-item.failed { border-color: #ff5c72; }
+  .file-icon { font-size: 1.3rem; }
+  .file-info { flex: 1; min-width: 0; }
+  .file-name { font-weight: 600; font-size: .9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .file-path { font-size: .74rem; color: #6f7fa3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .file-status { font-size: 1.1rem; width: 22px; text-align: center; }
+  .empty-msg { color: #6f7fa3; font-size: .86rem; padding: 20px; text-align: center; }
+  .folder-path { font-size: .78rem; color: #6f7fa3; margin-bottom: 8px; }
+  a.jsdelivr-link { color: #6bc9b0; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎸 G2 Four — Librería Web de Presets</h1>
+  <p class="sub">Pincha un archivo .zptc de la lista y se carga directamente en el slot activo de la pedalera. Los archivos se leen de un repositorio de GitHub a través de jsDelivr — gratis, sin backend propio.</p>
+</header>
+
+<main>
+
+  <!-- MIDI -->
+  <div class="card">
+    <h2><span class="dot" id="midiDot"></span> Conexión MIDI</h2>
+    <div class="row">
+      <span id="midiLabel">Conectando…</span>
+      <button class="btn" id="midiReconnectBtn">🔄 Reconectar</button>
+    </div>
+    <div id="midiStatus" class="status"></div>
+  </div>
+
+  <!-- CONFIGURACIÓN DEL REPOSITORIO -->
+  <div class="card">
+    <h2>⚙️ Repositorio de GitHub</h2>
+    <div class="row" style="gap:14px;">
+      <div style="flex:1; min-width:140px;">
+        <label>Usuario / organización</label>
+        <input type="text" id="cfgOwner" placeholder="ej: extudiar">
+      </div>
+      <div style="flex:1; min-width:140px;">
+        <label>Repositorio</label>
+        <input type="text" id="cfgRepo" placeholder="ej: g2four-presets">
+      </div>
+      <div style="flex:1; min-width:100px;">
+        <label>Rama</label>
+        <input type="text" id="cfgBranch" placeholder="main" value="main">
+      </div>
+      <div style="flex:1; min-width:140px;">
+        <label>Carpeta (opcional)</label>
+        <input type="text" id="cfgFolder" placeholder="presets">
+      </div>
+    </div>
+    <div class="row" style="margin-top:12px;">
+      <button class="btn primary" id="cfgLoadBtn">💾 Guardar y cargar lista</button>
+      <span style="font-size:.78rem;color:#6f7fa3;">La configuración se guarda en este navegador (localStorage).</span>
+    </div>
+    <div id="cfgStatus" class="status"></div>
+  </div>
+
+  <!-- SLOT DESTINO -->
+  <div class="card">
+    <h2>🎯 Slot destino</h2>
+    <div class="row">
+      <span>Slot activo detectado: <strong id="slotDetected" style="color:#6bc9b0;">—</strong></span>
+      <label style="display:flex;align-items:center;gap:6px;margin:0;">
+        <input type="checkbox" id="manualSlotToggle"> Forzar slot manual
+      </label>
+      <input type="number" id="manualSlotInput" min="1" max="300" placeholder="1-300" style="width:90px;" disabled>
+    </div>
+  </div>
+
+  <!-- LISTA DE ARCHIVOS -->
+  <div class="card">
+    <h2>🗂️ Presets disponibles</h2>
+    <div class="folder-path" id="folderPathLabel"></div>
+    <input type="text" id="searchInput" class="search-bar" placeholder="🔍 Buscar por nombre…">
+    <div id="fileGrid" class="file-grid">
+      <div class="empty-msg">Configura el repositorio arriba y pulsa "Guardar y cargar lista".</div>
+    </div>
+    <div id="loadStatus" class="status"></div>
+    <details class="debug" id="logDetails" style="display:none;">
+      <summary>🔧 Ver registro técnico (opcional)</summary>
+      <div class="debug-log-box" id="logBox"></div>
+    </details>
+  </div>
+
+</main>
+
+<script>
+// ================================================================
+// CONFIGURACIÓN PERSISTENTE (localStorage)
+// ================================================================
+const CFG_KEY = 'g2four_web_library_cfg';
+function loadCfg() {
+  try { return JSON.parse(localStorage.getItem(CFG_KEY)) || {}; } catch(e) { return {}; }
+}
+function saveCfg(cfg) { localStorage.setItem(CFG_KEY, JSON.stringify(cfg)); }
+
+function initCfgInputs() {
+  const cfg = loadCfg();
+  document.getElementById('cfgOwner').value = cfg.owner || '';
+  document.getElementById('cfgRepo').value = cfg.repo || '';
+  document.getElementById('cfgBranch').value = cfg.branch || 'main';
+  document.getElementById('cfgFolder').value = cfg.folder || '';
+}
+
+// ================================================================
+// UI helpers
+// ================================================================
+function setStatus(elId, type, msg) {
+  const el = document.getElementById(elId);
+  el.className = 'status ' + type;
+  el.textContent = msg;
+}
+function logClear() {
+  document.getElementById('logBox').textContent = '';
+  document.getElementById('logDetails').style.display = 'none';
+  document.getElementById('logDetails').open = false;
+}
+function logAppend(msg) {
+  const box = document.getElementById('logBox');
+  document.getElementById('logDetails').style.display = 'block';
+  box.textContent += (box.textContent ? '\n' : '') + msg;
+}
+function escapeHtml(str) {
+  return String(str ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function fmtBytes(n) {
+  if (n < 1024) return n + ' B';
+  if (n < 1024*1024) return (n/1024).toFixed(1) + ' KB';
+  return (n/1024/1024).toFixed(2) + ' MB';
+}
+
+// ================================================================
+// MIDI — conexión independiente (esta página vive fuera del editor)
+// ================================================================
+let midiAccess = null, midiOut = null, midiIn = null;
+let currentPresetSlot = -1;
+let g2Protocol = 'v2', g2PatchesPerBank = 10, g2NumPatches = 300, g2PatchLength = -1;
+window._g2PCIgnore = false;
+
+async function connectMIDI() {
+  const dot = document.getElementById('midiDot');
+  dot.className = 'dot pending';
+  document.getElementById('midiLabel').textContent = 'Solicitando acceso MIDI…';
+  try {
+    if (!navigator.requestMIDIAccess) throw new Error('Este navegador no soporta Web MIDI (usa Chrome o Edge de escritorio, y HTTPS).');
+    midiAccess = await navigator.requestMIDIAccess({ sysex: true });
+    let out = null, inp = null;
+    for (const [, p] of midiAccess.outputs) if (p.name && /g2|zoom/i.test(p.name)) { out = p; break; }
+    for (const [, p] of midiAccess.inputs) if (p.name && /g2|zoom/i.test(p.name)) { inp = p; break; }
+    if (!out) out = midiAccess.outputs.values().next().value;
+    if (!inp) inp = midiAccess.inputs.values().next().value;
+    if (!out || !inp) throw new Error('No se encontró ningún dispositivo MIDI conectado.');
+    midiOut = out; midiIn = inp;
+    midiIn.addEventListener('midimessage', onMidiMessage);
+    dot.className = 'dot on';
+    document.getElementById('midiLabel').textContent = '✅ ' + (out.name || 'Zoom G2 Four');
+    setStatus('midiStatus', 'ok', 'Conectado. Ya puedes cargar presets de la lista.');
+    midiOut.send([0xF0,0x52,0x00,0x6E,0x50,0xF7]); // edit enable
+    setTimeout(() => midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x13,0x00,0xF7]), 200); // pide patch activo
+    detectProtocol().catch(()=>{});
+  } catch (e) {
+    dot.className = 'dot';
+    document.getElementById('midiLabel').textContent = 'Sin conexión';
+    setStatus('midiStatus', 'err', '❌ ' + e.message);
+  }
+}
+document.getElementById('midiReconnectBtn').addEventListener('click', connectMIDI);
+window.addEventListener('DOMContentLoaded', connectMIDI);
+
+function onMidiMessage(msg) {
+  const data = msg.data;
+  if (data.length>=3 && (data[0]&0xF0)===0xB0) {
+    if (data[1]===0) window._g2BankMSB = data[2];
+    if (data[1]===32) window._g2BankLSB = data[2];
+    return;
+  }
+  if (data.length>=2 && (data[0]&0xF0)===0xC0 && !window._g2PCIgnore) {
+    const prog = data[1] & 0x7F;
+    const bankMSB = window._g2BankMSB ?? 0, bankLSB = window._g2BankLSB ?? 0;
+    const bank = (bankMSB<<7)|bankLSB;
+    if (g2PatchesPerBank>0) { currentPresetSlot = bank*g2PatchesPerBank + prog; updateSlotDisplay(); }
+    return;
+  }
+  if (data[0]===0xF0 && data[1]===0x52 && data[2]===0x00 && data[3]===0x6E && data[4]===0x64 && data[5]===0x26 && data.length>=12) {
+    const bank = data[8] + (data[9]<<7), prog = data[10] + (data[11]<<7);
+    if (g2PatchesPerBank>0) { currentPresetSlot = bank*g2PatchesPerBank + prog; updateSlotDisplay(); }
+    return;
+  }
+}
+function updateSlotDisplay() {
+  document.getElementById('slotDetected').textContent = currentPresetSlot>=0 ? String(currentPresetSlot+1) : '—';
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+function fmWaitSysex(matchFn, timeoutMs) {
+  return new Promise(resolve => {
+    let done = false;
+    const t = setTimeout(() => { if (!done) { done=true; midiIn.removeEventListener('midimessage', h); resolve(null); } }, timeoutMs);
+    function h(msg) { if (!done && matchFn(msg.data)) { done=true; clearTimeout(t); midiIn.removeEventListener('midimessage', h); resolve(msg.data); } }
+    midiIn.addEventListener('midimessage', h);
+  });
+}
+async function detectProtocol() {
+  if (!midiOut || !midiIn) return;
+  midiOut.send([0xF0,0x52,0x00,0x6E,0x44,0xF7]);
+  const r2 = await fmWaitSysex(d=>d.length>13&&d[0]===0xF0&&d[1]===0x52&&d[2]===0x00&&d[3]===0x6E&&d[4]===0x43, 600);
+  if (r2) { g2Protocol='v2'; g2NumPatches=r2[5]+(r2[6]<<7); g2PatchLength=r2[7]+(r2[8]<<7); g2PatchesPerBank=r2[11]+(r2[12]<<7); return; }
+  midiOut.send([0xF0,0x52,0x00,0x6E,0x07,0xF7]);
+  const r1 = await fmWaitSysex(d=>d.length>5&&d[0]===0xF0&&d[1]===0x52&&d[2]===0x00&&d[3]===0x6E&&d[4]===0x06, 600);
+  if (r1) { g2Protocol='v1'; g2NumPatches=r1[5]+(r1[6]<<7); g2PatchLength=r1.length>8?(r1[7]+(r1[8]<<7)):-1; g2PatchesPerBank=-1; }
+}
+
+// ================================================================
+// PTCF / SysEx — codificación 7-bit, CRC32, escritura directa a flash
+// (idéntico mecanismo 0x45 validado en el editor completo)
+// ================================================================
+function readI32LE(d,o){ return (d[o]|(d[o+1]<<8)|(d[o+2]<<16)|(d[o+3]<<24))>>>0; }
+function eight2seven(d,start,end){
+  if(start===undefined) start=0;
+  if(end===undefined) end=d.length-1;
+  const out=new Uint8Array((end-start+1)+Math.ceil((end-start+1)/7));
+  let i=start,o=0,s=0,c=0;
+  for(;i<=end;){
+    s=(i-start)%7;
+    if(s===0) c=o++;
+    const a=d[i];
+    out[c]|=(a&0x80)>>(s+1);
+    out[o]=a&0x7F;
+    o++; i++;
+  }
+  return out.slice(0,o);
+}
+let _crcTable=null;
+function crc32(data){
+  if(!_crcTable){ _crcTable=new Uint32Array(256);
+    for(let i=0;i<256;i++){ let c=i; for(let k=0;k<8;k++) c=(c&1)?(0xEDB88320^(c>>>1)):(c>>>1); _crcTable[i]=c>>>0; } }
+  let crc=0^(-1);
+  for(let i=0;i<data.length;i++) crc=(crc>>>8)^_crcTable[(crc^data[i])&0xFF];
+  return ((crc^(-1))>>>0);
+}
+function getSevenBitCRC(data){
+  let crc = crc32(data) ^ 0xFFFFFFFF; crc = crc>>>0;
+  return new Uint8Array([crc&0x7F,(crc>>>7)&0x7F,(crc>>>14)&0x7F,(crc>>>21)&0x7F,(crc>>>28)&0x0F]);
+}
+function extractPatchName(eight) {
+  let ptcfOff=-1;
+  for (let i=0;i<eight.length-3;i++) if (eight[i]===0x50&&eight[i+1]===0x54&&eight[i+2]===0x43&&eight[i+3]===0x46) { ptcfOff=i; break; }
+  if (ptcfOff<0) return 'preset';
+  const numEffects = readI32LE(eight, ptcfOff+12);
+  let off = ptcfOff+36+numEffects*4;
+  while (off+8<=eight.length) {
+    const id = String.fromCharCode(eight[off],eight[off+1],eight[off+2],eight[off+3]);
+    const len = readI32LE(eight, off+4);
+    if (len<0||off+8+len>eight.length) break;
+    if (id==='NAME') { let n=''; for(let b=0;b<len;b++){ if(eight[off+8+b]===0) break; n+=String.fromCharCode(eight[off+8+b]); } return n.trim()||'preset'; }
+    off += 8+len;
+  }
+  return 'preset';
+}
+
+async function writeRawPatchToSlot(patchBytes, slot) {
+  logAppend(`Detectando configuración de bancos…`);
+  await detectProtocol();
+  const ppb = (g2Protocol==='v2' && g2PatchesPerBank>0) ? g2PatchesPerBank : 10;
+  const bank = Math.floor(slot/ppb), prog = slot%ppb;
+  let patchData = patchBytes;
+  if (g2PatchLength>0) {
+    if (patchData.length>g2PatchLength) throw new Error(`El patch (${patchData.length}B) es más grande que el máximo aceptado por la pedalera (${g2PatchLength}B).`);
+    if (patchData.length<g2PatchLength) { const p=new Uint8Array(g2PatchLength); p.set(patchData); patchData=p; }
+  }
+  const len = patchData.length;
+  const sevenData = eight2seven(patchData);
+  const crc = getSevenBitCRC(patchData);
+  const header = [0xF0,0x52,0x00,0x6E,0x45,0x00,0x00, bank&0x7F,(bank>>7)&0x7F, prog&0x7F,(prog>>7)&0x7F, len&0x7F,(len>>7)&0x7F];
+  const msg = new Uint8Array(header.length+sevenData.length+crc.length+1);
+  msg.set(header,0); msg.set(sevenData,header.length); msg.set(crc,header.length+sevenData.length);
+  msg[msg.length-1]=0xF7;
+  logAppend(`Slot destino ${slot+1} → banco ${bank}, prog ${prog} (ppb=${ppb})`);
+  logAppend(`PTCF=${len}B, SysEx total=${msg.length}B`);
+  const replyPromise = fmWaitSysex(d=>d.length>=6&&d[0]===0xF0&&d[1]===0x52&&d[2]===0x00&&d[3]===0x6E&&d[4]===0x00&&d[5]===0x00, 4000);
+  window._g2PCIgnore = true;
+  midiOut.send(Array.from(msg));
+  const reply = await replyPromise;
+  window._g2PCIgnore = false;
+  if (!reply) throw new Error('Sin confirmación (00 00) de la pedalera tras la escritura en memoria.');
+  logAppend('Respuesta de éxito recibida (00 00).');
+  // Refresca el buffer activo yendo a un slot vecino y volviendo (truco de refresco).
+  const neighbor = slot<299 ? slot+1 : slot-1;
+  if (ppb>0) {
+    const nb=Math.floor(neighbor/ppb), np=neighbor%ppb;
+    midiOut.send([0xB0,0x00,(nb>>7)&0x7F]); midiOut.send([0xB0,0x20,nb&0x7F]); midiOut.send([0xC0,np&0x7F]);
+    await sleep(250);
+    midiOut.send([0xB0,0x00,(bank>>7)&0x7F]); midiOut.send([0xB0,0x20,bank&0x7F]); midiOut.send([0xC0,prog&0x7F]);
+  } else {
+    midiOut.send([0xC0, neighbor&0x7F]); await sleep(250); midiOut.send([0xC0, slot&0x7F]);
+  }
+  await sleep(250);
+  return patchData;
+}
+
+// ================================================================
+// LIBRERÍA — listado vía jsDelivr (repo de GitHub) + carga directa
+// ================================================================
+let libraryFiles = []; // [{ path, name, size }]
+
+function jsdelivrCdnUrl(owner, repo, branch, path) {
+  return `https://cdn.jsdelivr.net/gh/${owner}/${repo}@${branch}/${path.replace(/^\/+/, '')}`;
+}
+
+// El API de listado de jsDelivr devuelve un árbol anidado de carpetas/archivos;
+// lo aplanamos a una lista simple de rutas completas.
+function flattenJsdelivrTree(entries, prefix, out) {
+  for (const e of entries) {
+    const p = prefix + '/' + e.name.replace(/^\/+/, '');
+    if (e.type === 'directory' && Array.isArray(e.files)) {
+      flattenJsdelivrTree(e.files, p, out);
+    } else if (e.type === 'file') {
+      out.push({ path: p.replace(/^\/+/, ''), size: e.size || 0 });
+    }
+  }
+}
+
+async function fetchLibraryList() {
+  const cfg = loadCfg();
+  if (!cfg.owner || !cfg.repo) {
+    setStatus('cfgStatus', 'warn', '⚠ Indica al menos usuario y repositorio.');
+    return;
+  }
+  setStatus('cfgStatus', 'info', '⏳ Cargando lista de archivos desde jsDelivr…');
+  document.getElementById('fileGrid').innerHTML = '<div class="empty-msg">Cargando…</div>';
+  const branch = cfg.branch || 'main';
+  const apiUrl = `https://data.jsdelivr.com/v1/packages/gh/${cfg.owner}/${cfg.repo}@${branch}`;
+  try {
+    const resp = await fetch(apiUrl, { cache: 'no-store' });
+    if (!resp.ok) throw new Error(`jsDelivr respondió ${resp.status}. Revisa usuario/repo/rama, y que el repo sea público.`);
+    const data = await resp.json();
+    const all = [];
+    flattenJsdelivrTree(data.files || [], '', all);
+    const folder = (cfg.folder || '').replace(/^\/+|\/+$/g, '');
+    let filtered = all.filter(f => /\.zptc$/i.test(f.path));
+    if (folder) filtered = filtered.filter(f => f.path.startsWith(folder + '/'));
+    filtered.sort((a,b) => a.path.localeCompare(b.path, undefined, { numeric: true, sensitivity: 'base' }));
+    libraryFiles = filtered;
+    document.getElementById('folderPathLabel').textContent =
+      `📂 github.com/${cfg.owner}/${cfg.repo} (${branch})${folder ? ' / ' + folder : ''} — ${filtered.length} preset(s) encontrados`;
+    renderFileGrid(document.getElementById('searchInput').value.trim());
+    setStatus('cfgStatus', 'ok', `✅ Lista cargada: ${filtered.length} archivo(s) .zptc.`);
+  } catch (e) {
+    console.error(e);
+    setStatus('cfgStatus', 'err', '❌ ' + e.message);
+    document.getElementById('fileGrid').innerHTML = '<div class="empty-msg">No se pudo cargar la lista.</div>';
+  }
+}
+
+function renderFileGrid(filterText) {
+  const grid = document.getElementById('fileGrid');
+  const q = (filterText || '').toLowerCase();
+  const list = q ? libraryFiles.filter(f => f.path.toLowerCase().includes(q)) : libraryFiles;
+  if (list.length === 0) {
+    grid.innerHTML = `<div class="empty-msg">${libraryFiles.length===0 ? 'No hay archivos .zptc en este repositorio/carpeta.' : 'Sin resultados para esa búsqueda.'}</div>`;
+    return;
+  }
+  grid.innerHTML = '';
+  for (const f of list) {
+    const displayName = f.path.split('/').pop().replace(/\.zptc$/i, '');
+    const el = document.createElement('div');
+    el.className = 'file-item';
+    el.innerHTML = `
+      <span class="file-icon">🎸</span>
+      <div class="file-info">
+        <div class="file-name">${escapeHtml(displayName)}</div>
+        <div class="file-path">${escapeHtml(f.path)} · ${fmtBytes(f.size)}</div>
+      </div>
+      <span class="file-status"></span>`;
+    el.addEventListener('click', () => loadFileToSlot(f, el));
+    grid.appendChild(el);
+  }
+}
+
+let loadInProgress = false;
+
+async function loadFileToSlot(fileEntry, nodeEl) {
+  if (loadInProgress) return;
+  if (!midiOut || !midiIn) {
+    setStatus('loadStatus', 'warn', '⚠ Conecta MIDI primero.');
+    return;
+  }
+  const manualToggle = document.getElementById('manualSlotToggle').checked;
+  const manualVal = parseInt(document.getElementById('manualSlotInput').value, 10);
+  let slot;
+  if (manualToggle) {
+    if (!Number.isFinite(manualVal) || manualVal < 1 || manualVal > 300) {
+      setStatus('loadStatus', 'err', '❌ Indica un slot manual válido (1-300) o desmarca la casilla.');
+      return;
+    }
+    slot = manualVal - 1;
+  } else if (currentPresetSlot >= 0) {
+    slot = currentPresetSlot;
+  } else {
+    setStatus('loadStatus', 'err', '❌ No se detectó el slot activo. Marca "Forzar slot manual" o cambia de preset en la pedalera y vuelve a intentarlo.');
+    return;
+  }
+
+  loadInProgress = true;
+  logClear();
+  document.querySelectorAll('.file-item').forEach(n => n.classList.remove('done','failed','loading'));
+  nodeEl.classList.add('loading');
+  const statusSpan = nodeEl.querySelector('.file-status');
+  statusSpan.textContent = '⏳';
+
+  try {
+    const cfg = loadCfg();
+    const branch = cfg.branch || 'main';
+    const url = jsdelivrCdnUrl(cfg.owner, cfg.repo, branch, fileEntry.path);
+    setStatus('loadStatus', 'info', `⏳ Descargando "${fileEntry.path}"…`);
+    logAppend(`GET ${url}`);
+    const resp = await fetch(url, { cache: 'no-store' });
+    if (!resp.ok) throw new Error(`No se pudo descargar el archivo (HTTP ${resp.status}).`);
+    const buf = new Uint8Array(await resp.arrayBuffer());
+    if (buf.length < 12 || buf[0]!==0x50 || buf[1]!==0x54 || buf[2]!==0x43 || buf[3]!==0x46) {
+      throw new Error('El archivo no parece un .zptc válido (falta cabecera PTCF).');
+    }
+    const name = extractPatchName(buf);
+    setStatus('loadStatus', 'info', `⏳ Enviando "${name}" al slot ${slot+1}…`);
+    await writeRawPatchToSlot(buf, slot);
+    setStatus('loadStatus', 'ok', `✅ "${name}" cargado y sonando en el slot ${slot+1}.`);
+    nodeEl.classList.remove('loading'); nodeEl.classList.add('done');
+    statusSpan.textContent = '✅';
+  } catch (e) {
+    console.error(e);
+    setStatus('loadStatus', 'err', '❌ ' + e.message);
+    logAppend('❌ ' + e.message);
+    nodeEl.classList.remove('loading'); nodeEl.classList.add('failed');
+    statusSpan.textContent = '❌';
+  } finally {
+    loadInProgress = false;
+  }
+}
+
+// ================================================================
+// Eventos de UI
+// ================================================================
+document.getElementById('manualSlotToggle').addEventListener('change', (e) => {
+  document.getElementById('manualSlotInput').disabled = !e.target.checked;
+});
+document.getElementById('searchInput').addEventListener('input', (e) => {
+  renderFileGrid(e.target.value.trim());
+});
+document.getElementById('cfgLoadBtn').addEventListener('click', () => {
+  const cfg = {
+    owner: document.getElementById('cfgOwner').value.trim(),
+    repo: document.getElementById('cfgRepo').value.trim(),
+    branch: document.getElementById('cfgBranch').value.trim() || 'main',
+    folder: document.getElementById('cfgFolder').value.trim()
+  };
+  saveCfg(cfg);
+  fetchLibraryList();
+});
+
+initCfgInputs();
+// Si ya hay una configuración guardada, cargamos la lista automáticamente.
+(function autoLoad() {
+  const cfg = loadCfg();
+  if (cfg.owner && cfg.repo) fetchLibraryList();
+})();
+</script>
+</body>
+</html>
