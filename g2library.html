@@ -93,9 +93,10 @@
     <div id="midiStatus" class="status"></div>
   </div>
 
-  <!-- CONFIGURACIÓN DEL REPOSITORIO -->
-  <div class="card">
-    <h2>⚙️ Repositorio de GitHub</h2>
+  <!-- CONFIGURACIÓN DEL REPOSITORIO (avanzado, normalmente no hace falta tocarlo) -->
+  <details class="card" id="cfgCard" style="padding-top:8px;">
+    <summary style="cursor:pointer; font-weight:700; font-size:1.02rem;">⚙️ Repositorio de GitHub (avanzado)</summary>
+    <p style="font-size:.8rem;color:#6f7fa3;margin:10px 0 4px;">Ya está configurado por defecto (extudiar-cell/g2four, rama main, carpeta presets) y la lista se carga sola al abrir la página. Solo toca esto si algún día cambias de repositorio.</p>
     <div class="row" style="gap:14px;">
       <div style="flex:1; min-width:140px;">
         <label>Usuario / organización</label>
@@ -119,7 +120,7 @@
       <span style="font-size:.78rem;color:#6f7fa3;">La configuración se guarda en este navegador (localStorage).</span>
     </div>
     <div id="cfgStatus" class="status"></div>
-  </div>
+  </details>
 
   <!-- SLOT DESTINO -->
   <div class="card">
@@ -152,11 +153,28 @@
 
 <script>
 // ================================================================
-// CONFIGURACIÓN PERSISTENTE (localStorage)
+// CONFIGURACIÓN DEL REPOSITORIO
 // ================================================================
+// Repo fijo por defecto: no hace falta rellenarlo cada vez que se abre la página.
+// Si en el futuro cambias de repo, puedes sobreescribirlo desde el panel
+// "⚙️ Repositorio de GitHub (avanzado)" — eso se guarda en localStorage y
+// tiene prioridad sobre estos valores por defecto.
+const DEFAULT_CFG = {
+  owner: 'extudiar-cell',
+  repo: 'g2four',
+  branch: 'main',
+  folder: 'presets'
+};
 const CFG_KEY = 'g2four_web_library_cfg';
 function loadCfg() {
-  try { return JSON.parse(localStorage.getItem(CFG_KEY)) || {}; } catch(e) { return {}; }
+  let stored = {};
+  try { stored = JSON.parse(localStorage.getItem(CFG_KEY)) || {}; } catch(e) { stored = {}; }
+  return {
+    owner: stored.owner || DEFAULT_CFG.owner,
+    repo: stored.repo || DEFAULT_CFG.repo,
+    branch: stored.branch || DEFAULT_CFG.branch,
+    folder: stored.folder !== undefined && stored.folder !== '' ? stored.folder : DEFAULT_CFG.folder
+  };
 }
 function saveCfg(cfg) { localStorage.setItem(CFG_KEY, JSON.stringify(cfg)); }
 
@@ -524,11 +542,9 @@ document.getElementById('cfgLoadBtn').addEventListener('click', () => {
 });
 
 initCfgInputs();
-// Si ya hay una configuración guardada, cargamos la lista automáticamente.
-(function autoLoad() {
-  const cfg = loadCfg();
-  if (cfg.owner && cfg.repo) fetchLibraryList();
-})();
+// La lista se carga sola al abrir la página, con el repo por defecto
+// (o el que hayas guardado manualmente si lo cambiaste alguna vez).
+fetchLibraryList();
 </script>
 </body>
 </html>
