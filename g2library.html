@@ -71,11 +71,17 @@
   .file-status { font-size: 1.1rem; width: 22px; text-align: center; }
   .empty-msg { color: #6f7fa3; font-size: .86rem; padding: 20px; text-align: center; }
   .folder-path { font-size: .78rem; color: #6f7fa3; margin-bottom: 8px; }
+  .folder-group { margin-bottom: 6px; }
+  .folder-group:first-child { margin-top: 0; }
   .folder-group-header {
-    font-size: .82rem; font-weight: 700; color: #9fb0d0; margin: 14px 0 4px;
-    padding-bottom: 4px; border-bottom: 1px solid #232d47;
+    font-size: .86rem; font-weight: 700; color: #9fb0d0; margin: 10px 0 0;
+    padding: 6px 2px; border-bottom: 1px solid #232d47; cursor: pointer;
+    list-style: none; user-select: none;
   }
-  .folder-group-header:first-child { margin-top: 0; }
+  .folder-group-header::-webkit-details-marker { display: none; }
+  .folder-group-header::before { content: '▸ '; color: #6bc9b0; }
+  details[open] > .folder-group-header::before { content: '▾ '; }
+  .folder-group-body { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
   a.jsdelivr-link { color: #6bc9b0; }
 </style>
 </head>
@@ -493,27 +499,40 @@ function renderFileGrid(filterText) {
   grid.innerHTML = '';
   for (const groupName of sortedGroupNames) {
     const files = groups.get(groupName);
+    const label = `📁 ${groupName === '(sin carpeta)' ? 'Sin carpeta' : groupName} (${files.length})`;
+
     if (sortedGroupNames.length > 1) {
-      const header = document.createElement('div');
-      header.className = 'folder-group-header';
-      header.textContent = `📁 ${groupName === '(sin carpeta)' ? 'Sin carpeta' : groupName} (${files.length})`;
-      grid.appendChild(header);
-    }
-    for (const f of files) {
-      const displayName = f.path.split('/').pop().replace(/\.zptc$/i, '');
-      const el = document.createElement('div');
-      el.className = 'file-item';
-      el.innerHTML = `
-        <span class="file-icon">🎸</span>
-        <div class="file-info">
-          <div class="file-name">${escapeHtml(displayName)}</div>
-          <div class="file-path">${escapeHtml(f.path)} · ${fmtBytes(f.size)}</div>
-        </div>
-        <span class="file-status"></span>`;
-      el.addEventListener('click', () => loadFileToSlot(f, el));
-      grid.appendChild(el);
+      const details = document.createElement('details');
+      details.className = 'folder-group';
+      details.open = !!q; // si hay una búsqueda activa, se abren solas para ver los resultados
+      const summary = document.createElement('summary');
+      summary.className = 'folder-group-header';
+      summary.textContent = label;
+      details.appendChild(summary);
+      const body = document.createElement('div');
+      body.className = 'folder-group-body';
+      for (const f of files) body.appendChild(buildFileItem(f));
+      details.appendChild(body);
+      grid.appendChild(details);
+    } else {
+      for (const f of files) grid.appendChild(buildFileItem(f));
     }
   }
+}
+
+function buildFileItem(f) {
+  const displayName = f.path.split('/').pop().replace(/\.zptc$/i, '');
+  const el = document.createElement('div');
+  el.className = 'file-item';
+  el.innerHTML = `
+    <span class="file-icon">🎸</span>
+    <div class="file-info">
+      <div class="file-name">${escapeHtml(displayName)}</div>
+      <div class="file-path">${escapeHtml(f.path)} · ${fmtBytes(f.size)}</div>
+    </div>
+    <span class="file-status"></span>`;
+  el.addEventListener('click', () => loadFileToSlot(f, el));
+  return el;
 }
 
 let loadInProgress = false;
