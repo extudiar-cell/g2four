@@ -537,6 +537,7 @@ async function loadFileToSlot(fileEntry, nodeEl) {
     slot = currentPresetSlot;
   } else {
     setStatus('loadStatus', 'err', '❌ No se detectó el slot activo. Marca "Forzar slot manual" o cambia de preset en la pedalera y vuelve a intentarlo.');
+    alert('⚠️ No se ha detectado ningún slot activo en la pedalera.\n\nCambia de preset en la pedalera para que se detecte, o marca la casilla "Forzar slot manual" e indica un número de slot antes de cargar un preset.');
     return;
   }
 
