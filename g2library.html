@@ -422,37 +422,32 @@ async function fetchFileBytes(owner, repo, branch, path) {
   throw new Error(`No se pudo descargar el archivo (${lastErr ? lastErr.message : 'error desconocido'}).`);
 }
 
-// El API de listado de jsDelivr devuelve un árbol anidado de carpetas/archivos;
-// lo aplanamos a una lista simple de rutas completas.
-function flattenJsdelivrTree(entries, prefix, out) {
-  for (const e of entries) {
-    const p = prefix + '/' + e.name.replace(/^\/+/, '');
-    if (e.type === 'directory' && Array.isArray(e.files)) {
-      flattenJsdelivrTree(e.files, p, out);
-    } else if (e.type === 'file') {
-      out.push({ path: p.replace(/^\/+/, ''), size: e.size || 0 });
-    }
-  }
-}
-
+// Listado en tiempo real vía la API de GitHub (git trees, recursivo): una sola
+// llamada trae toda la estructura de archivos/carpetas del repo, sin caché de
+// terceros de por medio (a diferencia de jsDelivr, que a veces tarda en
+// reflejar altas/bajas recientes).
 async function fetchLibraryList() {
   const cfg = loadCfg();
   if (!cfg.owner || !cfg.repo) {
     setStatus('cfgStatus', 'warn', '⚠ Indica al menos usuario y repositorio.');
     return;
   }
-  setStatus('cfgStatus', 'info', '⏳ Cargando lista de archivos desde jsDelivr…');
+  setStatus('cfgStatus', 'info', '⏳ Cargando lista de archivos desde GitHub…');
   document.getElementById('fileGrid').innerHTML = '<div class="empty-msg">Cargando…</div>';
   const branch = cfg.branch || 'main';
-  const apiUrl = `https://data.jsdelivr.com/v1/packages/gh/${cfg.owner}/${cfg.repo}@${branch}`;
+  const apiUrl = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/git/trees/${encodeURIComponent(branch)}?recursive=1`;
   try {
-    const resp = await fetch(apiUrl, { cache: 'no-store' });
-    if (!resp.ok) throw new Error(`jsDelivr respondió ${resp.status}. Revisa usuario/repo/rama, y que el repo sea público.`);
+    const resp = await fetch(apiUrl, { cache: 'no-store', headers: { 'Accept': 'application/vnd.github+json' } });
+    if (!resp.ok) {
+      if (resp.status === 404) throw new Error('No se encontró el repositorio/rama en GitHub. Revisa usuario, repo y rama.');
+      if (resp.status === 403) throw new Error('GitHub ha limitado temporalmente las peticiones sin autenticar (límite por hora). Espera un poco y vuelve a intentarlo.');
+      throw new Error(`GitHub respondió ${resp.status}.`);
+    }
     const data = await resp.json();
-    const all = [];
-    flattenJsdelivrTree(data.files || [], '', all);
     const folder = (cfg.folder || '').replace(/^\/+|\/+$/g, '');
-    let filtered = all.filter(f => /\.zptc$/i.test(f.path));
+    let filtered = (data.tree || [])
+      .filter(e => e.type === 'blob' && /\.zptc$/i.test(e.path))
+      .map(e => ({ path: e.path, size: e.size || 0 }));
     if (folder) filtered = filtered.filter(f => f.path.startsWith(folder + '/'));
     filtered.sort((a,b) => a.path.localeCompare(b.path, undefined, { numeric: true, sensitivity: 'base' }));
     libraryFiles = filtered;
@@ -577,7 +572,7 @@ async function loadFileToSlot(fileEntry, nodeEl) {
   }
 }
 
-/// ================================================================
+// ================================================================
 // Eventos de UI
 // ================================================================
 document.getElementById('manualSlotToggle').addEventListener('change', (e) => {
