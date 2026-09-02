@@ -122,6 +122,7 @@
     }
     .nav-btn:disabled { opacity: 0.55; cursor: default; }
     .nav-btn:active:not(:disabled) { transform: scale(0.95); }
+    #demoModeBtn.active { background: #3a2a52; border-color: #8a5fd1; color: #d9b8ff; }
     .save-btn { background: #1a3a2c; border: 1px solid #2c6e5c; color: #6bc9b0; }
     .save-btn:hover:not(:disabled) { background: #1e4a38; border-color: #6bc9b0; box-shadow: 0 0 16px rgba(107,201,176,0.15); }
     .goto-input {
@@ -386,6 +387,150 @@
     .pedal.cat-pedal    { border-left: 6px solid #9b8c7c; }
     .pedal.cat-empty    { border-left: 6px solid #3a4a5a; }
 
+    /* --------------------------------------------------------------
+       ASPECTO "AMPLI REAL" POR MARCA (solo categoría Amp, 0x04xxxxxx)
+       Cada marca define sus propias variables de color; las reglas
+       genéricas .pedal.is-amp de más abajo son las que realmente pintan
+       usando esas variables, así no hay que repetir estilos por marca.
+       -------------------------------------------------------------- */
+    .pedal.is-amp.amp-marshall  { --amp-border:#9a9aa0; --amp-bg-on:#556677; --amp-glow:rgba(154,154,160,0.35); --amp-name:#f2f2f5; --amp-cat:#b8b8c0; --amp-screw:#e0e0e6; --amp-grille-dot:#c4c4cc; --amp-grille-bg:#3a3a40; }
+    .pedal.is-amp.amp-fender    { --amp-border:#c9a45c; --amp-bg-on:#4a3a1e; --amp-glow:rgba(201,164,92,0.35);  --amp-name:#fff3d8; --amp-cat:#e8c98a; --amp-screw:#d8c090; --amp-grille-dot:#8a6a3a; --amp-grille-bg:#2e2210; }
+    .pedal.is-amp.amp-vox       { --amp-border:#ff9d42; --amp-bg-on:#4a2a12; --amp-glow:rgba(255,157,66,0.4);   --amp-name:#fff0e0; --amp-cat:#ffcb96; --amp-screw:#ff9d42; --amp-grille-dot:#ff9d42; --amp-grille-bg:#2e1a0a; }
+    .pedal.is-amp.amp-mesa      { --amp-border:#b03030; --amp-bg-on:#2a2a2a; --amp-glow:rgba(224,122,122,0.35); --amp-name:#f5e0e0; --amp-cat:#e0a0a0; --amp-screw:#e07a7a; --amp-grille-dot:#e07a7a; --amp-grille-bg:#1a1a1a; }
+    .pedal.is-amp.amp-mesa-recto{ --amp-border:#5a5aff; --amp-bg-on:#141418; --amp-glow:rgba(138,138,255,0.4);  --amp-name:#e8e8ff; --amp-cat:#a0a0ff; --amp-screw:#8a8aff; --amp-grille-dot:#8a8aff; --amp-grille-bg:#0c0c10; }
+    .pedal.is-amp.amp-bogner    { --amp-border:#b8c4e0; --amp-bg-on:#1a2a5c; --amp-glow:rgba(90,110,220,0.35);  --amp-name:#eef2ff; --amp-cat:#a8bce8; --amp-screw:#b8c4e0; --amp-grille-dot:#b8c4e0; --amp-grille-bg:#0e1a3a; }
+    .pedal.is-amp.amp-hiwatt    { --amp-border:#d4af37; --amp-bg-on:#1a1a1a; --amp-glow:rgba(212,175,55,0.35);  --amp-name:#f5ecd0; --amp-cat:#d4af37; --amp-screw:#d4af37; --amp-grille-dot:#d4af37; --amp-grille-bg:#111111; }
+    .pedal.is-amp.amp-orange    { --amp-border:#f0d8a8; --amp-bg-on:#e0611a; --amp-glow:rgba(224,97,26,0.45);   --amp-name:#fff8ec; --amp-cat:#ffe0b8; --amp-screw:#fff3d8; --amp-grille-dot:#f0d8a8; --amp-grille-bg:#c94f14; }
+    .pedal.is-amp.amp-diezel    { --amp-border:#ff5a1a; --amp-bg-on:#232323; --amp-glow:rgba(255,138,74,0.4);   --amp-name:#ffe0d0; --amp-cat:#ff8a4a; --amp-screw:#ff8a4a; --amp-grille-dot:#ff8a4a; --amp-grille-bg:#161616; }
+    .pedal.is-amp.amp-matchless { --amp-border:#c0c0c8; --amp-bg-on:#6b1a2a; --amp-glow:rgba(192,192,200,0.3);  --amp-name:#ffe8ec; --amp-cat:#e08a9a; --amp-screw:#c0c0c8; --amp-grille-dot:#c0c0c8; --amp-grille-bg:#4a1220; }
+    .pedal.is-amp.amp-krank     { --amp-border:#e02020; --amp-bg-on:#0f0f0f; --amp-glow:rgba(255,80,80,0.45);   --amp-name:#ffe0e0; --amp-cat:#ff5050; --amp-screw:#ff5050; --amp-grille-dot:#ff5050; --amp-grille-bg:#0a0a0a; }
+    .pedal.is-amp.amp-peavey    { --amp-border:#c0272d; --amp-bg-on:#1a1a1a; --amp-glow:rgba(224,90,90,0.4);    --amp-name:#ffe0e0; --amp-cat:#e05a5a; --amp-screw:#e05a5a; --amp-grille-dot:#e05a5a; --amp-grille-bg:#111111; }
+    .pedal.is-amp.amp-dumble    { --amp-border:#e8c8f0; --amp-bg-on:#3a1a3a; --amp-glow:rgba(216,160,232,0.35); --amp-name:#f8e8ff; --amp-cat:#d8a0e8; --amp-screw:#e8c8f0; --amp-grille-dot:#d8a0e8; --amp-grille-bg:#2a1030; }
+    .pedal.is-amp.amp-supro     { --amp-border:#e8dcc0; --amp-bg-on:#7a2a2a; --amp-glow:rgba(232,220,192,0.3);  --amp-name:#fff0e0; --amp-cat:#e8b0b0; --amp-screw:#e8dcc0; --amp-grille-dot:#e8dcc0; --amp-grille-bg:#5a1e1e; }
+    .pedal.is-amp.amp-evh       { --amp-border:#e0e0e0; --amp-bg-on:#141414; --amp-glow:rgba(224,224,224,0.3);  --amp-name:#ffffff; --amp-cat:#f0f0f0; --amp-screw:#e0e0e0; --amp-grille-dot:#3a3a3a; --amp-grille-bg:#0a0a0a; --amp-stripe:#c0272d; }
+    .pedal.is-amp.amp-friedman  { --amp-border:#4a90d9; --amp-bg-on:#1c1c1e; --amp-glow:rgba(122,176,224,0.4);  --amp-name:#e8f0ff; --amp-cat:#7ab0e0; --amp-screw:#7ab0e0; --amp-grille-dot:#7ab0e0; --amp-grille-bg:#101014; }
+
+    /* Reglas genéricas que usan las variables de arriba. border-left ya
+       identifica la marca aunque el ampli esté apagado; el fondo/textura
+       de "ampli real" completo solo aparece con el efecto activado (ON),
+       igual que hace el resto de categorías. */
+    .pedal.is-amp                { border-left-color: var(--amp-border, #f5c542); padding-bottom: 34px; position: relative; overflow: hidden; }
+    .pedal.is-amp.on             { background: var(--amp-bg-on, #6a4a1a) !important; border-color: var(--amp-border, #f5c542) !important; box-shadow: 0 6px 0 #060a12, 0 0 30px var(--amp-glow, rgba(245,197,66,0.4)) !important; }
+    .pedal.is-amp.on .name       { color: var(--amp-name, #fff0e0); }
+    .pedal.is-amp.on .category   { color: var(--amp-cat, #ffcb96); }
+    .pedal:not(.is-amp)          { align-self: flex-start; } /* deja que el ampli sea el único que "sobresalga" más alto en la fila */
+    .amp-screw {
+      position: absolute; width: 5px; height: 5px; border-radius: 50%;
+      background: var(--amp-screw, #d8d8d8);
+      box-shadow: inset 0 1px 1px rgba(0,0,0,0.5);
+      z-index: 2; display: none;
+    }
+    .pedal.is-amp.on .amp-screw { display: block; }
+    .amp-screw.tl { top: 6px; left: 6px; }
+    .amp-screw.tr { top: 6px; right: 6px; }
+    .amp-screw.bl { bottom: 6px; left: 6px; }
+    .amp-screw.br { bottom: 6px; right: 6px; }
+    .pedal.is-amp.on::after {
+      content: ''; position: absolute; left: 10px; right: 10px; bottom: 10px; height: 18px;
+      border-radius: 4px;
+      background-image: radial-gradient(var(--amp-grille-dot, #3a2a10) 1.1px, transparent 1.1px);
+      background-size: 5px 5px;
+      background-color: var(--amp-grille-bg, #2a1e0c);
+    }
+    /* EVH: franja diagonal en vez de rejilla de puntos */
+    .pedal.is-amp.amp-evh.on::after { background-image: none; background: repeating-linear-gradient(115deg, var(--amp-stripe) 0 8px, #f0f0f0 8px 12px, #141414 12px 30px); }
+
+    /* --------------------------------------------------------------
+       PATRÓN DE REJILLA PROPIO POR MARCA — cada una con una forma
+       distinta (no solo color), para que no se confundan entre sí de
+       un vistazo. Todas reutilizan las variables --amp-grille-dot /
+       --amp-grille-bg (y alguna variable extra puntual) ya definidas
+       más arriba para cada marca.
+       -------------------------------------------------------------- */
+    /* Marshall: moteado sal y pimienta (tela real de sus cabinets) */
+    .pedal.is-amp.amp-marshall.on::after {
+      background-image:
+        radial-gradient(var(--amp-screw) 1px, transparent 1px),
+        radial-gradient(var(--amp-grille-dot) 1.6px, transparent 1.6px);
+      background-size: 6px 6px, 9px 9px;
+      background-position: 0 0, 3px 4px;
+    }
+    /* Fender: espiga (herringbone), la textura real del tweed */
+    .pedal.is-amp.amp-fender.on::after {
+      background-image:
+        repeating-linear-gradient(45deg, var(--amp-grille-dot) 0 3px, transparent 3px 6px),
+        repeating-linear-gradient(-45deg, var(--amp-grille-dot) 0 3px, transparent 3px 6px);
+      background-size: 10px 10px;
+    }
+    /* Vox: diamante, como la tela real del AC30 */
+    .pedal.is-amp.amp-vox.on::after {
+      background-image:
+        repeating-linear-gradient(45deg, var(--amp-grille-dot) 0 1.5px, transparent 1.5px 9px),
+        repeating-linear-gradient(-45deg, var(--amp-grille-dot) 0 1.5px, transparent 1.5px 9px);
+    }
+    /* Mesa Mark I/III: rejilla cruzada fina */
+    .pedal.is-amp.amp-mesa.on::after {
+      background-image:
+        repeating-linear-gradient(0deg, var(--amp-grille-dot) 0 1px, transparent 1px 7px),
+        repeating-linear-gradient(90deg, var(--amp-grille-dot) 0 1px, transparent 1px 7px);
+    }
+    /* Mesa Dual Rectifier: rejillas verticales de ventilación */
+    .pedal.is-amp.amp-mesa-recto.on::after {
+      background-image: repeating-linear-gradient(90deg, var(--amp-grille-dot) 0 3px, transparent 3px 10px);
+    }
+    /* Bogner: rombos acolchados (quilted), aire boutique */
+    .pedal.is-amp.amp-bogner.on::after {
+      background-image:
+        repeating-linear-gradient(60deg, var(--amp-grille-dot) 0 1.5px, transparent 1.5px 11px),
+        repeating-linear-gradient(-60deg, var(--amp-grille-dot) 0 1.5px, transparent 1.5px 11px);
+    }
+    /* Hiwatt: líneas verticales doradas */
+    .pedal.is-amp.amp-hiwatt.on::after {
+      background-image: repeating-linear-gradient(90deg, var(--amp-grille-dot) 0 2px, transparent 2px 7px);
+    }
+    /* Orange: cesta/basket-weave, la rejilla real de Orange */
+    .pedal.is-amp.amp-orange.on::after {
+      background-image:
+        repeating-linear-gradient(0deg, var(--amp-grille-dot) 0 2px, transparent 2px 9px),
+        repeating-linear-gradient(90deg, var(--amp-grille-dot) 0 2px, transparent 2px 9px);
+      background-size: 9px 9px;
+    }
+    /* Diezel: metal perforado, agujeros grandes tipo industrial */
+    .pedal.is-amp.amp-diezel.on::after {
+      background-image: radial-gradient(var(--amp-grille-dot) 1.8px, transparent 1.8px);
+      background-size: 9px 9px;
+    }
+    /* Matchless: pata de gallo (houndstooth) */
+    .pedal.is-amp.amp-matchless.on::after {
+      background-image:
+        repeating-linear-gradient(45deg, var(--amp-grille-dot) 0 4px, transparent 4px 8px),
+        repeating-linear-gradient(-45deg, var(--amp-grille-dot) 0 4px, transparent 4px 8px);
+      background-size: 12px 12px;
+    }
+    /* Krank: zigzag agresivo */
+    .pedal.is-amp.amp-krank.on::after {
+      background-image:
+        repeating-linear-gradient(135deg, var(--amp-grille-dot) 0 4px, transparent 4px 16px),
+        repeating-linear-gradient(45deg, var(--amp-grille-dot) 0 4px, transparent 4px 16px);
+    }
+    /* Peavey: relámpago diagonal irregular */
+    .pedal.is-amp.amp-peavey.on::after {
+      background-image: repeating-linear-gradient(115deg, var(--amp-grille-dot) 0 5px, transparent 5px 9px, transparent 9px 26px);
+    }
+    /* Dumble: pinstripe fino y elegante */
+    .pedal.is-amp.amp-dumble.on::after {
+      background-image: repeating-linear-gradient(70deg, var(--amp-grille-dot) 0 1px, transparent 1px 8px);
+    }
+    /* Supro: escamas onduladas, aire vintage */
+    .pedal.is-amp.amp-supro.on::after {
+      background-image: radial-gradient(circle at 50% 0%, transparent 5px, var(--amp-grille-dot) 6px, transparent 7px);
+      background-size: 12px 8px;
+    }
+    /* Friedman: metal cepillado, líneas horizontales muy finas */
+    .pedal.is-amp.amp-friedman.on::after {
+      background-image: repeating-linear-gradient(0deg, var(--amp-grille-dot) 0 0.6px, transparent 0.6px 3px);
+    }
+
     .pedal.empty {
       opacity: 0.55;
       border-style: dashed;
@@ -644,9 +789,11 @@
     .presets-progress-fill { height: 100%; background: #6bc9b0; border-radius: 10px; width: 0%; transition: width 0.15s; }
     .presets-progress-text { font-size: 0.65rem; font-family: monospace; color: #4a6080; white-space: nowrap; }
     .presets-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px;
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px;
       max-height: 230px; overflow-y: auto; padding-right: 4px;
     }
+    #favoritesGrid { grid-template-columns: repeat(5, 1fr); }
+    #aiLibraryGrid { grid-template-columns: repeat(5, 1fr); }
     .presets-grid::-webkit-scrollbar { width: 4px; }
     .presets-grid::-webkit-scrollbar-track { background: #0d1020; }
     .presets-grid::-webkit-scrollbar-thumb { background: #3f5270; border-radius: 4px; }
@@ -659,6 +806,14 @@
     .preset-num { font-family: monospace; font-size: 0.68rem; color: #f0c040; min-width: 24px; flex-shrink: 0; }
     .preset-name-text { font-size: 0.82rem; color: #c8daf0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .presets-empty { text-align: center; padding: 32px; color: #3f5270; font-size: 0.75rem; grid-column: 1/-1; }
+    .fav-card { background:#111828; border:1px solid #3f5270; border-radius:8px; padding:8px 10px; display:flex; flex-direction:column; gap:6px; }
+    .fav-card-name { font-size:0.78rem; color:#f0f4ff; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .fav-tags { display:flex; flex-wrap:wrap; gap:4px; min-height:16px; }
+    .fav-tag { font-size:0.6rem; background:#0d1f30; color:#6bc9b0; padding:2px 6px; border-radius:8px; }
+    .fav-actions { display:flex; gap:6px; }
+    .fav-btn { flex:1; background:#1a2a3c; border:1px solid #3f5270; border-radius:6px; padding:5px; color:#6bc9b0; cursor:pointer; font-size:0.85rem; display:flex; align-items:center; justify-content:center; }
+    .fav-btn:hover { border-color:#6bc9b0; background:#0f1a2a; }
+    .fav-btn-delete { color:#d86a6a; flex:0 0 auto; padding:5px 10px; }
 
     .audio-drop-zone {
       border: 2px dashed #3f5270; border-radius: 16px; padding: 12px 10px; text-align: center;
@@ -1106,12 +1261,17 @@
         <button class="lang-btn" onclick="setLanguage('en')" id="lang-en">EN</button>
       </div>
       <button class="nav-btn presetai-btn" id="presetAiBtn" type="button">🤖 PresetAI</button>
+      <button class="nav-btn" id="demoModeBtn" type="button" title="Editar y previsualizar sin enviar nada a ninguna pedalera">🎭 Modo Demo</button>
       <button class="nav-btn save-btn" id="saveBtn" data-i18n="save">💾 GUARDAR</button>
       <button class="nav-btn save-btn" id="saveToDiskBtn" data-i18n="save_to_disk">💾 GUARDAR EN DISCO</button>
       <div class="midi-indicator">
         <span class="midi-dot" id="midiDot"></span>
         <span class="midi-label" id="midiLabel">MIDI</span>
+        <button class="nav-btn" id="midiReconnectMainBtn" type="button" title="Buscar de nuevo la pedalera por MIDI" style="padding:3px 8px; font-size:0.65rem;">🔌</button>
       </div>
+    </div>
+    <div id="demoModeBanner" style="display:none; align-items:center; gap:8px; justify-content:center; background:#3a2a52; color:#d9b8ff; font-size:0.82rem; padding:6px 10px;">
+      🎭 Modo demo activo — los cambios se ven en pantalla pero no se envían a ninguna pedalera real
     </div>
   </div>
 
@@ -1128,6 +1288,8 @@
       <button type="button" class="zone-tab" data-zone="rhythm" data-i18n="rhythms">🥁 RITMOS</button>
       <button type="button" class="zone-tab" data-zone="filemanager" data-i18n="file_manager">📁 GESTOR DE ARCHIVOS</button>
       <button type="button" class="zone-tab" data-zone="filesexplorer" data-i18n="files_explorer">🗂️ EXPLORADOR DE ARCHIVOS</button>
+      <button type="button" class="zone-tab" data-zone="favorites">⭐ FAVORITOS</button>
+      <button type="button" class="zone-tab" data-zone="ailibrary">🤖 BIBLIOTECA IA</button>
     </div>
     <div class="zone-body">
       <div class="zone-section active" id="zone-presets">
@@ -1326,6 +1488,25 @@
           <div class="fm-debug-log" id="fxDebugLog" style="display:none"></div>
         </div>
       </div>
+
+      <div class="zone-section" id="zone-favorites">
+        <div class="presets-toolbar">
+          <button type="button" class="presets-scan-btn" id="favSaveBtn">★ GUARDAR PATCH ACTUAL</button>
+          <span id="favStatus">Guarda variantes en tu navegador, sin tocar el pedal</span>
+        </div>
+        <div class="presets-grid" id="favoritesGrid">
+          <div class="presets-empty">Aún no tienes favoritos guardados</div>
+        </div>
+      </div>
+
+      <div class="zone-section" id="zone-ailibrary">
+        <div class="presets-toolbar">
+          <span id="aiLibStatus">Presets generados con PresetAI, guardados en el navegador sin necesidad de escribirlos en la pedalera</span>
+        </div>
+        <div class="presets-grid" id="aiLibraryGrid">
+          <div class="presets-empty">Aún no tienes presets de PresetAI guardados</div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1344,6 +1525,18 @@
     </div>
     <div class="tuner-freq" id="tunerFreq">— Hz</div>
     <button class="tuner-close" id="tunerCloseBtn" data-i18n="tuner_close">Cerrar</button>
+  </div>
+</div>
+
+<div id="favSaveModal" class="modal">
+  <div class="modal-content" style="max-width:420px;">
+    <div class="modal-header">Guardar favorito</div>
+    <input type="text" id="favNameInput" placeholder="Nombre (ej: Blues cálido)" maxlength="40"
+      style="width:100%;box-sizing:border-box;padding:10px 14px;border-radius:40px;border:1px solid #3f5270;background:#0c101e;color:#f0f4ff;font-size:0.9rem;margin-bottom:10px;">
+    <input type="text" id="favTagsInput" placeholder="Etiquetas separadas por coma (ej: blues, limpio)" maxlength="60"
+      style="width:100%;box-sizing:border-box;padding:10px 14px;border-radius:40px;border:1px solid #3f5270;background:#0c101e;color:#f0f4ff;font-size:0.9rem;margin-bottom:4px;">
+    <button type="button" class="close-modal" id="favSaveConfirmBtn" style="margin-top:14px;">Guardar</button>
+    <button type="button" class="close-modal" id="favSaveCancelBtn" style="background:transparent;">Cancelar</button>
   </div>
 </div>
 
@@ -1652,6 +1845,36 @@
       case 0x0B: return 'cat-pedal';
       default: return '';
     }
+  }
+
+  // Aspecto "ampli real" por marca emulada, solo para la categoría Amp
+  // (0x04xxxxxx). Cada rango de id corresponde a un modelo real distinto
+  // (ver tabla de equivalencias más abajo en el archivo); el mapa asigna
+  // el color/textura de esa marca real en vez del dorado genérico de
+  // categoría.
+  const AMP_BRAND_MAP = new Map([
+    [0x04000010, 'marshall'], [0x04000020, 'marshall'], [0x04000030, 'marshall'],
+    [0x04000040, 'fender'],   [0x04000050, 'fender'],   [0x04000060, 'fender'],   [0x04000070, 'fender'],
+    [0x04000080, 'vox'],
+    [0x04000090, 'mesa'],     [0x040000A0, 'mesa'],
+    [0x040000B0, 'mesa-recto'],
+    [0x040000C0, 'bogner'],
+    [0x040000D0, 'hiwatt'],
+    [0x040000E0, 'orange'],
+    [0x040000F0, 'diezel'],
+    [0x04000100, 'matchless'],
+    [0x04000110, 'krank'],
+    [0x04000120, 'peavey'],
+    [0x04000130, 'dumble'],
+    [0x04000140, 'supro'],
+    [0x04000150, 'evh'],
+    [0x04000160, 'friedman'],
+  ]);
+
+  function getAmpBrandClass(id) {
+    if (((id >>> 24) & 0xFF) !== 0x04) return null;
+    const brand = AMP_BRAND_MAP.get(id >>> 0);
+    return brand ? `amp-${brand}` : null;
   }
 
   function getCategoryName(id) {
@@ -2104,14 +2327,13 @@
   DEFAULT_PARAMS_MAP.set(0x01000040, [0x02, 0x30, 0x30, 0x54]);
   DEFAULT_PARAMS_MAP.set(0x01000050, [0x10, 0x30, 0x30, 0x54]);
   DEFAULT_PARAMS_MAP.set(0x01000060, [0x0a, 0x01, 0x20, 0x44]);
-  DEFAULT_PARAMS_MAP.set(0x04000020, [0x32, 0x46, 0x5a, 0x00, 0x00, 0x00, 0x50]);
+  DEFAULT_PARAMS_MAP.set(0x04000020, [0x32, 0x46, 0x3c, 0x1e, 0x3d, 0x00, 0x50]);
   DEFAULT_PARAMS_MAP.set(0x03000020, [0x32, 0x46, 0x5a, 0x50]);
   DEFAULT_PARAMS_MAP.set(0x03000030, [0x32, 0x00, 0x46, 0x5a]);
   DEFAULT_PARAMS_MAP.set(0x03000040, [0x32, 0x46, 0x5a, 0x50]);
   DEFAULT_PARAMS_MAP.set(0x03000050, [0x32, 0x46, 0x40, 0x50]);
   DEFAULT_PARAMS_MAP.set(0x03000060, [0x32, 0x46, 0x40, 0x50]);
-  DEFAULT_PARAMS_MAP.set(0x04000060, [0x38, 0x46, 0x50, 0x50, 0x00, 0x00, 0x00]);
-  DEFAULT_PARAMS_MAP.set(0x04000050, [0x38, 0x46, 0x50, 0x00, 0x38, 0x50, 0x40, 0x40]);
+DEFAULT_PARAMS_MAP.set(0x04000060, [0x00, 0x21, 0x37, 0x32, 0x5a, 0x00, 0x28]);  DEFAULT_PARAMS_MAP.set(0x04000050, [0x38, 0x46, 0x50, 0x00, 0x38, 0x50, 0x40, 0x40]);
   DEFAULT_PARAMS_MAP.set(0x060000A0, [0x19, 0x40, 0x32, 0x50]);
   DEFAULT_PARAMS_MAP.set(0x060000B0, [0x19, 0x40, 0x32, 0x50]);
   DEFAULT_PARAMS_MAP.set(0x060000C0, [0x19, 0x40, 0x32, 0x50]);
@@ -2127,7 +2349,7 @@
   DEFAULT_PARAMS_MAP.set(0x09000030, [0x00, 0x32, 0x28, 0x4b]);
   DEFAULT_PARAMS_MAP.set(0x09000050, [0x00, 0x32, 0x28, 0x4b]);
   DEFAULT_PARAMS_MAP.set(0x09000060, [0x00, 0x32, 0x28, 0x4b]);
-  DEFAULT_PARAMS_MAP.set(0x02000010, [0x00, 0x4b, 0x32, 0x0a, 0x64]);
+  DEFAULT_PARAMS_MAP.set(0x02000010, [0x00, 0x4b, 0x32, 0x50, 0x64]);
   DEFAULT_PARAMS_MAP.set(0x0B000030, [0x4b, 0x32, 0x0a, 0x64]);
   DEFAULT_PARAMS_MAP.set(0x0B000040, [0x4b, 0x32, 0x0a, 0x64]);
   DEFAULT_PARAMS_MAP.set(0x06000090, [0x00, 0x19, 0x46, 0x50]);
@@ -2182,6 +2404,66 @@
   let slot7Pending = false;
   let lastKnownPresetSlot = -1;
   let pendingNameChange = null;
+
+  // --------------------------------------------------------------
+  // MODO DEMO — permite diseñar y ver patches sin ninguna pedalera real
+  // conectada (para enseñar el funcionamiento, o para trabajar en diseños
+  // cuando no tienes el pedal a mano). Funciona en dos escenarios:
+  //  1) No hay ningún dispositivo MIDI conectado: se sustituye midiOut por
+  //     un objeto "fantasma" cuyo .send() no hace nada, así todas las
+  //     comprobaciones "if (!midiOut) return" que ya existen por todo el
+  //     código pasan igual, y toda la edición local (currentPatchData +
+  //     renderPedalboard) sigue funcionando exactamente igual que siempre.
+  //  2) SÍ hay una pedalera real conectada, pero quieres previsualizar sin
+  //     mandarle nada de verdad: el .send() real de ese dispositivo se
+  //     parchea una vez (ver makeMidiOutSuppressible) para que compruebe
+  //     demoMode en cada envío y no mande nada mientras esté activo.
+  // --------------------------------------------------------------
+  let demoMode = false;
+  const virtualMidiOut = { send: () => {} };
+
+  function makeMidiOutSuppressible(output) {
+    if (!output || output.__demoPatched) return output;
+    const realSend = output.send.bind(output);
+    output.send = function (data, timestamp) {
+      if (demoMode) return; // modo demo activo: no se manda nada real a la pedalera
+      return realSend(data, timestamp);
+    };
+    output.__demoPatched = true;
+    return output;
+  }
+
+  function createBlankPatchData() {
+    return {
+      name: 'NUEVO PATCH',
+      effects: Array.from({ length: 7 }, () => ({ id: 0x00000000, enabled: false, parameters: [] })),
+      tempo: 120,
+      routing: null
+    };
+  }
+
+  function setDemoMode(on) {
+    demoMode = on;
+    if (on && !midiOut) midiOut = virtualMidiOut; // sin pedal real: usamos uno "fantasma"
+    if (!on) {
+      if (midiOut === virtualMidiOut) midiOut = null; // al salir, si era el fantasma, se quita
+      // Si mientras tanto se conectó/encendió la pedalera de verdad, esto la
+      // detecta sin necesidad de recargar la página. Si ya había una
+      // pedalera real conectada (no era el fantasma), connectMIDI() no
+      // hace nada nuevo porque el permiso ya está concedido y el puerto ya
+      // está abierto.
+      if (!midiOut) connectMIDI().catch(e => console.warn(e));
+    }
+    if (on && !currentPatchData) {
+      currentPatchData = createBlankPatchData();
+      fullRefresh();
+    }
+    const btn = document.getElementById('demoModeBtn');
+    const banner = document.getElementById('demoModeBanner');
+    if (btn) btn.classList.toggle('active', on);
+    if (banner) banner.style.display = on ? 'flex' : 'none';
+    try { localStorage.setItem('g2four_demo_mode', on ? '1' : '0'); } catch (e) {}
+  }
 
   window._g2 = {
     get currentPatchData() { return currentPatchData; },
@@ -2337,6 +2619,28 @@
     midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x20,0x00, slot, paramNum, lsb, msb, 0,0,0,0xF7]);
   }
 
+  // En los Delay (y algún otro efecto con "Time"+"Mode"), la pedalera
+  // RECALCULA el parámetro Time en cuanto recibe Mode (para cuadrar el
+  // tiempo con la subdivisión rítmica del modo). Si se manda primero Time
+  // y luego Mode, el Mode pisa el Time que acabamos de enviar y el valor
+  // final no es el que queríamos — antes esto se "arreglaba" a base de
+  // mandar el patch dos veces. Esta función decide el ORDEN de envío (no
+  // el paramNum, que sigue siendo fijo): si el array de nombres trae Time
+  // antes que Mode, se intercambia el orden de esos dos concretos para
+  // que Mode salga primero; el resto de parámetros no se toca.
+  function orderParamsForLiveSend(paramNames, fallbackLength) {
+    const n = paramNames ? paramNames.length : (fallbackLength || 0);
+    const order = [];
+    for (let i = 0; i < n; i++) order.push(i);
+    if (!paramNames) return order;
+    const modeIdx = paramNames.findIndex(p => /^mode$/i.test(p));
+    const timeIdx = paramNames.findIndex(p => /^time$/i.test(p));
+    if (modeIdx === -1 || timeIdx === -1 || modeIdx < timeIdx) return order;
+    order[timeIdx] = modeIdx;
+    order[modeIdx] = timeIdx;
+    return order;
+  }
+
   function toggleSlot(slot, enable) {
     if (currentPatchData && currentPatchData.effects[slot]) {
       currentPatchData.effects[slot].enabled = enable;
@@ -2370,7 +2674,8 @@
     }
     renderPedalboard();
     if (defaults) {
-      for (let i = 0; i < numParams && i < defaults.length; i++) setParameterRaw(slot, i + 2, defaults[i]);
+      const sendOrder = orderParamsForLiveSend(paramNames, defaults.length);
+      sendOrder.forEach(paramIdx => { if (paramIdx < defaults.length) setParameterRaw(slot, paramIdx + 2, defaults[paramIdx]); });
     }
   }
 
@@ -2465,6 +2770,247 @@
     }
   }
 
+  // --------------------------------------------------------------
+  // FAVORITOS — biblioteca de patches completos guardados en el
+  // navegador (localStorage), independiente de la memoria del pedal.
+  // No envía nada por MIDI: solo actualiza la vista local.
+  // --------------------------------------------------------------
+  const FAVORITES_KEY = 'g2four_favorites';
+
+  function getFavorites() {
+    try {
+      const raw = localStorage.getItem(FAVORITES_KEY);
+      const list = raw ? JSON.parse(raw) : [];
+      return Array.isArray(list) ? list : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function saveFavoritesList(list) {
+    try {
+      localStorage.setItem(FAVORITES_KEY, JSON.stringify(list));
+    } catch (e) {
+      console.error('No se pudo guardar el favorito en localStorage:', e);
+    }
+  }
+
+  function renderFavoritesGrid() {
+    const grid = document.getElementById('favoritesGrid');
+    if (!grid) return;
+    const favorites = getFavorites();
+    grid.innerHTML = '';
+    if (favorites.length === 0) {
+      grid.innerHTML = '<div class="presets-empty">Aún no tienes favoritos guardados</div>';
+      return;
+    }
+    favorites.slice().reverse().forEach(fav => {
+      const card = document.createElement('div');
+      card.className = 'fav-card';
+      const tagsHtml = (fav.tags || []).map(t => `<span class="fav-tag">${t}</span>`).join('');
+      card.innerHTML = `
+        <div class="fav-card-name" title="${fav.name}">${fav.name}</div>
+        <div class="fav-tags">${tagsHtml}</div>
+        <div class="fav-actions">
+          <button type="button" class="fav-btn fav-btn-load">▶ Load/Cargar</button>
+          <button type="button" class="fav-btn fav-btn-delete">🗑</button>
+        </div>`;
+      card.querySelector('.fav-btn-load').addEventListener('click', () => loadFavorite(fav.id));
+      card.querySelector('.fav-btn-delete').addEventListener('click', () => deleteFavorite(fav.id));
+      grid.appendChild(card);
+    });
+  }
+
+  // Los favoritos son variantes rápidas del MISMO parche (mismo ampli,
+  // mismo slot 7/salida) para comparar sonidos cambiando drive, delay,
+  // reverb, etc. Por eso el slot 7 (índice 6) queda deliberadamente FUERA
+  // del sistema de favoritos: no se guarda, no se sobrescribe al cargar y
+  // no se le envía nada por MIDI. Así se evita por completo el problema de
+  // fondo (el comando de cambio de tipo en tiempo real para el slot 7 dejaba
+  // el pedal en un estado que corrompía cualquier guardado posterior).
+  function saveCurrentAsFavorite(name, tagsText) {
+    if (!currentPatchData) return;
+    const tags = tagsText.split(',').map(t => t.trim()).filter(Boolean);
+    const favorite = {
+      id: Date.now(),
+      name: name.trim() || 'Sin nombre',
+      tags,
+      savedAt: new Date().toISOString(),
+      effects: JSON.parse(JSON.stringify(currentPatchData.effects.slice(0, 6))), // solo slots 1-6
+      tempo: currentPatchData.tempo,
+      routing: currentPatchData.routing
+    };
+    const list = getFavorites();
+    list.push(favorite);
+    saveFavoritesList(list);
+    renderFavoritesGrid();
+  }
+
+  async function loadFavorite(id) {
+    const list = getFavorites();
+    const fav = list.find(f => f.id === id);
+    if (!fav || !currentPatchData) return;
+    currentPatchData.name = fav.name;
+    // Solo se pisan los slots 1-6; el slot 7 (índice 6) se deja tal cual
+    // esté en el parche actual, ya que los favoritos no lo tocan.
+    for (let slot = 0; slot < 6; slot++) {
+      if (fav.effects[slot]) currentPatchData.effects[slot] = JSON.parse(JSON.stringify(fav.effects[slot]));
+    }
+    currentPatchData.tempo = fav.tempo;
+    currentPatchData.routing = fav.routing;
+    const nameEl = document.getElementById('presetName');
+    if (nameEl) nameEl.textContent = fav.name;
+    isModified = true;
+    updateModifiedIndicator();
+    renderPedalboard();
+    await pushFavoriteLive(fav.effects, currentPatchData.tempo);
+  }
+
+  // Envía en vivo, slot a slot, los efectos 1-6 de un favorito recién
+  // cargado, reutilizando setEffectLive (id + enabled + parámetros) igual
+  // que cuando se edita un efecto a mano. Antes de este cambio, "Cargar"
+  // solo tocaba currentPatchData y volvía a pintar el pedalboard: la
+  // pantalla mostraba el favorito pero la pedalera seguía sonando con el
+  // patch anterior porque nunca se le mandaba nada por MIDI. El slot 7
+  // nunca se toca aquí (ver comentario junto a saveCurrentAsFavorite).
+  async function pushFavoriteLive(effects, tempo) {
+    if (!midiOut || !effects) return;
+    for (let slot = 0; slot < 6 && slot < effects.length; slot++) {
+      const fx = effects[slot];
+      if (!fx) continue;
+      setEffectLive(slot, fx);
+      await sleep(220); // deja que la pedalera asiente tipo+parámetros antes del siguiente slot
+    }
+    if (typeof tempo === 'number') {
+      const bpm = Math.max(40, Math.min(250, tempo | 0));
+      midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x20,0x00,0x64,0x02, bpm & 0x7F, (bpm >> 7) & 0x7F, 0,0,0,0xF7]);
+      await sleep(60);
+    }
+    syncCurrentPatch();
+  }
+
+  // --------------------------------------------------------------
+  // BIBLIOTECA IA — biblioteca de patches generados con PresetAI,
+  // guardados en el navegador (misma idea que Favoritos, misma clave de
+  // localStorage compartida con el iframe de PresetAI porque es
+  // srcdoc sin sandbox y por tanto mismo origen). El botón "Guardar en
+  // Biblioteca" que guarda cada entrada vive DENTRO del panel de
+  // PresetAI (más abajo, en <template id="presetAiTemplate">); aquí solo
+  // se lee/pinta/carga lo que ya se haya guardado desde allí.
+  // --------------------------------------------------------------
+  const AI_LIBRARY_KEY = 'g2four_ai_library';
+
+  function getAiLibrary() {
+    try {
+      const raw = localStorage.getItem(AI_LIBRARY_KEY);
+      const list = raw ? JSON.parse(raw) : [];
+      return Array.isArray(list) ? list : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function saveAiLibraryList(list) {
+    try {
+      localStorage.setItem(AI_LIBRARY_KEY, JSON.stringify(list));
+    } catch (e) {
+      console.error('No se pudo guardar en la Biblioteca IA:', e);
+    }
+  }
+
+  function deleteAiLibraryEntry(id) {
+    saveAiLibraryList(getAiLibrary().filter(e => e.id !== id));
+    renderAiLibraryGrid();
+  }
+
+  function renderAiLibraryGrid() {
+    const grid = document.getElementById('aiLibraryGrid');
+    if (!grid) return;
+    const list = getAiLibrary();
+    grid.innerHTML = '';
+    if (list.length === 0) {
+      grid.innerHTML = '<div class="presets-empty">Aún no tienes presets de PresetAI guardados</div>';
+      return;
+    }
+    list.slice().reverse().forEach(entry => {
+      const card = document.createElement('div');
+      card.className = 'fav-card';
+      card.innerHTML = `
+        <div class="fav-card-name" title="${entry.name}">${entry.name}</div>
+        <div class="fav-tags">${entry.subtitle ? `<span class="fav-tag">${entry.subtitle}</span>` : ''}</div>
+        <div class="fav-actions">
+          <button type="button" class="fav-btn fav-btn-load">▶ Load/Cargar</button>
+          <button type="button" class="fav-btn fav-btn-delete">🗑</button>
+        </div>`;
+      card.querySelector('.fav-btn-load').addEventListener('click', () => loadAiPreset(entry));
+      card.querySelector('.fav-btn-delete').addEventListener('click', () => deleteAiLibraryEntry(entry.id));
+      grid.appendChild(card);
+    });
+  }
+
+  // El formato que guarda PresetAI (data.slots: effectId en hex, params
+  // como objeto {nombre: valor} en el mismo orden que espera la pedalera,
+  // enabled) es distinto del que usa el resto del editor
+  // (currentPatchData.effects: id numérico, parameters como array por
+  // posición). Esta función traduce de uno a otro para poder reutilizar
+  // setEffectLive tal cual, igual que hace Favoritos.
+  function convertAiSlotsToEffects(slots) {
+    const effects = [];
+    for (let i = 0; i < 7; i++) {
+      const s = slots && slots[i];
+      if (!s || !s.effectId) { effects.push(null); continue; }
+      const id = parseInt(s.effectId, 16) >>> 0;
+      const keys = Object.keys(s.params || {});
+      const parameters = keys.map(k => s.params[k]);
+      effects.push({ id, enabled: !!s.enabled, parameters });
+    }
+    return effects;
+  }
+
+  // Cargar un preset de la Biblioteca IA: mismo criterio que Favoritos.
+  // Los slots 1-6 se envían en vivo con setEffectLive (que ya incluye el
+  // orden correcto Mode-antes-que-Time para delays). El slot 7 NUNCA se
+  // manda en vivo por la misma limitación real de la pedalera explicada
+  // junto a pendSlot7Effect: se deja como cambio pendiente hasta guardar.
+  async function loadAiPreset(entry) {
+    if (!currentPatchData || !entry || !entry.data) return;
+    const effects = convertAiSlotsToEffects(entry.data.slots);
+    currentPatchData.name = entry.name;
+    for (let slot = 0; slot < 6; slot++) {
+      if (effects[slot]) currentPatchData.effects[slot] = JSON.parse(JSON.stringify(effects[slot]));
+    }
+    if (typeof entry.data.tempo === 'number') currentPatchData.tempo = entry.data.tempo;
+    const nameEl = document.getElementById('presetName');
+    if (nameEl) nameEl.textContent = entry.name;
+    isModified = true;
+    updateModifiedIndicator();
+    renderPedalboard();
+    if (!midiOut) return;
+    for (let slot = 0; slot < 6; slot++) {
+      const fx = effects[slot];
+      if (!fx) continue;
+      setEffectLive(slot, fx);
+      await sleep(220);
+    }
+    if (effects[6]) {
+      slot7Pending = true;
+      renderPedalboard();
+    }
+    if (typeof entry.data.tempo === 'number') {
+      const bpm = Math.max(40, Math.min(250, entry.data.tempo | 0));
+      midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x20,0x00,0x64,0x02, bpm & 0x7F, (bpm >> 7) & 0x7F, 0,0,0,0xF7]);
+      await sleep(60);
+    }
+    syncCurrentPatch();
+  }
+
+  function deleteFavorite(id) {
+    if (!confirm('¿Borrar este favorito? No se puede deshacer.')) return;
+    const list = getFavorites().filter(f => f.id !== id);
+    saveFavoritesList(list);
+    renderFavoritesGrid();
+  }
+
   // Construye el registro EDTB de 24 bytes del slot 7 a partir del estado
   // local actual (currentPatchData.effects[6]) y lo inyecta en un buffer de
   // patch ya decodificado (8-bit, sin cabecera SysEx), sobreescribiendo lo
@@ -2530,7 +3076,9 @@
       if (!midiOut) return;
       const val = fx.enabled ? 1 : 0;
       midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x20,0x00, slot, 0x00, val, 0,0,0,0,0xF7]);
-      (fx.parameters || []).forEach((v, i) => setParameterRaw(slot, i + 2, v || 0));
+      const paramNames = getParamNames(fx.id);
+      const sendOrder = orderParamsForLiveSend(paramNames, (fx.parameters || []).length);
+      sendOrder.forEach(paramIdx => setParameterRaw(slot, paramIdx + 2, (fx.parameters && fx.parameters[paramIdx]) || 0));
     }, 150);
   }
 
@@ -2698,8 +3246,12 @@
         }
       }
 
+      const ampBrandClass = getAmpBrandClass(id) || '';
+      const isAmpClass = ampBrandClass ? 'is-amp' : '';
+
       html += `
-        <div class="pedal ${catClass} ${onClass} ${emptyClass} ${bpmClass} ${flashClass} ${pendingClass}" data-slot="${i}" data-bpm="${isBpm}" style="flex-grow:${flexGrow};">
+        <div class="pedal ${catClass} ${onClass} ${emptyClass} ${bpmClass} ${flashClass} ${pendingClass} ${isAmpClass} ${ampBrandClass}" data-slot="${i}" data-bpm="${isBpm}" style="flex-grow:${flexGrow};">
+          ${isAmpClass ? '<span class="amp-screw tl"></span><span class="amp-screw tr"></span><span class="amp-screw bl"></span><span class="amp-screw br"></span>' : ''}
           <button type="button" class="change-btn" data-slot="${i}" data-i18n-title="change_effect" title="Cambiar efecto">⇄</button>
           <div class="drag-handle" data-slot="${i}" data-i18n-title="drag_reorder" title="Arrastrar para reordenar">⠿</div>
           <div class="pedal-number">${slotNumber}</div>
@@ -2722,6 +3274,7 @@
       `;
     }
     board.innerHTML = html;
+    updateDspBadge();
 
     // Click en LED/nombre = toggle ON/OFF (o tap tempo si es BPM)
     board.querySelectorAll('.pedal-top[data-toggle="true"]').forEach(el => {
@@ -2966,6 +3519,26 @@
   // --------------------------------------------------------------
   // TOP BAR
   // --------------------------------------------------------------
+  // Actualiza el badge de DSP de la cabecera a partir del patch actual en
+  // memoria local. Separado de updateTopBar() para poder llamarlo también
+  // desde renderPedalboard(): así el badge se refresca tras CUALQUIER
+  // edición local (slider, cambio de efecto, favoritos, Biblioteca IA,
+  // Modo Demo...) sin depender de que la pedalera real devuelva el eco del
+  // patch por SysEx — algo que en Modo Demo (sin pedal) nunca ocurre.
+  function updateDspBadge() {
+    const dspBadge = document.getElementById('dspUsageBadge');
+    if (!dspBadge) return;
+    if (!currentPatchData) {
+      dspBadge.textContent = 'DSP: —%';
+      dspBadge.classList.remove('warn', 'over');
+      return;
+    }
+    const used = getUsedDSP();
+    dspBadge.textContent = `DSP: ${used}%`;
+    dspBadge.classList.toggle('over', used > 100);
+    dspBadge.classList.toggle('warn', used > 85 && used <= 100);
+  }
+
   function updateTopBar() {
     if (!currentPatchData) {
       document.getElementById('presetName').textContent = '—';
@@ -2993,15 +3566,7 @@
 
     const dspBadge = document.getElementById('dspUsageBadge');
     if (dspBadge) {
-      if (!currentPatchData) {
-        dspBadge.textContent = 'DSP: —%';
-        dspBadge.classList.remove('warn', 'over');
-      } else {
-        const used = getUsedDSP();
-        dspBadge.textContent = `DSP: ${used}%`;
-        dspBadge.classList.toggle('over', used > 100);
-        dspBadge.classList.toggle('warn', used > 85 && used <= 100);
-      }
+      updateDspBadge();
     }
   }
 
@@ -3365,7 +3930,7 @@
       if (!targetOutput) targetOutput = access.outputs.values().next().value;
       if (!targetInput) targetInput = access.inputs.values().next().value;
       if (!targetOutput || !targetInput) throw new Error('Dispositivo no encontrado');
-      midiOut = targetOutput;
+      midiOut = makeMidiOutSuppressible(targetOutput);
       midiIn = targetInput;
 
       document.getElementById('midiDot').classList.add('on');
@@ -3605,7 +4170,44 @@
       document.querySelectorAll('.zone-section').forEach(s => s.classList.remove('active'));
       tab.classList.add('active');
       document.getElementById('zone-' + tab.dataset.zone).classList.add('active');
+      // La Biblioteca IA se alimenta desde el panel de PresetAI (otro
+      // documento, mismo localStorage): repintar al abrir la pestaña por
+      // si se guardó algo nuevo desde allí en lo que iba de sesión.
+      if (tab.dataset.zone === 'ailibrary') renderAiLibraryGrid();
     });
+  });
+
+  // Favoritos: abrir modal, confirmar/cancelar guardado, y pintar la rejilla ya guardada
+  renderFavoritesGrid();
+  renderAiLibraryGrid();
+
+  // Modo Demo: botón manual, recuerda la última preferencia entre sesiones.
+  document.getElementById('demoModeBtn').addEventListener('click', () => setDemoMode(!demoMode));
+  try {
+    if (localStorage.getItem('g2four_demo_mode') === '1') setDemoMode(true);
+  } catch (e) {}
+
+  // Reconectar a mano en cualquier momento (p.ej. si conectaste la pedalera
+  // después de abrir la página, o cambiaste de puerto USB).
+  document.getElementById('midiReconnectMainBtn').addEventListener('click', () => {
+    if (demoMode) return; // en modo demo no tiene sentido: se reconecta solo al salir
+    connectMIDI().catch(e => console.warn(e));
+  });
+  document.getElementById('favSaveBtn').addEventListener('click', () => {
+    document.getElementById('favNameInput').value = '';
+    document.getElementById('favTagsInput').value = '';
+    document.getElementById('favSaveModal').style.display = 'flex';
+    document.getElementById('favNameInput').focus();
+  });
+  document.getElementById('favSaveConfirmBtn').addEventListener('click', () => {
+    const name = document.getElementById('favNameInput').value;
+    const tags = document.getElementById('favTagsInput').value;
+    if (!name.trim()) { document.getElementById('favNameInput').focus(); return; }
+    saveCurrentAsFavorite(name, tags);
+    document.getElementById('favSaveModal').style.display = 'none';
+  });
+  document.getElementById('favSaveCancelBtn').addEventListener('click', () => {
+    document.getElementById('favSaveModal').style.display = 'none';
   });
 
   // ================================================================
@@ -5267,7 +5869,9 @@ details.param-debug .debug-log-box{background:#080c14;border:1px solid #1a2030;b
     </div>
     <div class="btn-row">
       <button class="btn-green" id="saveFlashBtn" data-pai="save_flash_btn">💾 Guardar permanentemente + descargar .zptc</button>
+      <button class="btn-green" id="saveToAiLibraryBtn" type="button" style="background:#3a2a52;border-color:#8a5fd1;" data-pai="save_ai_library_btn">📚 Guardar en Biblioteca</button>
     </div>
+    <div id="aiLibrarySaveStatus" class="status" style="display:none;"></div>
     <div id="saveStatus" class="status" style="display:none;"></div>
     <div class="log" id="saveLog" style="display:none;"></div>
   </div>
@@ -5339,6 +5943,10 @@ const PAI_I18N = {
   slot_override_label: { es: 'Forzar slot (1-300):', en: 'Force slot (1-300):' },
   slot_override_ph: { es: 'opcional', en: 'optional' },
   save_flash_btn: { es: '💾 Guardar permanentemente + descargar .zptc', en: '💾 Save permanently + download .zptc' },
+  save_ai_library_btn: { es: '📚 Guardar en Biblioteca', en: '📚 Save to Library' },
+  ai_lib_no_preset: { es: 'Analiza primero un preset (paso 3) antes de guardarlo en la Biblioteca.', en: 'Parse a preset first (step 3) before saving it to the Library.' },
+  ai_lib_saved_prefix: { es: '✅ Guardado en la Biblioteca IA:', en: '✅ Saved to the AI Library:' },
+  ai_lib_save_err: { es: 'No se pudo guardar en la Biblioteca:', en: 'Could not save to the Library:' },
   modal_title: { es: 'G2 Four — Asistente de Presets de Artistas', en: 'G2 Four — Artist Preset Assistant' },
   prompt_lang_label: { es: 'Idioma del prompt:', en: 'Prompt language:' },
   prompt_lang_switched_es: { es: 'Prompt cambiado a español.', en: 'Prompt switched to Spanish.' },
@@ -6772,6 +7380,24 @@ document.getElementById('saveFlashBtn').addEventListener('click', async () => {
     setStatus('saveStatus','err', `${pt('save_err_prefix')} ` + e.message);
   } finally {
     btn.disabled = false;
+  }
+});
+
+document.getElementById('saveToAiLibraryBtn').addEventListener('click', () => {
+  if (!parsedJSON) { setStatus('aiLibrarySaveStatus','err', pt('ai_lib_no_preset')); return; }
+  const name = (document.getElementById('presetNameInput').value || '').trim()
+    || `${(parsedJSON.artist||'').trim()} - ${(parsedJSON.song||'').trim()}`.trim() || 'Preset IA';
+  const subtitle = [parsedJSON.artist, parsedJSON.song].filter(Boolean).join(' - ');
+  const entry = { id: Date.now(), name, subtitle, savedAt: new Date().toISOString(), data: parsedJSON };
+  try {
+    const AI_LIBRARY_KEY = 'g2four_ai_library';
+    const raw = localStorage.getItem(AI_LIBRARY_KEY);
+    const list = raw ? JSON.parse(raw) : [];
+    (Array.isArray(list) ? list : []).push(entry);
+    localStorage.setItem(AI_LIBRARY_KEY, JSON.stringify(Array.isArray(list) ? list : [entry]));
+    setStatus('aiLibrarySaveStatus','ok', `${pt('ai_lib_saved_prefix')} "${name}"`);
+  } catch (e) {
+    setStatus('aiLibrarySaveStatus','err', `${pt('ai_lib_save_err')} ` + e.message);
   }
 });
 
