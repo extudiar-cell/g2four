@@ -531,6 +531,54 @@
       background-image: repeating-linear-gradient(0deg, var(--amp-grille-dot) 0 0.6px, transparent 0.6px 3px);
     }
 
+    /* --------------------------------------------------------------
+       COLOR "PEDAL REAL" PARA EFECTOS NO-AMPLI (drive, dinámica,
+       modulación, delay, reverb, wah) que emulan un pedal concreto y
+       reconocible. Mismo mecanismo que en los amplis: variables CSS por
+       efecto + reglas genéricas .fx-tinted que las consumen. Solo se
+       aplica el color completo con el efecto encendido; apagado usa el
+       borde izquierdo de acento sobre el fondo genérico de categoría,
+       igual que el resto de pedales.
+       -------------------------------------------------------------- */
+    .pedal.fx-tinted            { border-left-color: var(--fx-border, #ff4a3a); }
+    .pedal.fx-tinted.on         { background: var(--fx-bg, #8a1a1a) !important; border-color: var(--fx-border, #ff4a3a) !important; box-shadow: 0 6px 0 #060a12, 0 0 30px var(--fx-glow, rgba(255,74,58,0.4)) !important; }
+    .pedal.fx-tinted.fx-light.on .name,
+    .pedal.fx-tinted.fx-light.on .category { color: #1a1408; }
+
+    /* DRIVE */
+    .fx-ep-drive    { --fx-bg:#e8dcc0; --fx-border:#8a6a3a; --fx-glow:rgba(138,106,58,0.3); }   /* EP Drive → Echoplex preamp / Xotic EP Booster */
+    .fx-rc-drive    { --fx-bg:#cfa96a; --fx-border:#8a6a3a; --fx-glow:rgba(138,106,58,0.3); }   /* RC Drive → Xotic RC Booster */
+    .fx-ts808       { --fx-bg:#2d6a2d; --fx-border:#f0f0e0; --fx-glow:rgba(80,180,80,0.4); }    /* TS Drive / TS+Boost → Ibanez TS808 */
+    .fx-klon        { --fx-bg:#b8892a; --fx-border:#f0d090; --fx-glow:rgba(212,175,55,0.4); }   /* GoldDrive → Klon Centaur */
+    .fx-zendrive    { --fx-bg:#a89361; --fx-border:#6e5c34; --fx-glow:rgba(168,147,97,0.3); }   /* Zen O.DRV → Hermida Zendrive */
+    .fx-gridslammer { --fx-bg:#1a1a1a; --fx-border:#c0272d; --fx-glow:rgba(224,50,50,0.4); }    /* BG GRID → Mesa Grid Slammer */
+    .fx-mxr-orange  { --fx-bg:#d9601a; --fx-border:#6b2e0a; --fx-glow:rgba(217,96,26,0.4); }    /* Plus DIST/DIST One/MetalWRLD → MXR Distortion+/Boss DS-1/MT-2 */
+    .fx-rat         { --fx-bg:#141414; --fx-border:#999999; --fx-glow:rgba(255,255,255,0.15); } /* SqueakDST → ProCo RAT */
+    .fx-riot        { --fx-bg:#5a1a7a; --fx-border:#d8a0e8; --fx-glow:rgba(180,90,220,0.4); }   /* VioletDST → Suhr Riot Reloaded */
+    .fx-tonebender  { --fx-bg:#8a8a8e; --fx-border:#e8e8ec; --fx-glow:rgba(200,200,210,0.3); }  /* TB MK1.5 → Tone Bender MK1.5 */
+    .fx-bigmuff-nyc { --fx-bg:#1a1a1a; --fx-border:#b06ad4; --fx-glow:rgba(176,106,212,0.35); } /* NYC Muff → EHX Big Muff NYC */
+    .fx-throttlebox { --fx-bg:#1a1a1a; --fx-border:#e0611a; --fx-glow:rgba(224,97,26,0.35); }   /* HG THRTTL → Mesa Throttle Box */
+    /* DYNAMICS */
+    .fx-dynacomp    { --fx-bg:#d94f9e; --fx-border:#6b1a4a; --fx-glow:rgba(217,79,158,0.4); }   /* Comp → MXR Dyna Comp */
+    .fx-ross        { --fx-bg:#8a8a8e; --fx-border:#e8e8ec; --fx-glow:rgba(200,200,210,0.3); }  /* GrayComp → Ross Compressor */
+    .fx-demeter     { --fx-bg:#141414; --fx-border:#b8935a; --fx-glow:rgba(184,147,90,0.3); }   /* BlackOpt → Demeter Compulator */
+    .fx-urei        { --fx-bg:#141414; --fx-border:#4a90d9; --fx-glow:rgba(74,144,217,0.4); }   /* 1176 LMT → UREI 1176LN */
+    /* MODULATION */
+    .fx-smallclone  { --fx-bg:#2a8a3a; --fx-border:#e8f5e8; --fx-glow:rgba(60,180,80,0.4); }    /* CloneCho → EHX Small Clone */
+    .fx-boss-ch1    { --fx-bg:#1a3a8a; --fx-border:#a0c0f0; --fx-glow:rgba(74,144,217,0.4); }   /* ChorusOne → Boss CH-1 */
+    .fx-corona      { --fx-bg:#1a7a7a; --fx-border:#a0e8e8; --fx-glow:rgba(60,180,180,0.4); }   /* TriChorus → TC Corona Chorus */
+    .fx-smallstone  { --fx-bg:#a01a1a; --fx-border:#f0d0d0; --fx-glow:rgba(200,60,60,0.4); }    /* StonePha → EHX Small Stone */
+    .fx-mxr-flanger { --fx-bg:#7a7a80; --fx-border:#e0e0e6; --fx-glow:rgba(200,200,210,0.3); }  /* VinFLNGR → MXR Flanger M117R */
+    /* DELAY */
+    .fx-echoplex    { --fx-bg:#cfa96a; --fx-border:#8a6a3a; --fx-glow:rgba(138,106,58,0.3); }   /* TapeEcho3 → Maestro Echoplex EP-3 */
+    .fx-eventide    { --fx-bg:#1c1c1e; --fx-border:#e0611a; --fx-glow:rgba(224,97,26,0.3); }    /* DualDelay → Eventide TimeFactor */
+    /* REVERB */
+    .fx-fender-bf   { --fx-bg:#1c1c1e; --fx-border:#b8c0c8; --fx-glow:rgba(184,192,200,0.3); }  /* FD Spring → Fender '65 Twin (blackface) */
+    /* PEDAL */
+    .fx-crybaby     { --fx-bg:#a01a1a; --fx-border:#f0d0d0; --fx-glow:rgba(200,60,60,0.4); }    /* BlackWah → Dunlop Cry Baby */
+    .fx-chromewah   { --fx-bg:#b8bcc0; --fx-border:#6a6e72; --fx-glow:rgba(184,188,192,0.35); } /* ChromeWah → wah cromado */
+    .fx-ibanezwah   { --fx-bg:#141414; --fx-border:#999999; --fx-glow:rgba(255,255,255,0.15); } /* WAH100 → wah Ibanez */
+
     .pedal.empty {
       opacity: 0.55;
       border-style: dashed;
@@ -1261,16 +1309,16 @@
         <button class="lang-btn" onclick="setLanguage('en')" id="lang-en">EN</button>
       </div>
       <button class="nav-btn presetai-btn" id="presetAiBtn" type="button">🤖 PresetAI</button>
-      <button class="nav-btn" id="demoModeBtn" type="button" title="Editar y previsualizar sin enviar nada a ninguna pedalera">🎭 Modo Demo</button>
+      <button class="nav-btn" id="demoModeBtn" type="button" data-i18n="demo_mode_btn" data-i18n-title="demo_mode_btn_title" title="Editar y previsualizar sin enviar nada a ninguna pedalera">🎭 Modo Demo</button>
       <button class="nav-btn save-btn" id="saveBtn" data-i18n="save">💾 GUARDAR</button>
       <button class="nav-btn save-btn" id="saveToDiskBtn" data-i18n="save_to_disk">💾 GUARDAR EN DISCO</button>
       <div class="midi-indicator">
         <span class="midi-dot" id="midiDot"></span>
         <span class="midi-label" id="midiLabel">MIDI</span>
-        <button class="nav-btn" id="midiReconnectMainBtn" type="button" title="Buscar de nuevo la pedalera por MIDI" style="padding:3px 8px; font-size:0.65rem;">🔌</button>
+        <button class="nav-btn" id="midiReconnectMainBtn" type="button" data-i18n-title="midi_reconnect_title" title="Buscar de nuevo la pedalera por MIDI" style="padding:3px 8px; font-size:0.65rem;">🔌</button>
       </div>
     </div>
-    <div id="demoModeBanner" style="display:none; align-items:center; gap:8px; justify-content:center; background:#3a2a52; color:#d9b8ff; font-size:0.82rem; padding:6px 10px;">
+    <div id="demoModeBanner" style="display:none; align-items:center; gap:8px; justify-content:center; background:#3a2a52; color:#d9b8ff; font-size:0.82rem; padding:6px 10px;" data-i18n="demo_mode_banner">
       🎭 Modo demo activo — los cambios se ven en pantalla pero no se envían a ninguna pedalera real
     </div>
   </div>
@@ -1286,10 +1334,9 @@
       <button type="button" class="zone-tab active" data-zone="presets">📋 PRESETS</button>
       <button type="button" class="zone-tab" data-zone="audio" data-i18n="backing_tracks">🎵 PISTAS DE ACOMPAÑAMIENTO MP3</button>
       <button type="button" class="zone-tab" data-zone="rhythm" data-i18n="rhythms">🥁 RITMOS</button>
-      <button type="button" class="zone-tab" data-zone="filemanager" data-i18n="file_manager">📁 GESTOR DE ARCHIVOS</button>
-      <button type="button" class="zone-tab" data-zone="filesexplorer" data-i18n="files_explorer">🗂️ EXPLORADOR DE ARCHIVOS</button>
-      <button type="button" class="zone-tab" data-zone="favorites">⭐ FAVORITOS</button>
-      <button type="button" class="zone-tab" data-zone="ailibrary">🤖 BIBLIOTECA IA</button>
+      <button type="button" class="zone-tab" data-zone="files" data-i18n="files">📁 ARCHIVOS</button>
+      <button type="button" class="zone-tab" data-zone="favorites" data-i18n="favorites_tab">⭐ FAVORITOS</button>
+      <button type="button" class="zone-tab" data-zone="ailibrary" data-i18n="ai_library_tab">🤖 BIBLIOTECA IA</button>
     </div>
     <div class="zone-body">
       <div class="zone-section active" id="zone-presets">
@@ -1435,76 +1482,82 @@
         </div>
       </div>
 
-      <div class="zone-section" id="zone-filemanager">
-        <div class="fm-section">
-          <div class="fm-section-title" data-i18n="fm_save_title">📤 Guardar preset actual a archivo zptc</div>
-          <div class="fm-btn-row">
-            <button type="button" class="fm-btn primary-action" id="fmSaveAsZptcBtn" data-i18n="fm_save_btn">💾 GUARDAR COMO ZPTC</button>
-          </div>
-          <div class="fm-status-bar" id="fmSaveAsStatus" data-i18n="fm_save_status">Descarga el preset activo de la pedalera como archivo .zptc</div>
-        </div>
+      <div class="zone-section" id="zone-files">
+        <div style="display:flex; gap:24px; align-items:flex-start; flex-wrap:wrap;">
+          <div style="flex:1 1 320px; min-width:280px;">
+            <div data-i18n="files_save_load_col" style="color:#f5c542; font-weight:700; font-size:0.85rem; margin-bottom:10px; letter-spacing:0.4px;">💾 GUARDAR / CARGAR .ZPTC</div>
+            <div class="fm-section">
+              <div class="fm-section-title" data-i18n="fm_save_title">📤 Guardar preset actual a archivo zptc</div>
+              <div class="fm-btn-row">
+                <button type="button" class="fm-btn primary-action" id="fmSaveAsZptcBtn" data-i18n="fm_save_btn">💾 GUARDAR COMO ZPTC</button>
+              </div>
+              <div class="fm-status-bar" id="fmSaveAsStatus" data-i18n="fm_save_status">Descarga el preset activo de la pedalera como archivo .zptc</div>
+            </div>
 
-        <div class="fm-section">
-          <div class="fm-section-title" data-i18n="fm_load_title">📥 Cargar un .zptc en un slot de la pedalera</div>
-          <div class="fm-btn-row">
-            <button type="button" class="fm-btn primary-action" id="fmPickZptcBtn" data-i18n="fm_load_btn">📂 CARGAR ZPTC</button>
-            <input type="number" class="fm-slot-input" id="fmSlotInput" min="1" max="300" placeholder="Slot 1-300">
-            <button type="button" class="fm-btn" id="fmUploadZptcBtn" data-i18n="fm_upload_btn" disabled>⬆️ SUBIR</button>
-          </div>
-          <input type="file" id="fmZptcFileInput" accept=".zptc" style="display:none">
-          <div class="fm-status-bar" id="fmUploadStatus" data-i18n="fm_load_status">Elige un .zptc, indica el slot destino (1-300) y pulsa Subir</div>
-        </div>
+            <div class="fm-section">
+              <div class="fm-section-title" data-i18n="fm_load_title">📥 Cargar un .zptc en un slot de la pedalera</div>
+              <div class="fm-btn-row">
+                <button type="button" class="fm-btn primary-action" id="fmPickZptcBtn" data-i18n="fm_load_btn">📂 CARGAR ZPTC</button>
+                <input type="number" class="fm-slot-input" id="fmSlotInput" min="1" max="300" placeholder="Slot 1-300">
+                <button type="button" class="fm-btn" id="fmUploadZptcBtn" data-i18n="fm_upload_btn" disabled>⬆️ SUBIR</button>
+              </div>
+              <input type="file" id="fmZptcFileInput" accept=".zptc" style="display:none">
+              <div class="fm-status-bar" id="fmUploadStatus" data-i18n="fm_load_status">Elige un .zptc, indica el slot destino (1-300) y pulsa Subir</div>
+            </div>
 
-        <div class="fm-section">
-          <div class="fm-section-title" data-i18n="fm_backup_title">🗄️ Copia de seguridad 300 zptc</div>
-          <div class="fm-btn-row">
-            <button type="button" class="fm-btn primary-action" id="fmBackupAllBtn" data-i18n="fm_backup_btn">📦 RESPALDO TOTAL ZPTC</button>
+            <div class="fm-section">
+              <div class="fm-section-title" data-i18n="fm_backup_title">🗄️ Copia de seguridad 300 zptc</div>
+              <div class="fm-btn-row">
+                <button type="button" class="fm-btn primary-action" id="fmBackupAllBtn" data-i18n="fm_backup_btn">📦 RESPALDO TOTAL ZPTC</button>
+              </div>
+              <div class="fm-progress-wrap" id="fmBackupProgressWrap" style="display:none;margin-top:6px;">
+                <div class="fm-progress-track"><div class="fm-progress-fill" id="fmBackupProgressFill"></div></div>
+                <div class="fm-progress-text" id="fmBackupProgressText">0 / 0</div>
+              </div>
+              <div class="fm-status-bar" id="fmBackupStatus" data-i18n="fm_backup_status">Descarga los 300 presets como archivos .zptc individuales</div>
+              <div class="fm-debug-log" id="fmBackupDebugLog" style="display:none"></div>
+            </div>
           </div>
-          <div class="fm-progress-wrap" id="fmBackupProgressWrap" style="display:none;margin-top:6px;">
-            <div class="fm-progress-track"><div class="fm-progress-fill" id="fmBackupProgressFill"></div></div>
-            <div class="fm-progress-text" id="fmBackupProgressText">0 / 0</div>
-          </div>
-          <div class="fm-status-bar" id="fmBackupStatus" data-i18n="fm_backup_status">Descarga los 300 presets como archivos .zptc individuales</div>
-          <div class="fm-debug-log" id="fmBackupDebugLog" style="display:none"></div>
-        </div>
-      </div>
 
-      <div class="zone-section" id="zone-filesexplorer">
-        <div class="fm-section">
-          <div class="fm-section-title" data-i18n="fx_title">🗂️ Explorador de archivos .zptc — click para cargar directamente</div>
-          <div class="fx-toolbar">
-            <button type="button" class="fm-btn primary-action" id="fxPickFolderBtn" data-i18n="fx_pick_folder">📂 ELEGIR CARPETA</button>
-            <button type="button" class="fm-btn" id="fxRefreshBtn" data-i18n="fx_refresh" disabled>⟳ REFRESCAR</button>
-            <label class="rhy-mute-label" style="margin-left:4px;">
-              <input type="checkbox" id="fxManualSlotToggle"> <span data-i18n="fx_manual_slot">forzar slot manual</span>
-            </label>
-            <input type="number" class="fm-slot-input" id="fxManualSlotInput" min="1" max="300" placeholder="1-300" style="width:70px;">
+          <div style="flex:1 1 320px; min-width:280px; border-left:1px solid #2a3040; padding-left:24px;">
+            <div data-i18n="files_explore_col" style="color:#f5c542; font-weight:700; font-size:0.85rem; margin-bottom:10px; letter-spacing:0.4px;">🎧 EXPLORAR Y ESCUCHAR</div>
+            <div class="fm-section">
+              <div class="fm-section-title" data-i18n="fx_title">🗂️ Explorador de archivos .zptc — click para cargar directamente</div>
+              <div class="fx-toolbar">
+                <button type="button" class="fm-btn primary-action" id="fxPickFolderBtn" data-i18n="fx_pick_folder">📂 ELEGIR CARPETA</button>
+                <button type="button" class="fm-btn" id="fxRefreshBtn" data-i18n="fx_refresh" disabled>⟳ REFRESCAR</button>
+                <label class="rhy-mute-label" style="margin-left:4px;">
+                  <input type="checkbox" id="fxManualSlotToggle"> <span data-i18n="fx_manual_slot">forzar slot manual</span>
+                </label>
+                <input type="number" class="fm-slot-input" id="fxManualSlotInput" min="1" max="300" placeholder="1-300" style="width:70px;">
+              </div>
+              <div class="fx-note" data-i18n="fx_note">Click en un archivo .zptc = se escribe directamente en el slot activo y se escucha al instante.</div>
+              <div class="fx-tree" id="fxTreeContainer">
+                <div class="fx-tree-empty" data-i18n="fx_empty">Elige una carpeta para empezar a explorar…</div>
+              </div>
+              <div class="fm-status-bar" id="fxStatus" data-i18n="fx_status_init">Elige una carpeta con tus copias de seguridad .zptc</div>
+              <div class="fm-debug-log" id="fxDebugLog" style="display:none"></div>
+            </div>
           </div>
-          <div class="fx-note" data-i18n="fx_note">Click en un archivo .zptc = se escribe directamente en el slot activo y se escucha al instante.</div>
-          <div class="fx-tree" id="fxTreeContainer">
-            <div class="fx-tree-empty" data-i18n="fx_empty">Elige una carpeta para empezar a explorar…</div>
-          </div>
-          <div class="fm-status-bar" id="fxStatus" data-i18n="fx_status_init">Elige una carpeta con tus copias de seguridad .zptc</div>
-          <div class="fm-debug-log" id="fxDebugLog" style="display:none"></div>
         </div>
       </div>
 
       <div class="zone-section" id="zone-favorites">
         <div class="presets-toolbar">
-          <button type="button" class="presets-scan-btn" id="favSaveBtn">★ GUARDAR PATCH ACTUAL</button>
-          <span id="favStatus">Guarda variantes en tu navegador, sin tocar el pedal</span>
+          <button type="button" class="presets-scan-btn" id="favSaveBtn" data-i18n="fav_save_btn">★ GUARDAR PATCH ACTUAL</button>
+          <span id="favStatus" data-i18n="fav_status">Guarda variantes en tu navegador, sin tocar el pedal</span>
         </div>
         <div class="presets-grid" id="favoritesGrid">
-          <div class="presets-empty">Aún no tienes favoritos guardados</div>
+          <div class="presets-empty" data-i18n="fav_empty">Aún no tienes favoritos guardados</div>
         </div>
       </div>
 
       <div class="zone-section" id="zone-ailibrary">
         <div class="presets-toolbar">
-          <span id="aiLibStatus">Presets generados con PresetAI, guardados en el navegador sin necesidad de escribirlos en la pedalera</span>
+          <span id="aiLibStatus" data-i18n="ai_lib_status_main">Presets generados con PresetAI, guardados en el navegador sin necesidad de escribirlos en la pedalera</span>
         </div>
         <div class="presets-grid" id="aiLibraryGrid">
-          <div class="presets-empty">Aún no tienes presets de PresetAI guardados</div>
+          <div class="presets-empty" data-i18n="ai_lib_empty">Aún no tienes presets de PresetAI guardados</div>
         </div>
       </div>
     </div>
@@ -1530,13 +1583,13 @@
 
 <div id="favSaveModal" class="modal">
   <div class="modal-content" style="max-width:420px;">
-    <div class="modal-header">Guardar favorito</div>
-    <input type="text" id="favNameInput" placeholder="Nombre (ej: Blues cálido)" maxlength="40"
+    <div class="modal-header" data-i18n="fav_modal_title">Guardar favorito</div>
+    <input type="text" id="favNameInput" data-i18n-placeholder="fav_name_ph" placeholder="Nombre (ej: Blues cálido)" maxlength="40"
       style="width:100%;box-sizing:border-box;padding:10px 14px;border-radius:40px;border:1px solid #3f5270;background:#0c101e;color:#f0f4ff;font-size:0.9rem;margin-bottom:10px;">
-    <input type="text" id="favTagsInput" placeholder="Etiquetas separadas por coma (ej: blues, limpio)" maxlength="60"
+    <input type="text" id="favTagsInput" data-i18n-placeholder="fav_tags_ph" placeholder="Etiquetas separadas por coma (ej: blues, limpio)" maxlength="60"
       style="width:100%;box-sizing:border-box;padding:10px 14px;border-radius:40px;border:1px solid #3f5270;background:#0c101e;color:#f0f4ff;font-size:0.9rem;margin-bottom:4px;">
-    <button type="button" class="close-modal" id="favSaveConfirmBtn" style="margin-top:14px;">Guardar</button>
-    <button type="button" class="close-modal" id="favSaveCancelBtn" style="background:transparent;">Cancelar</button>
+    <button type="button" class="close-modal" id="favSaveConfirmBtn" data-i18n="fav_modal_save" style="margin-top:14px;">Guardar</button>
+    <button type="button" class="close-modal" id="favSaveCancelBtn" data-i18n="fav_modal_cancel" style="background:transparent;">Cancelar</button>
   </div>
 </div>
 
@@ -1569,8 +1622,20 @@
     "no_presets": "Sin presets cargados aún",
     "backing_tracks": "🎵 PISTAS DE ACOMPAÑAMIENTO MP3",
     "rhythms": "🥁 RITMOS",
-    "file_manager": "📁 GESTOR DE ARCHIVOS",
-    "files_explorer": "🗂️ EXPLORADOR DE ARCHIVOS",
+    "files": "📁 ARCHIVOS",
+    "files_save_load_col": "💾 GUARDAR / CARGAR .ZPTC",
+    "files_explore_col": "🎧 EXPLORAR Y ESCUCHAR",
+    "favorites_tab": "⭐ FAVORITOS",
+    "ai_library_tab": "🤖 BIBLIOTECA IA",
+    "fav_save_btn": "★ GUARDAR PATCH ACTUAL",
+    "fav_status": "Guarda variantes en tu navegador, sin tocar el pedal",
+    "fav_empty": "Aún no tienes favoritos guardados",
+    "ai_lib_status_main": "Presets generados con PresetAI, guardados en el navegador sin necesidad de escribirlos en la pedalera",
+    "ai_lib_empty": "Aún no tienes presets de PresetAI guardados",
+    "demo_mode_btn": "🎭 Modo Demo",
+    "demo_mode_btn_title": "Editar y previsualizar sin enviar nada a ninguna pedalera",
+    "demo_mode_banner": "🎭 Modo demo activo — los cambios se ven en pantalla pero no se envían a ninguna pedalera real",
+    "midi_reconnect_title": "Buscar de nuevo la pedalera por MIDI",
     "playlist": "LISTA",
     "no_songs": "Sin canciones aún",
     "player": "REPRODUCTOR",
@@ -1619,6 +1684,12 @@
     "effect_modal_title": "Selecciona un efecto",
     "close": "Cerrar",
     "unsaved": "⏳ SIN GUARDAR",
+    "unsaved_title": "Cambio sin guardar: no sonará hasta pulsar SAVE",
+    "fav_modal_title": "Guardar favorito",
+    "fav_name_ph": "Nombre (ej: Blues cálido)",
+    "fav_tags_ph": "Etiquetas separadas por coma (ej: blues, limpio)",
+    "fav_modal_save": "Guardar",
+    "fav_modal_cancel": "Cancelar",
     "change_effect": "Cambiar efecto",
     "drag_reorder": "Arrastrar para reordenar",
     "empty": "Vacío",
@@ -1644,8 +1715,20 @@
     "no_presets": "No presets loaded yet",
     "backing_tracks": "🎵 MP3 BACKING TRACKS",
     "rhythms": "🥁 RHYTHMS",
-    "file_manager": "📁 FILE MANAGER",
-    "files_explorer": "🗂️ FILES EXPLORER",
+    "files": "📁 FILES",
+    "files_save_load_col": "💾 SAVE / LOAD .ZPTC",
+    "files_explore_col": "🎧 EXPLORE & LISTEN",
+    "favorites_tab": "⭐ FAVORITES",
+    "ai_library_tab": "🤖 AI LIBRARY",
+    "fav_save_btn": "★ SAVE CURRENT PATCH",
+    "fav_status": "Saves variants in your browser, without touching the pedal",
+    "fav_empty": "You don't have any favorites saved yet",
+    "ai_lib_status_main": "Presets generated with PresetAI, saved in your browser without needing to write them to the pedal",
+    "ai_lib_empty": "You don't have any PresetAI presets saved yet",
+    "demo_mode_btn": "🎭 Demo Mode",
+    "demo_mode_btn_title": "Edit and preview without sending anything to any real pedal",
+    "demo_mode_banner": "🎭 Demo mode active — changes show on screen but nothing is sent to any real pedal",
+    "midi_reconnect_title": "Search again for the pedal over MIDI",
     "playlist": "PLAYLIST",
     "no_songs": "No songs yet",
     "player": "PLAYER",
@@ -1694,6 +1777,12 @@
     "effect_modal_title": "Select an effect",
     "close": "Close",
     "unsaved": "⏳ UNSAVED",
+    "unsaved_title": "Unsaved change: won't be heard until you press SAVE",
+    "fav_modal_title": "Save favorite",
+    "fav_name_ph": "Name (e.g. Warm Blues)",
+    "fav_tags_ph": "Comma-separated tags (e.g. blues, clean)",
+    "fav_modal_save": "Save",
+    "fav_modal_cancel": "Cancel",
     "change_effect": "Change effect",
     "drag_reorder": "Drag to reorder",
     "empty": "Empty",
@@ -1875,6 +1964,58 @@
     if (((id >>> 24) & 0xFF) !== 0x04) return null;
     const brand = AMP_BRAND_MAP.get(id >>> 0);
     return brand ? `amp-${brand}` : null;
+  }
+
+  // Aspecto "pedal real" para efectos NO amplificador que emulan un pedal
+  // concreto y reconocible (según el propio manual de Zoom, "Simulation of
+  // the Ibanez TS808", etc., o evidencia de color confirmada aparte cuando
+  // el manual no lo dice pero el pedal real es inconfundible, p.ej. Suhr
+  // Riot Reloaded = morado). El resto de efectos de cada categoría se
+  // quedan con el color genérico de categoría de siempre.
+  // light:true = fondo claro, hace falta texto oscuro para que se lea bien.
+  const EFFECT_COLOR_MAP = new Map([
+    // DRIVE
+    [0x03000010, { cls: 'fx-ep-drive',   light: true  }], // EP Drive → Echoplex preamp / Xotic EP Booster
+    [0x03000020, { cls: 'fx-rc-drive',   light: true  }], // RC Drive → Xotic RC Booster
+    [0x03000030, { cls: 'fx-ts808',      light: false }], // TS Drive → Ibanez TS808
+    [0x03000040, { cls: 'fx-klon',       light: true  }], // GoldDrive → Klon Centaur
+    [0x03000060, { cls: 'fx-zendrive',   light: true  }], // Zen O.DRV → Hermida Zendrive
+    [0x03000070, { cls: 'fx-gridslammer',light: false }], // BG GRID → Mesa Grid Slammer
+    [0x03000090, { cls: 'fx-mxr-orange', light: false }], // Plus DIST → MXR Distortion+
+    [0x030000A0,{ cls: 'fx-mxr-orange', light: false }], // DIST One → Boss DS-1
+    [0x030000B0,{ cls: 'fx-rat',        light: false }], // SqueakDST → ProCo RAT
+    [0x030000D0,{ cls: 'fx-riot',       light: false }], // VioletDST → Suhr Riot Reloaded
+    [0x030000E0,{ cls: 'fx-tonebender', light: true  }], // TB MK1.5 → Tone Bender MK1.5
+    [0x03000100,{ cls: 'fx-bigmuff-nyc',light: false }], // NYC Muff → EHX Big Muff NYC
+    [0x03000130,{ cls: 'fx-mxr-orange', light: false }], // MetalWRLD → Boss MT-2
+    [0x03000140,{ cls: 'fx-throttlebox',light: false }], // HG THRTTL → Mesa Throttle Box
+    [0x03000150,{ cls: 'fx-ts808',      light: false }], // TS+Boost → basado en TS808
+    // DYNAMICS
+    [0x01000010,{ cls: 'fx-dynacomp',   light: false }], // Comp → MXR Dyna Comp
+    [0x01000030,{ cls: 'fx-ross',       light: true  }], // GrayComp → Ross Compressor
+    [0x01000050,{ cls: 'fx-demeter',    light: false }], // BlackOpt → Demeter Compulator
+    [0x01000060,{ cls: 'fx-urei',       light: false }], // 1176 LMT → UREI 1176LN
+    // MODULATION
+    [0x06000020,{ cls: 'fx-smallclone', light: false }], // CloneCho → EHX Small Clone
+    [0x06000030,{ cls: 'fx-boss-ch1',   light: false }], // ChorusOne → Boss CH-1
+    [0x06000040,{ cls: 'fx-corona',     light: false }], // TriChorus → TC Corona Chorus
+    [0x060000B0,{ cls: 'fx-smallstone', light: false }], // StonePha → EHX Small Stone
+    [0x060000F0,{ cls: 'fx-mxr-flanger',light: true  }], // VinFLNGR → MXR Flanger M117R
+    // DELAY
+    [0x08000040,{ cls: 'fx-echoplex',   light: true  }], // TapeEcho3 → Maestro Echoplex EP-3
+    [0x08000050,{ cls: 'fx-eventide',   light: false }], // DualDelay → Eventide TimeFactor
+    // REVERB
+    [0x09000040,{ cls: 'fx-fender-bf',  light: false }], // FD Spring → Fender '65 Twin (blackface)
+    // PEDAL
+    [0x0B000030,{ cls: 'fx-crybaby',    light: false }], // BlackWah → Dunlop Cry Baby
+    [0x0B000040,{ cls: 'fx-chromewah',  light: true  }], // ChromeWah → wah de acabado cromado
+    [0x0B000050,{ cls: 'fx-ibanezwah',  light: false }], // WAH100 → wah de Ibanez
+  ]);
+
+  function getEffectColorClass(id) {
+    const entry = EFFECT_COLOR_MAP.get(id >>> 0);
+    if (!entry) return '';
+    return `fx-tinted ${entry.cls}${entry.light ? ' fx-light' : ''}`;
   }
 
   function getCategoryName(id) {
@@ -2471,7 +2612,8 @@ DEFAULT_PARAMS_MAP.set(0x04000060, [0x00, 0x21, 0x37, 0x32, 0x5a, 0x00, 0x28]); 
     get midiOut() { return midiOut; },
     get midiIn() { return midiIn; },
     get fullRefresh() { return fullRefresh; },
-    get currentPresetSlot() { return currentPresetSlot; }
+    get currentPresetSlot() { return currentPresetSlot; },
+    get getParamNames() { return getParamNames; }
   };
 
   function seven2eight(data, start, end) {
@@ -2801,7 +2943,7 @@ DEFAULT_PARAMS_MAP.set(0x04000060, [0x00, 0x21, 0x37, 0x32, 0x5a, 0x00, 0x28]); 
     const favorites = getFavorites();
     grid.innerHTML = '';
     if (favorites.length === 0) {
-      grid.innerHTML = '<div class="presets-empty">Aún no tienes favoritos guardados</div>';
+      grid.innerHTML = `<div class="presets-empty" data-i18n="fav_empty">${translations[currentLang].fav_empty}</div>`;
       return;
     }
     favorites.slice().reverse().forEach(fav => {
@@ -2929,7 +3071,7 @@ DEFAULT_PARAMS_MAP.set(0x04000060, [0x00, 0x21, 0x37, 0x32, 0x5a, 0x00, 0x28]); 
     const list = getAiLibrary();
     grid.innerHTML = '';
     if (list.length === 0) {
-      grid.innerHTML = '<div class="presets-empty">Aún no tienes presets de PresetAI guardados</div>';
+      grid.innerHTML = `<div class="presets-empty" data-i18n="ai_lib_empty">${translations[currentLang].ai_lib_empty}</div>`;
       return;
     }
     list.slice().reverse().forEach(entry => {
@@ -3248,14 +3390,15 @@ DEFAULT_PARAMS_MAP.set(0x04000060, [0x00, 0x21, 0x37, 0x32, 0x5a, 0x00, 0x28]); 
 
       const ampBrandClass = getAmpBrandClass(id) || '';
       const isAmpClass = ampBrandClass ? 'is-amp' : '';
+      const fxColorClass = ampBrandClass ? '' : getEffectColorClass(id); // los amplis usan su propio sistema
 
       html += `
-        <div class="pedal ${catClass} ${onClass} ${emptyClass} ${bpmClass} ${flashClass} ${pendingClass} ${isAmpClass} ${ampBrandClass}" data-slot="${i}" data-bpm="${isBpm}" style="flex-grow:${flexGrow};">
+        <div class="pedal ${catClass} ${onClass} ${emptyClass} ${bpmClass} ${flashClass} ${pendingClass} ${isAmpClass} ${ampBrandClass} ${fxColorClass}" data-slot="${i}" data-bpm="${isBpm}" style="flex-grow:${flexGrow};">
           ${isAmpClass ? '<span class="amp-screw tl"></span><span class="amp-screw tr"></span><span class="amp-screw bl"></span><span class="amp-screw br"></span>' : ''}
           <button type="button" class="change-btn" data-slot="${i}" data-i18n-title="change_effect" title="Cambiar efecto">⇄</button>
           <div class="drag-handle" data-slot="${i}" data-i18n-title="drag_reorder" title="Arrastrar para reordenar">⠿</div>
           <div class="pedal-number">${slotNumber}</div>
-          ${isPendingSlot7 ? '<div class="pending-badge" title="Cambio sin guardar: no sonará hasta pulsar SAVE">⏳ SIN GUARDAR</div>' : ''}
+          ${isPendingSlot7 ? `<div class="pending-badge" data-i18n="unsaved" data-i18n-title="unsaved_title" title="${translations[currentLang].unsaved_title}">${translations[currentLang].unsaved}</div>` : ''}
           <div class="pedal-top" data-slot="${i}" data-toggle="${!isEmpty}">
             <div class="led"></div>
             <div class="name">${isEmpty ? '—' : name}</div>
@@ -7169,12 +7312,34 @@ function toggleSlot(slot, enable) {
 }
 function syncPatch() { midiOut.send([0xF0,0x52,0x00,0x6E,0x64,0x13,0x00,0xF7]); }
 
+// Mismo criterio que en el editor principal (ver orderParamsForLiveSend allí):
+// en Delay y similares, si se manda primero Time y luego Mode, la pedalera
+// recalcula Time al recibir Mode y el valor final no es el que queríamos.
+// Aquí se accede a los nombres de parámetro reales a través de la ventana
+// padre (pg2.getParamNames), ya que este panel no tiene su propia base de
+// datos de efectos. Si por lo que sea no está disponible, se manda en el
+// orden que ya traían los datos (comportamiento anterior, sin reordenar).
+function orderParamsForLiveSendLocal(paramNames, fallbackLength) {
+  const n = paramNames ? paramNames.length : (fallbackLength || 0);
+  const order = [];
+  for (let i = 0; i < n; i++) order.push(i);
+  if (!paramNames) return order;
+  const modeIdx = paramNames.findIndex(p => /^mode$/i.test(p));
+  const timeIdx = paramNames.findIndex(p => /^time$/i.test(p));
+  if (modeIdx === -1 || timeIdx === -1 || modeIdx < timeIdx) return order;
+  order[timeIdx] = modeIdx;
+  order[modeIdx] = timeIdx;
+  return order;
+}
+
 async function sendChainToPedal(data) {
   sendLogClear();
   document.getElementById('progressWrap').style.display='block';
   const slots = data.slots;
-  const TOTAL_PASSES = 2; // Se envía la cadena completa 2 veces seguidas para que la G2 Four
-                          // asiente bien todos los parámetros (a veces la 1ª pasada no los aplica todos).
+  const pg2 = window.parent && window.parent._g2;
+  const getParamNamesRemote = pg2 && pg2.getParamNames;
+  const TOTAL_PASSES = 1; // Antes se mandaba la cadena 2 veces para compensar el problema
+                          // de Mode/Time en los delays; ya no hace falta (ver orderParamsForLiveSendLocal).
   try {
     for (let pass=1; pass<=TOTAL_PASSES; pass++) {
       sendLogAppend(`${pt('send_pass')} ${pass}/${TOTAL_PASSES}…`);
@@ -7182,12 +7347,14 @@ async function sendChainToPedal(data) {
         const s = slots[i];
         const id = parseInt(s.effectId,16)>>>0;
         const paramNames = Object.keys(s.params||{});
+        const paramNamesReal = getParamNamesRemote ? getParamNamesRemote(id) : null;
         const overallIndex = (pass-1)*slots.length + i;
         const overallTotal = TOTAL_PASSES*slots.length;
         document.getElementById('progressBar').style.width = Math.round((overallIndex/overallTotal)*100)+'%';
         changeEffectType(i, id);
         await sleep(120);
-        for (let p=0;p<paramNames.length;p++) {
+        const sendOrder = orderParamsForLiveSendLocal(paramNamesReal, paramNames.length);
+        for (const p of sendOrder) {
           const val = s.params[paramNames[p]];
           if (val!==undefined) { setParam(i, p+2, val); await sleep(30); }
         }
