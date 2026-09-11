@@ -1547,6 +1547,9 @@
         <div class="presets-toolbar">
           <button type="button" class="presets-scan-btn" id="favSaveBtn" data-i18n="fav_save_btn">★ GUARDAR PATCH ACTUAL</button>
           <span id="favStatus" data-i18n="fav_status">Guarda variantes en tu navegador, sin tocar el pedal</span>
+          <button type="button" class="fm-btn" id="favExportBtn" data-i18n="fav_export_btn">⬇️ Export Favorites</button>
+          <button type="button" class="fm-btn" id="favImportBtn" data-i18n="fav_import_btn">⬆️ Import Favorites</button>
+          <input type="file" id="favImportFileInput" accept=".json" style="display:none">
         </div>
         <div class="presets-grid" id="favoritesGrid">
           <div class="presets-empty" data-i18n="fav_empty">Aún no tienes favoritos guardados</div>
@@ -1556,6 +1559,9 @@
       <div class="zone-section" id="zone-ailibrary">
         <div class="presets-toolbar">
           <span id="aiLibStatus" data-i18n="ai_lib_status_main">Presets generados con PresetAI, guardados en el navegador sin necesidad de escribirlos en la pedalera</span>
+          <button type="button" class="fm-btn" id="aiLibExportBtn" data-i18n="ai_lib_export_btn">⬇️ Export AI Library</button>
+          <button type="button" class="fm-btn" id="aiLibImportBtn" data-i18n="ai_lib_import_btn">⬆️ Import AI Library</button>
+          <input type="file" id="aiLibImportFileInput" accept=".json" style="display:none">
         </div>
         <div class="presets-grid" id="aiLibraryGrid">
           <div class="presets-empty" data-i18n="ai_lib_empty">Aún no tienes presets de PresetAI guardados</div>
@@ -1686,6 +1692,14 @@
     "close": "Cerrar",
     "unsaved": "⏳ SIN GUARDAR",
     "unsaved_title": "Cambio sin guardar: no sonará hasta pulsar SAVE",
+    "based_on": "Basado en",
+    "fav_export_btn": "⬇️ Export Favorites",
+    "fav_import_btn": "⬆️ Import Favorites",
+    "ai_lib_export_btn": "⬇️ Export AI Library",
+    "ai_lib_import_btn": "⬆️ Import AI Library",
+    "lib_import_ok": "✅ Importado correctamente",
+    "lib_import_err": "❌ El archivo no es un JSON válido de esta app",
+    "lib_import_wrong_kind": "❌ Ese archivo es de la otra biblioteca (Favoritos/IA), no de esta",
     "fav_modal_title": "Guardar favorito",
     "fav_name_ph": "Nombre (ej: Blues cálido)",
     "fav_tags_ph": "Etiquetas separadas por coma (ej: blues, limpio)",
@@ -1779,6 +1793,14 @@
     "close": "Close",
     "unsaved": "⏳ UNSAVED",
     "unsaved_title": "Unsaved change: won't be heard until you press SAVE",
+    "based_on": "Based on",
+    "fav_export_btn": "⬇️ Export Favorites",
+    "fav_import_btn": "⬆️ Import Favorites",
+    "ai_lib_export_btn": "⬇️ Export AI Library",
+    "ai_lib_import_btn": "⬆️ Import AI Library",
+    "lib_import_ok": "✅ Imported successfully",
+    "lib_import_err": "❌ That file isn't a valid JSON export from this app",
+    "lib_import_wrong_kind": "❌ That file is from the other library (Favorites/AI), not this one",
     "fav_modal_title": "Save favorite",
     "fav_name_ph": "Name (e.g. Warm Blues)",
     "fav_tags_ph": "Comma-separated tags (e.g. blues, clean)",
@@ -1801,6 +1823,7 @@
     currentLang = lang;
     localStorage.setItem('g2four_lang', lang);
     updateUI();
+    renderPedalboard(); // refresca los tooltips "Basado en..." al cambiar de idioma
   }
 
   function updateUI() {
@@ -2009,14 +2032,106 @@
     [0x09000040,{ cls: 'fx-fender-bf',  light: false }], // FD Spring → Fender '65 Twin (blackface)
     // PEDAL
     [0x0B000030,{ cls: 'fx-crybaby',    light: false }], // BlackWah → Dunlop Cry Baby
-    [0x0B000040,{ cls: 'fx-chromewah',  light: true  }], // ChromeWah → wah de acabado cromado
-    [0x0B000050,{ cls: 'fx-ibanezwah',  light: false }], // WAH100 → wah de Ibanez
+    [0x0B000040,{ cls: 'fx-chromewah',  light: true  }], // ChromeWah → Vox V847
+    [0x0B000050,{ cls: 'fx-ibanezwah',  light: false }], // WAH100 → Ibanez WAH10
   ]);
 
   function getEffectColorClass(id) {
     const entry = EFFECT_COLOR_MAP.get(id >>> 0);
     if (!entry) return '';
     return `fx-tinted ${entry.cls}${entry.light ? ' fx-light' : ''}`;
+  }
+
+  // Mapa de "a qué pedal/ampli real emula cada efecto", para el tooltip
+  // nativo (title) al pasar el ratón por el nombre. Generado a partir de
+  // la misma tabla que ya usa PresetAI como contexto (columna "Modelo
+  // emulado"), así que las dos fuentes quedan consistentes entre sí. Solo
+  // incluye los efectos con un pedal real identificado; el resto no
+  // llevan tooltip.
+  const REAL_PEDAL_MAP = new Map([
+    // DYNAMICS
+    [0x01000010, { es: 'MXR Dyna Comp', en: 'MXR Dyna Comp' }], // Comp
+    [0x01000030, { es: 'ROSS Compressor', en: 'ROSS Compressor' }], // GrayComp
+    [0x01000050, { es: 'Demeter COMP-1 Compulator', en: 'Demeter COMP-1 Compulator' }], // BlackOpt
+    [0x01000060, { es: 'UREI 1176LN', en: 'UREI 1176LN' }], // 1176 LMT
+    // FILTER
+    [0x02000070, { es: 'Z.Vex Seek-Wah', en: 'Z.Vex Seek-Wah' }], // SeqFLTR
+    // DRIVE
+    [0x03000010, { es: 'Maestro Echoplex (etapa de preamplificación)', en: 'Maestro Echoplex (preamp stage)' }], // EP Drive
+    [0x03000020, { es: 'Xotic RC Booster', en: 'Xotic RC Booster' }], // RC Drive
+    [0x03000030, { es: 'Ibanez TS808 Tube Screamer', en: 'Ibanez TS808 Tube Screamer' }], // TS Drive
+    [0x03000040, { es: 'Klon Centaur', en: 'Klon Centaur' }], // GoldDrive
+    [0x03000050, { es: 'Mad Professor Sweet Honey Overdrive', en: 'Mad Professor Sweet Honey Overdrive' }], // SweetDrv
+    [0x03000058, { es: 'Boss OD-1', en: 'Boss OD-1' }], // Over Drive
+    [0x03000060, { es: 'Hermida Audio Zendrive', en: 'Hermida Audio Zendrive' }], // Zen O.DRV
+    [0x03000070, { es: 'Mesa/Boogie Grid Slammer', en: 'Mesa/Boogie Grid Slammer' }], // BG GRID
+    [0x03000090, { es: 'MXR Distortion+', en: 'MXR Distortion+' }], // Plus DIST
+    [0x030000A0, { es: 'Boss DS-1', en: 'Boss DS-1' }], // DIST One
+    [0x030000B0, { es: 'Pro Co RAT', en: 'Pro Co RAT' }], // SqueakDST
+    [0x030000D0, { es: 'Suhr Riot Reloaded', en: 'Suhr Riot Reloaded' }], // VioletDST
+    [0x030000E0, { es: 'Sola Sound / Tone Bender MkI.5', en: 'Sola Sound / Tone Bender MkI.5' }], // TB MK1.5
+    [0x03000100, { es: 'Electro-Harmonix Big Muff Pi (versión NYC)', en: 'Electro-Harmonix Big Muff Pi (NYC version)' }], // NYC Muff
+    [0x03000130, { es: 'Boss MT-2 Metal Zone', en: 'Boss MT-2 Metal Zone' }], // MetalWRLD
+    [0x03000140, { es: 'Mesa/Boogie Throttle Box', en: 'Mesa/Boogie Throttle Box' }], // HG THRTTL
+    [0x03000150, { es: 'TS808 + booster (combinado)', en: 'TS808 + booster (combined)' }], // TS+Boost
+    [0x03000160, { es: 'BluesBreaker + booster (combinado)', en: 'BluesBreaker + booster (combined)' }], // RedCR+BST
+    [0x03000190, { es: 'Zoom G5n (función Output Booster)', en: 'Zoom G5n (Output Booster function)' }], // OutputBST
+    // AMP
+    [0x04000010, { es: 'Marshall JTM45', en: 'Marshall JTM45' }], // MS 45os
+    [0x04000020, { es: 'Marshall 1959 Super Lead ("Plexi")', en: 'Marshall 1959 Super Lead ("Plexi")' }], // MS 1959
+    [0x04000030, { es: 'Marshall JCM800 2203', en: 'Marshall JCM800 2203' }], // MS 800
+    [0x04000040, { es: 'Fender \'59 Bassman', en: 'Fender \'59 Bassman' }], // FD B-MAN
+    [0x04000050, { es: 'Fender \'65 Twin Reverb', en: 'Fender \'65 Twin Reverb' }], // FD TWIN-R
+    [0x04000060, { es: 'Fender \'65 Deluxe Reverb', en: 'Fender \'65 Deluxe Reverb' }], // FD DLX-R
+    [0x04000070, { es: 'Fender Vibro-King / master volume', en: 'Fender Vibro-King / master volume' }], // FD MASTER
+    [0x04000080, { es: 'Vox AC30 Top Boost', en: 'Vox AC30 Top Boost' }], // UK 30A
+    [0x04000090, { es: 'Mesa/Boogie Mark I', en: 'Mesa/Boogie Mark I' }], // BG MARK1
+    [0x040000A0, { es: 'Mesa/Boogie Mark III', en: 'Mesa/Boogie Mark III' }], // BG MARK3
+    [0x040000B0, { es: 'Mesa/Boogie Dual Rectifier', en: 'Mesa/Boogie Dual Rectifier' }], // RectiDual
+    [0x040000C0, { es: 'Bogner Ecstasy (canal azul)', en: 'Bogner Ecstasy (blue channel)' }], // XtasyBlue
+    [0x040000D0, { es: 'Hiwatt DR103', en: 'Hiwatt DR103' }], // HW 100
+    [0x040000E0, { es: 'Orange OR120', en: 'Orange OR120' }], // ORG120
+    [0x040000F0, { es: 'Diezel Herbert', en: 'Diezel Herbert' }], // DZ Herb
+    [0x04000100, { es: 'Matchless DC-30', en: 'Matchless DC-30' }], // MATCH30
+    [0x04000110, { es: 'Krank Krampus', en: 'Krank Krampus' }], // KRAMPUS
+    [0x04000120, { es: 'Peavey 6505 / 5150', en: 'Peavey 6505 / 5150' }], // REDLOOM
+    [0x04000130, { es: 'Two-Rock / Dumble (tono clean)', en: 'Two-Rock / Dumble (clean tone)' }], // VELVET
+    [0x04000140, { es: 'Supro Thunderbolt (vintage)', en: 'Supro Thunderbolt (vintage)' }], // MUDDY
+    [0x04000150, { es: 'EVH 5150 III', en: 'EVH 5150 III' }], // 7 HEAVEN
+    [0x04000160, { es: 'Friedman BE-100', en: 'Friedman BE-100' }], // POLLEX
+    // MODULATION
+    [0x06000020, { es: 'Electro-Harmonix Small Clone', en: 'Electro-Harmonix Small Clone' }], // CloneCho
+    [0x06000030, { es: 'BOSS CH-1 Super Chorus', en: 'BOSS CH-1 Super Chorus' }], // ChorusOne
+    [0x06000040, { es: 'tc electronic Corona Tri-Chorus', en: 'tc electronic Corona Tri-Chorus' }], // TriChorus
+    [0x060000B0, { es: 'Electro-Harmonix Small Stone', en: 'Electro-Harmonix Small Stone' }], // StonePha
+    [0x060000E0, { es: 'Shin-ei Uni-Vibe', en: 'Shin-ei Uni-Vibe' }], // TheVibe
+    [0x060000F0, { es: 'MXR M-117R', en: 'MXR M-117R' }], // VinFLNGR
+    // SFX
+    [0x07000020, { es: 'Boss / DigiTech loop roll', en: 'Boss / DigiTech loop roll' }], // LoopRoll
+    // DELAY
+    [0x08000040, { es: 'Maestro Echoplex EP-3', en: 'Maestro Echoplex EP-3' }], // TapeEcho3
+    [0x08000050, { es: 'Eventide TimeFactor (algoritmo DigitalDelay)', en: 'Eventide TimeFactor (DigitalDelay algorithm)' }], // DualDelay
+    // REVERB
+    [0x09000040, { es: 'Reverb de muelle Fender', en: 'Fender spring reverb' }], // FD Spring
+    [0x09000050, { es: 'EMT 140 (plate)', en: 'EMT 140 (plate)' }], // Plate REV
+    [0x090000E0, { es: 'Reverb con gate estilo AMS (años 80)', en: '80s-style gated reverb (AMS style)' }], // GateRevrb
+    [0x09000110, { es: 'Red Panda Particle', en: 'Red Panda Particle' }], // ParticleR
+    // PEDAL
+    [0x0B000030, { es: 'Dunlop Cry Baby', en: 'Dunlop Cry Baby' }], // BlackWah
+    [0x0B000040, { es: 'Vox V847', en: 'Vox V847' }], // ChromeWah
+    [0x0B000050, { es: 'Ibanez WAH10', en: 'Ibanez WAH10' }], // WAH100
+    [0x0B000060, { es: 'Wah estilo talk-box', en: 'Talk-box style wah' }], // VoiceWah
+    [0x0B000070, { es: 'DigiTech Whammy', en: 'DigiTech Whammy' }], // PDL Pitch
+    [0x0B000090, { es: 'Altavoz rotativo Leslie 122', en: 'Leslie 122 rotary speaker' }], // PDL Roto
+    [0x0B0000B0, { es: 'Uni-Vibe en formato pedal de expresión', en: 'Uni-Vibe in expression-pedal form' }], // PDL Vibe
+    [0x0B000120, { es: 'Bit-crusher en formato pedal de expresión', en: 'Bit-crusher in expression-pedal form' }], // P-BitCRSH
+  ]);
+
+  function getRealPedalTooltip(id) {
+    const entry = REAL_PEDAL_MAP.get(id >>> 0);
+    if (!entry) return '';
+    const label = translations[currentLang].based_on || 'Basado en';
+    return `${label}: ${entry[currentLang] || entry.es}`;
   }
 
   function getCategoryName(id) {
@@ -2938,6 +3053,58 @@ DEFAULT_PARAMS_MAP.set(0x04000060, [0x00, 0x21, 0x37, 0x32, 0x5a, 0x00, 0x28]); 
     }
   }
 
+  // --------------------------------------------------------------
+  // EXPORTAR / IMPORTAR (Favoritos y Biblioteca IA)
+  // Solo mueve los datos guardados en localStorage a un archivo .json y
+  // viceversa — no necesita la pedalera conectada. Sirve para pasar tu
+  // lista de un navegador/dispositivo a otro (p.ej. PC → tablet), ya que
+  // localStorage no se sincroniza solo entre ellos.
+  // --------------------------------------------------------------
+  function exportLibraryToFile(kind, list) {
+    const envelope = {
+      g2fourExport: kind, // 'favorites' | 'ai_library' — para validar al importar
+      exportedAt: new Date().toISOString(),
+      items: list
+    };
+    const blob = new Blob([JSON.stringify(envelope, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const stamp = new Date().toISOString().slice(0, 10);
+    a.href = url;
+    a.download = `g2four-${kind === 'favorites' ? 'favoritos' : 'biblioteca-ia'}-${stamp}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function importLibraryFromFile(kind, file, getList, saveList, render, statusEl) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const parsed = JSON.parse(reader.result);
+        // Acepta tanto el formato con envoltorio (g2fourExport/items) como
+        // un array suelto, por si alguien edita el JSON a mano.
+        const incoming = Array.isArray(parsed) ? parsed : parsed.items;
+        if (!Array.isArray(incoming)) throw new Error('Formato no reconocido');
+        if (parsed.g2fourExport && parsed.g2fourExport !== kind) {
+          statusEl.textContent = translations[currentLang].lib_import_wrong_kind;
+          return;
+        }
+        const current = getList();
+        // Se añaden al final con id nuevo, nunca se sobrescribe lo que ya
+        // tenías guardado.
+        const merged = current.concat(incoming.map(item => ({ ...item, id: Date.now() + Math.random() })));
+        saveList(merged);
+        render();
+        statusEl.textContent = `${translations[currentLang].lib_import_ok} (${incoming.length})`;
+      } catch (e) {
+        statusEl.textContent = translations[currentLang].lib_import_err;
+      }
+    };
+    reader.readAsText(file);
+  }
+
   function renderFavoritesGrid() {
     const grid = document.getElementById('favoritesGrid');
     if (!grid) return;
@@ -3402,7 +3569,7 @@ DEFAULT_PARAMS_MAP.set(0x04000060, [0x00, 0x21, 0x37, 0x32, 0x5a, 0x00, 0x28]); 
           ${isPendingSlot7 ? `<div class="pending-badge" data-i18n="unsaved" data-i18n-title="unsaved_title" title="${translations[currentLang].unsaved_title}">${translations[currentLang].unsaved}</div>` : ''}
           <div class="pedal-top" data-slot="${i}" data-toggle="${!isEmpty}">
             <div class="led"></div>
-            <div class="name">${isEmpty ? '—' : name}</div>
+            <div class="name" title="${isEmpty ? '' : getRealPedalTooltip(id)}">${isEmpty ? '—' : name}</div>
             <div class="pedal-subrow">
               <button type="button" class="nav-effect-btn nav-prev" data-slot="${i}" title="Efecto anterior">◀</button>
               <div class="pedal-subrow-labels">
@@ -4324,6 +4491,22 @@ DEFAULT_PARAMS_MAP.set(0x04000060, [0x00, 0x21, 0x37, 0x32, 0x5a, 0x00, 0x28]); 
   // Favoritos: abrir modal, confirmar/cancelar guardado, y pintar la rejilla ya guardada
   renderFavoritesGrid();
   renderAiLibraryGrid();
+
+  // Exportar/Importar Favoritos y Biblioteca IA como .json (sin pedal).
+  document.getElementById('favExportBtn').addEventListener('click', () => exportLibraryToFile('favorites', getFavorites()));
+  document.getElementById('favImportBtn').addEventListener('click', () => document.getElementById('favImportFileInput').click());
+  document.getElementById('favImportFileInput').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) importLibraryFromFile('favorites', file, getFavorites, saveFavoritesList, renderFavoritesGrid, document.getElementById('favStatus'));
+    e.target.value = '';
+  });
+  document.getElementById('aiLibExportBtn').addEventListener('click', () => exportLibraryToFile('ai_library', getAiLibrary()));
+  document.getElementById('aiLibImportBtn').addEventListener('click', () => document.getElementById('aiLibImportFileInput').click());
+  document.getElementById('aiLibImportFileInput').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) importLibraryFromFile('ai_library', file, getAiLibrary, saveAiLibraryList, renderAiLibraryGrid, document.getElementById('aiLibStatus'));
+    e.target.value = '';
+  });
 
   // Modo Demo: botón manual, recuerda la última preferencia entre sesiones.
   document.getElementById('demoModeBtn').addEventListener('click', () => setDemoMode(!demoMode));
@@ -6463,9 +6646,9 @@ tres primeras columnas): es únicamente contexto para razonar mejor tu elección
 ### PEDAL / EXPRESIÓN (0x0B) — el único tipo permitido de forma fiable en el slot 7
 0x0B000010 | Output VP | 0 | (sin parámetros) | Diseño original de Zoom
 0x0B000020 | Pedal VOL | 3 | VOL, Min, Max, Curve | Diseño original de Zoom
-0x0B000030 | BlackWah | 6 | FREQ, Range, Dry, VOL | Vox V846
-0x0B000040 | ChromeWah | 6 | FREQ, Range, Dry, VOL | Dunlop Cry Baby GCB-95
-0x0B000050 | WAH100 | 5 | FREQ, Depth, Dry, VOL | Wah estilo Morley / Dunlop 100
+0x0B000030 | BlackWah | 6 | FREQ, Range, Dry, VOL | Dunlop Cry Baby
+0x0B000040 | ChromeWah | 6 | FREQ, Range, Dry, VOL | Vox V847
+0x0B000050 | WAH100 | 5 | FREQ, Depth, Dry, VOL | Ibanez WAH10
 0x0B000060 | VoiceWah | 10 | Vowel, PTTRN, Voice, Mode | Wah estilo talk-box
 0x0B000070 | PDL Pitch | 6 | BEND, COLOR, TONE, MODE | DigiTech Whammy
 0x0B000080 | PDL MnPit | 6 | Bend, Color, Tone, Mode | Diseño original de Zoom
@@ -6808,9 +6991,9 @@ the first three columns): it's purely context to help you reason about your choi
 ### PEDAL / EXPRESSION (0x0B) — the only type reliably allowed in slot 7
 0x0B000010 | Output VP | 0 | (no parameters) | Original Zoom design
 0x0B000020 | Pedal VOL | 3 | VOL, Min, Max, Curve | Original Zoom design
-0x0B000030 | BlackWah | 6 | FREQ, Range, Dry, VOL | Vox V846
-0x0B000040 | ChromeWah | 6 | FREQ, Range, Dry, VOL | Dunlop Cry Baby GCB-95
-0x0B000050 | WAH100 | 5 | FREQ, Depth, Dry, VOL | Morley / Dunlop 100 style wah
+0x0B000030 | BlackWah | 6 | FREQ, Range, Dry, VOL | Dunlop Cry Baby
+0x0B000040 | ChromeWah | 6 | FREQ, Range, Dry, VOL | Vox V847
+0x0B000050 | WAH100 | 5 | FREQ, Depth, Dry, VOL | Ibanez WAH10
 0x0B000060 | VoiceWah | 10 | Vowel, PTTRN, Voice, Mode | Talk-box style wah
 0x0B000070 | PDL Pitch | 6 | BEND, COLOR, TONE, MODE | DigiTech Whammy
 0x0B000080 | PDL MnPit | 6 | Bend, Color, Tone, Mode | Original Zoom design
