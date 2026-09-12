@@ -418,7 +418,7 @@
     .pedal.is-amp.on             { background: var(--amp-bg-on, #6a4a1a) !important; border-color: var(--amp-border, #f5c542) !important; box-shadow: 0 6px 0 #060a12, 0 0 30px var(--amp-glow, rgba(245,197,66,0.4)) !important; }
     .pedal.is-amp.on .name       { color: var(--amp-name, #fff0e0); }
     .pedal.is-amp.on .category   { color: var(--amp-cat, #ffcb96); }
-    .pedal:not(.is-amp)          { align-self: flex-start; } /* deja que el ampli sea el único que "sobresalga" más alto en la fila */
+    .pedal:not(.is-amp)          { align-self: flex-start; min-height: 205px; } /* deja que el ampli sea el único que "sobresalga" más alto en la fila, pero todos los demás (incluido el slot vacío, sin sliders) mantienen la misma altura entre sí */
     .amp-screw {
       position: absolute; width: 5px; height: 5px; border-radius: 50%;
       background: var(--amp-screw, #d8d8d8);
@@ -859,6 +859,8 @@
     .fav-card-name { font-size:0.78rem; color:#f0f4ff; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .fav-tags { display:flex; flex-wrap:wrap; gap:4px; min-height:16px; }
     .fav-tag { font-size:0.6rem; background:#0d1f30; color:#6bc9b0; padding:2px 6px; border-radius:8px; }
+    .fav-tag-link { text-decoration:none; cursor:pointer; max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:inline-block; vertical-align:top; }
+    .fav-tag-link:hover { background:#123a4a; text-decoration:underline; }
     .fav-actions { display:flex; gap:6px; }
     .fav-btn { flex:1; background:#1a2a3c; border:1px solid #3f5270; border-radius:6px; padding:5px; color:#6bc9b0; cursor:pointer; font-size:0.85rem; display:flex; align-items:center; justify-content:center; }
     .fav-btn:hover { border-color:#6bc9b0; background:#0f1a2a; }
@@ -1702,7 +1704,7 @@
     "lib_import_wrong_kind": "❌ Ese archivo es de la otra biblioteca (Favoritos/IA), no de esta",
     "fav_modal_title": "Guardar favorito",
     "fav_name_ph": "Nombre (ej: Blues cálido)",
-    "fav_tags_ph": "Etiquetas separadas por coma (ej: blues, limpio)",
+    "fav_tags_ph": "Etiquetas separadas por coma, o un enlace (ej: blues, limpio, youtube.com/...)",
     "fav_modal_save": "Guardar",
     "fav_modal_cancel": "Cancelar",
     "change_effect": "Cambiar efecto",
@@ -1803,7 +1805,7 @@
     "lib_import_wrong_kind": "❌ That file is from the other library (Favorites/AI), not this one",
     "fav_modal_title": "Save favorite",
     "fav_name_ph": "Name (e.g. Warm Blues)",
-    "fav_tags_ph": "Comma-separated tags (e.g. blues, clean)",
+    "fav_tags_ph": "Comma-separated tags, or a link (e.g. blues, clean, youtube.com/...)",
     "fav_modal_save": "Save",
     "fav_modal_cancel": "Cancel",
     "change_effect": "Change effect",
@@ -3105,6 +3107,26 @@ DEFAULT_PARAMS_MAP.set(0x04000060, [0x00, 0x21, 0x37, 0x32, 0x5a, 0x00, 0x28]); 
     reader.readAsText(file);
   }
 
+  // Si una etiqueta de favorito es un enlace (p.ej. a un vídeo de YouTube
+  // con la referencia de la canción), se muestra como un tag clicable que
+  // abre en una pestaña nueva, en vez de como texto plano. Así, quien
+  // practica una canción con ese patch tiene también el vídeo a mano sin
+  // tener que ir a buscarlo.
+  const TAG_URL_RE = /^(https?:\/\/)?([\w-]+\.)+[a-z]{2,}(\/\S*)?$/i;
+
+  function escapeHtmlMain(str) {
+    return String(str).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+  }
+
+  function renderFavTag(rawTag) {
+    const tag = (rawTag || '').trim();
+    if (TAG_URL_RE.test(tag)) {
+      const href = /^https?:\/\//i.test(tag) ? tag : `https://${tag}`;
+      return `<a class="fav-tag fav-tag-link" href="${escapeHtmlMain(href)}" target="_blank" rel="noopener noreferrer" title="${escapeHtmlMain(tag)}">🔗 ${escapeHtmlMain(tag)}</a>`;
+    }
+    return `<span class="fav-tag">${escapeHtmlMain(tag)}</span>`;
+  }
+
   function renderFavoritesGrid() {
     const grid = document.getElementById('favoritesGrid');
     if (!grid) return;
@@ -3117,9 +3139,9 @@ DEFAULT_PARAMS_MAP.set(0x04000060, [0x00, 0x21, 0x37, 0x32, 0x5a, 0x00, 0x28]); 
     favorites.slice().reverse().forEach(fav => {
       const card = document.createElement('div');
       card.className = 'fav-card';
-      const tagsHtml = (fav.tags || []).map(t => `<span class="fav-tag">${t}</span>`).join('');
+      const tagsHtml = (fav.tags || []).map(renderFavTag).join('');
       card.innerHTML = `
-        <div class="fav-card-name" title="${fav.name}">${fav.name}</div>
+        <div class="fav-card-name" title="${escapeHtmlMain(fav.name)}">${escapeHtmlMain(fav.name)}</div>
         <div class="fav-tags">${tagsHtml}</div>
         <div class="fav-actions">
           <button type="button" class="fav-btn fav-btn-load">▶ Load/Cargar</button>
