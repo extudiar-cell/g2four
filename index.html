@@ -10,6 +10,9 @@
       padding: 0;
       box-sizing: border-box;
     }
+    /* ================================================================
+       BASE Y LAYOUT GENERAL
+       ================================================================ */
     body {
       font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
       background: #0a0e18;
@@ -861,6 +864,159 @@
     .fav-tag { font-size:0.6rem; background:#0d1f30; color:#6bc9b0; padding:2px 6px; border-radius:8px; }
     .fav-tag-link { text-decoration:none; cursor:pointer; max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:inline-block; vertical-align:top; }
     .fav-tag-link:hover { background:#123a4a; text-decoration:underline; }
+    .fav-tag-youtube    { background:#3a1414; color:#ff8a8a; }
+    .fav-tag-youtube:hover    { background:#4a1a1a; }
+    .fav-tag-spotify    { background:#0f3020; color:#6bdb96; }
+    .fav-tag-spotify:hover    { background:#144028; }
+    .fav-tag-tabs       { background:#2a2038; color:#c9a8f0; }
+    .fav-tag-tabs:hover       { background:#362849; }
+    .fav-tag-soundcloud { background:#3a2410; color:#ffb066; }
+    .fav-tag-soundcloud:hover { background:#4a2e14; }
+    .fav-tag-social     { background:#301a30; color:#e0a0d0; }
+    .fav-tag-social:hover     { background:#3e2240; }
+
+    /* ============================================================
+       SETLISTS — editor inline dentro de la tarjeta
+       ============================================================ */
+    .setlist-editor { margin-top:10px; border-top:1px solid #2a3040; padding-top:10px; text-align:left; }
+    .setlist-songs-list { display:flex; flex-direction:column; gap:10px; margin-bottom:10px; max-height:320px; overflow-y:auto; }
+    .setlist-song-block { background:#0a0d16; border:1px solid #232a3a; border-radius:10px; padding:8px; }
+    .setlist-song-header { display:flex; align-items:center; gap:6px; margin-bottom:6px; }
+    .setlist-song-name-input {
+      flex:1; box-sizing:border-box; background:#161b26; border:1px solid #2a3348; border-radius:6px;
+      color:#f5d020; font-weight:700; font-size:0.78rem; padding:5px 8px;
+    }
+    .setlist-song-links-input {
+      flex:1; box-sizing:border-box; background:#161b26; border:1px solid #2a3348; border-radius:6px;
+      color:#f0f4ff; font-size:0.7rem; padding:5px 8px;
+    }
+    .setlist-song-presets { display:flex; flex-direction:column; gap:6px; padding-left:14px; }
+    .setlist-item-row { display:flex; align-items:center; gap:6px; background:#0d1220; border-radius:8px; padding:6px 8px; }
+    .setlist-item-num { font-size:0.65rem; color:#6a7a90; width:16px; flex-shrink:0; }
+    .setlist-item-num.sub { color:#4a5a70; }
+    .setlist-item-main { flex:1; min-width:0; display:flex; flex-direction:column; gap:3px; }
+    .setlist-label-input, .setlist-links-input {
+      width:100%; box-sizing:border-box; background:#161b26; border:1px solid #2a3348; border-radius:6px;
+      color:#f0f4ff; font-size:0.72rem; padding:4px 8px;
+    }
+    .setlist-label-input { font-weight:600; }
+    .setlist-item-preset { font-size:0.6rem; color:#6a7a90; }
+    .setlist-mini-btn {
+      background:#161b26; border:1px solid #2a3348; color:#c8d0e0; border-radius:6px;
+      width:24px; height:24px; font-size:0.65rem; cursor:pointer; flex-shrink:0;
+    }
+    .setlist-mini-btn:hover:not(:disabled) { border-color:#6bc9b0; color:#6bc9b0; }
+    .setlist-mini-btn:disabled { opacity:0.3; cursor:default; }
+    .setlist-add-row { display:flex; gap:6px; }
+    .setlist-add-song-row { border-top:1px solid #2a3040; padding-top:10px; }
+    .setlist-new-song-input {
+      flex:1; background:#161b26; border:1px solid #2a3348; color:#f0f4ff; border-radius:6px;
+      padding:6px 8px; font-size:0.72rem;
+    }
+    .setlist-add-select {
+      flex:1; background:#161b26; border:1px solid #2a3348; color:#f0f4ff; border-radius:6px;
+      padding:6px 8px; font-size:0.72rem;
+    }
+    .setlists-grid { grid-template-columns: repeat(4, 1fr); }
+    .setlist-card { grid-column: span 1; }
+    .setlist-card.editing { grid-column: span 1; } /* al editar, no ocupar más de una columna de ancho */
+
+    /* ============================================================
+       MODO DIRECTO — pantalla completa para tocar en directo
+       ============================================================ */
+    .modo-directo-overlay {
+      display: none;
+      position: fixed; inset: 0; z-index: 500;
+      background: #05070c;
+      flex-direction: row;
+    }
+    .modo-directo-overlay.open { display: flex; }
+    .modo-directo-exit {
+      position: absolute; top: 16px; right: 16px; z-index: 2;
+      background: #161b26; border: 1px solid #2a3348; color: #c8d0e0;
+      width: 40px; height: 40px; border-radius: 50%; font-size: 1.1rem; cursor: pointer;
+    }
+    .modo-directo-exit:hover { border-color: #ff6a6a; color: #ff6a6a; }
+    /* Sidebar fija con TODAS las canciones del setlist, para navegar de un
+       vistazo sin depender solo de ◀▶. */
+    .modo-directo-sidebar {
+      width: 220px; flex-shrink: 0; overflow-y: auto;
+      background: #0a0d16; border-right: 1px solid #1a2030;
+      padding: 60px 10px 20px;
+    }
+    .modo-directo-sidebar-item {
+      display: flex; align-items: baseline; gap: 8px;
+      padding: 10px 10px; border-radius: 8px; margin-bottom: 4px;
+      color: #7f8aa3; font-size: 0.85rem; font-weight: 600; cursor: pointer;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .modo-directo-sidebar-item:hover { background: #10162a; color: #c8d0e0; }
+    .modo-directo-sidebar-item.active { background: #2a2408; color: #fff8d0; }
+    .modo-directo-sidebar-item.disabled { opacity: 0.35; cursor: default; pointer-events: none; }
+    .modo-directo-sidebar-num { color: #4a5a70; font-size: 0.7rem; flex-shrink: 0; }
+    .modo-directo-sidebar-item.active .modo-directo-sidebar-num { color: #f5d020; }
+    .modo-directo-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+    .modo-directo-topbar {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 18px 24px; color: #7f8aa3;
+    }
+    #modoDirectoSetlistName {
+      color: #f5d020; font-weight: 700; line-height: 1.1;
+      font-size: clamp(2rem, 7vw, 5rem);
+    }
+    #modoDirectoPos { font-size: clamp(0.8rem, 2vw, 1rem); flex-shrink: 0; }
+    .modo-directo-center {
+      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 18px; padding: 0 24px; text-align: center;
+    }
+    .modo-directo-label {
+      color: #f2f5fa; font-weight: 700; line-height: 1.15;
+      font-size: clamp(2rem, 7vw, 5rem);
+    }
+    .modo-directo-links { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+    .modo-directo-links .fav-tag-link { font-size: clamp(0.85rem, 1.6vw, 1.1rem); padding: 8px 16px; }
+    /* Cabecera del grid de presets: título + botón para elegir 3 o 4
+       columnas, según tengas un pedal de 3 footswitches o uno externo de 4. */
+    .modo-directo-preset-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0 24px 8px; color: #6a7a90; font-size: 0.8rem;
+    }
+    .modo-directo-cols-toggle { display: flex; gap: 4px; }
+    .modo-directo-cols-btn {
+      background: #161b26; border: 1px solid #2a3348; color: #c8d0e0;
+      width: 26px; height: 26px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; cursor: pointer;
+    }
+    .modo-directo-cols-btn:hover { border-color: #6bc9b0; color: #6bc9b0; }
+    .modo-directo-cols-btn.active { background: #2a2408; border-color: #f5d020; color: #f5d020; }
+    /* Grid de presets de la canción actual — pensado para ocupar toda la
+       fila con pocos botones grandes, tipo footswitch físico. */
+    .modo-directo-strip {
+      display: grid; gap: 12px; padding: 0 24px 20px; max-height: 30vh; overflow-y: auto;
+    }
+    .modo-directo-strip-item {
+      background: #10162a; border: 2px solid #2a3348; border-radius: 12px;
+      padding: 22px 14px; color: #b8c4e0; font-weight: 700; text-align: center;
+      font-size: clamp(1rem, 2.2vw, 1.6rem); overflow: hidden; text-overflow: ellipsis;
+      white-space: nowrap; cursor: pointer; transition: 0.15s;
+    }
+    .modo-directo-strip-item:hover { border-color: #4a5a78; }
+    .modo-directo-strip-item.active {
+      border-color: #f5d020; color: #fff8d0; background: #2a2408;
+      box-shadow: 0 0 18px rgba(245,208,32,0.4);
+    }
+    .modo-directo-strip-num {
+      display: inline-block; min-width: 1.4em; margin-right: 6px;
+      color: #6a7a90; font-weight: 700;
+    }
+    .modo-directo-strip-item.active .modo-directo-strip-num { color: #f5d020; }
+    .modo-directo-tapzones { display: flex; height: 22vh; min-height: 120px; }
+    .modo-directo-tapzone {
+      flex: 1; background: #0c101e; border: none; border-top: 1px solid #1a2030;
+      color: #3a4a5a; font-size: clamp(2rem, 5vw, 3.5rem); cursor: pointer; transition: 0.15s;
+    }
+    .modo-directo-tapzone:hover { background: #10162a; color: #6bc9b0; }
+    .modo-directo-tapzone:active { background: #141c34; }
+    #modoDirectoPrevBtn { border-right: 1px solid #1a2030; }
     .fav-actions { display:flex; gap:6px; }
     .fav-btn { flex:1; background:#1a2a3c; border:1px solid #3f5270; border-radius:6px; padding:5px; color:#6bc9b0; cursor:pointer; font-size:0.85rem; display:flex; align-items:center; justify-content:center; }
     .fav-btn:hover { border-color:#6bc9b0; background:#0f1a2a; }
@@ -1340,6 +1496,7 @@
       <button type="button" class="zone-tab" data-zone="files" data-i18n="files">📁 ARCHIVOS</button>
       <button type="button" class="zone-tab" data-zone="favorites" data-i18n="favorites_tab">⭐ FAVORITOS</button>
       <button type="button" class="zone-tab" data-zone="ailibrary" data-i18n="ai_library_tab">🤖 BIBLIOTECA IA</button>
+      <button type="button" class="zone-tab" data-zone="setlists" data-i18n="setlists_tab">🎤 SETLISTS</button>
     </div>
     <div class="zone-body">
       <div class="zone-section active" id="zone-presets">
@@ -1569,6 +1726,44 @@
           <div class="presets-empty" data-i18n="ai_lib_empty">Aún no tienes presets de PresetAI guardados</div>
         </div>
       </div>
+
+      <div class="zone-section" id="zone-setlists">
+        <div class="presets-toolbar">
+          <span data-i18n="setlist_status">Listas ordenadas de presets reales para tocar en directo, con pantalla grande y navegación táctil</span>
+          <input type="text" id="setlistNameInput" data-i18n-placeholder="setlist_name_ph" placeholder="Nombre del setlist (ej: Concierto Sala X)" style="max-width:220px;">
+          <button type="button" class="fm-btn primary-action" id="setlistCreateBtn" data-i18n="setlist_create_btn">+ Nuevo Setlist</button>
+        </div>
+        <div class="presets-grid setlists-grid" id="setlistsGrid">
+          <div class="presets-empty" data-i18n="setlist_empty">Aún no tienes ningún setlist creado</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modoDirectoOverlay" class="modo-directo-overlay">
+    <button type="button" id="modoDirectoExitBtn" class="modo-directo-exit" data-i18n-title="modo_directo_exit" title="Salir del Modo Directo">✕</button>
+    <div id="modoDirectoSongsSidebar" class="modo-directo-sidebar"></div>
+    <div class="modo-directo-main">
+      <div class="modo-directo-topbar">
+        <span id="modoDirectoSetlistName"></span>
+        <span id="modoDirectoPos"></span>
+      </div>
+      <div class="modo-directo-center">
+        <div id="modoDirectoLabel" class="modo-directo-label"></div>
+        <div id="modoDirectoLinks" class="modo-directo-links"></div>
+      </div>
+      <div class="modo-directo-preset-header">
+        <span data-i18n="modo_directo_presets_label">Presets de esta canción</span>
+        <div class="modo-directo-cols-toggle">
+          <button type="button" class="modo-directo-cols-btn" data-cols="3">3</button>
+          <button type="button" class="modo-directo-cols-btn" data-cols="4">4</button>
+        </div>
+      </div>
+      <div id="modoDirectoStrip" class="modo-directo-strip"></div>
+      <div class="modo-directo-tapzones">
+        <button type="button" id="modoDirectoPrevBtn" class="modo-directo-tapzone" data-i18n-title="modo_directo_prev" title="Canción anterior">◀</button>
+        <button type="button" id="modoDirectoNextBtn" class="modo-directo-tapzone" data-i18n-title="modo_directo_next" title="Siguiente canción">▶</button>
+      </div>
     </div>
   </div>
 
@@ -1617,6 +1812,7 @@
   // ================================================================
   const translations = {
   "es": {
+    // --- CABECERA Y NAVEGACIÓN GENERAL ---
     "title": "Zoom G2 Four - Visor/Editor",
     "prev": "◀",
     "next": "▶",
@@ -1624,11 +1820,15 @@
     "rename_click": "Click para renombrar",
     "preset_no": "Número de preset",
     "tuner": "🎸 Afinador",
+    "tuner_title": "🎸 Afinador Cromático",
+    "tuner_close": "Cerrar",
     "save": "💾 GUARDAR",
     "save_to_disk": "💾 GUARDAR EN DISCO",
     "midi_status": "Conecta MIDI y pulsa Escanear",
     "scan_presets": "⟳ ESCANEAR PRESETS",
     "no_presets": "Sin presets cargados aún",
+    "footer": "Toca el efecto para ON/OFF · Toca ⇄ para cambiar de efecto · Sliders inferiores = parámetros · Teclas 1-7 · Flechas ← → · Nº + Enter",
+    // --- PESTAÑAS PRINCIPALES ---
     "backing_tracks": "🎵 PISTAS DE ACOMPAÑAMIENTO MP3",
     "rhythms": "🥁 RITMOS",
     "files": "📁 ARCHIVOS",
@@ -1636,19 +1836,13 @@
     "files_explore_col": "🎧 EXPLORAR Y ESCUCHAR",
     "favorites_tab": "⭐ FAVORITOS",
     "ai_library_tab": "🤖 BIBLIOTECA IA",
-    "fav_save_btn": "★ GUARDAR PATCH ACTUAL",
-    "fav_status": "Guarda variantes en tu navegador, sin tocar el pedal",
-    "fav_empty": "Aún no tienes favoritos guardados",
-    "ai_lib_status_main": "Presets generados con PresetAI, guardados en el navegador sin necesidad de escribirlos en la pedalera",
-    "ai_lib_empty": "Aún no tienes presets de PresetAI guardados",
-    "demo_mode_btn": "🎭 Modo Demo",
-    "demo_mode_btn_title": "Editar y previsualizar sin enviar nada a ninguna pedalera",
-    "demo_mode_banner": "🎭 Modo demo activo — los cambios se ven en pantalla pero no se envían a ninguna pedalera real",
-    "midi_reconnect_title": "Buscar de nuevo la pedalera por MIDI",
+    "setlists_tab": "🎤 SETLISTS",
+    // --- PISTAS MP3 ---
     "playlist": "LISTA",
     "no_songs": "Sin canciones aún",
     "player": "REPRODUCTOR",
     "drop_zone": "Arrastra archivos MP3 aquí o haz click",
+    // --- RITMOS ---
     "bass": "GRAVES",
     "mid": "MEDIOS",
     "treble": "AGUDOS",
@@ -1665,11 +1859,18 @@
     "change_every": "Cambio cada",
     "measure": "compás",
     "measures": "compases",
+    "measure_1": "1 compás",
+    "measure_2": "2 compases",
     "octave": "Octava",
+    "octave_low": "Grave (E1)",
+    "octave_mid": "Media (E2)",
+    "octave_high": "Alta (E3)",
     "legend_root": "Fundamental",
     "legend_third": "Tercera",
     "legend_fifth": "Quinta",
     "legend_octave": "Octava",
+    "legend_hint": "· Clic en celda para cambiar el grado",
+    // --- ARCHIVOS (guardar/cargar + explorador) ---
     "fm_save_title": "📤 Guardar preset actual a archivo zptc",
     "fm_save_btn": "💾 GUARDAR COMO ZPTC",
     "fm_save_status": "Descarga el preset activo de la pedalera como archivo .zptc",
@@ -1687,37 +1888,63 @@
     "fx_note": "Click en un archivo .zptc = se escribe directamente en el slot activo y se escucha al instante. Usa \"forzar slot manual\" para elegir otro slot.",
     "fx_empty": "Elige una carpeta para empezar a explorar…",
     "fx_status_init": "Elige una carpeta con tus copias de seguridad .zptc",
-    "footer": "Toca el efecto para ON/OFF · Toca ⇄ para cambiar de efecto · Sliders inferiores = parámetros · Teclas 1-7 · Flechas ← → · Nº + Enter",
-    "tuner_title": "🎸 Afinador Cromático",
-    "tuner_close": "Cerrar",
+    // --- PEDALBOARD Y EFECTOS ---
     "effect_modal_title": "Selecciona un efecto",
     "close": "Cerrar",
     "unsaved": "⏳ SIN GUARDAR",
     "unsaved_title": "Cambio sin guardar: no sonará hasta pulsar SAVE",
     "based_on": "Basado en",
+    "change_effect": "Cambiar efecto",
+    "drag_reorder": "Arrastrar para reordenar",
+    "empty": "Vacío",
+    // --- FAVORITOS ---
+    "fav_save_btn": "★ GUARDAR PATCH ACTUAL",
+    "fav_status": "Guarda variantes en tu navegador, sin tocar el pedal",
+    "fav_empty": "Aún no tienes favoritos guardados",
     "fav_export_btn": "⬇️ Export Favorites",
     "fav_import_btn": "⬆️ Import Favorites",
-    "ai_lib_export_btn": "⬇️ Export AI Library",
-    "ai_lib_import_btn": "⬆️ Import AI Library",
-    "lib_import_ok": "✅ Importado correctamente",
-    "lib_import_err": "❌ El archivo no es un JSON válido de esta app",
-    "lib_import_wrong_kind": "❌ Ese archivo es de la otra biblioteca (Favoritos/IA), no de esta",
     "fav_modal_title": "Guardar favorito",
     "fav_name_ph": "Nombre (ej: Blues cálido)",
     "fav_tags_ph": "Etiquetas separadas por coma, o un enlace (ej: blues, limpio, youtube.com/...)",
     "fav_modal_save": "Guardar",
     "fav_modal_cancel": "Cancelar",
-    "change_effect": "Cambiar efecto",
-    "drag_reorder": "Arrastrar para reordenar",
-    "empty": "Vacío",
-    "measure_1": "1 compás",
-    "measure_2": "2 compases",
-    "octave_low": "Grave (E1)",
-    "octave_mid": "Media (E2)",
-    "octave_high": "Alta (E3)",
-    "legend_hint": "· Clic en celda para cambiar el grado"
+    // --- BIBLIOTECA IA ---
+    "ai_lib_status_main": "Presets generados con PresetAI, guardados en el navegador sin necesidad de escribirlos en la pedalera",
+    "ai_lib_empty": "Aún no tienes presets de PresetAI guardados",
+    "ai_lib_export_btn": "⬇️ Export AI Library",
+    "ai_lib_import_btn": "⬆️ Import AI Library",
+    // --- IMPORTAR/EXPORTAR (compartido Favoritos y Biblioteca IA) ---
+    "lib_import_ok": "✅ Importado correctamente",
+    "lib_import_err": "❌ El archivo no es un JSON válido de esta app",
+    "lib_import_wrong_kind": "❌ Ese archivo es de la otra biblioteca (Favoritos/IA), no de esta",
+    // --- MODO DEMO ---
+    "demo_mode_btn": "🎭 Modo Demo",
+    "demo_mode_btn_title": "Editar y previsualizar sin enviar nada a ninguna pedalera",
+    "demo_mode_banner": "🎭 Modo demo activo — los cambios se ven en pantalla pero no se envían a ninguna pedalera real",
+    "midi_reconnect_title": "Buscar de nuevo la pedalera por MIDI",
+    // --- SETLISTS / MODO DIRECTO ---
+    "setlist_status": "Listas ordenadas de presets reales para tocar en directo, con pantalla grande y navegación táctil",
+    "setlist_name_ph": "Nombre del setlist (ej: Concierto Sala X)",
+    "setlist_create_btn": "+ Nuevo Setlist",
+    "setlist_empty": "Aún no tienes ningún setlist creado",
+    "setlist_items_suffix": "presets",
+    "setlist_play": "Tocar",
+    "setlist_label_ph": "Etiqueta (ej: Intro clean)",
+    "setlist_links_ph": "Enlaces separados por coma",
+    "setlist_move_up": "Subir",
+    "setlist_move_down": "Bajar",
+    "setlist_remove_item": "Quitar de la lista",
+    "setlist_no_items": "Añade tu primer preset abajo",
+    "setlist_add_placeholder": "Añadir preset del pedal…",
+    "setlist_need_scan": "Escanea presets primero (pestaña Presets)",
+    "setlist_add_btn": "Añadir",
+    "modo_directo_exit": "Salir del Modo Directo",
+    "modo_directo_presets_label": "Presets de esta canción",
+    "modo_directo_prev": "Preset anterior",
+    "modo_directo_next": "Siguiente preset",
   },
   "en": {
+    // --- CABECERA Y NAVEGACIÓN GENERAL ---
     "title": "Zoom G2 Four - Viewer/Editor",
     "prev": "◀",
     "next": "▶",
@@ -1725,11 +1952,15 @@
     "rename_click": "Click to rename",
     "preset_no": "Preset number",
     "tuner": "🎸 Tuner",
+    "tuner_title": "🎸 Chromatic Tuner",
+    "tuner_close": "Close",
     "save": "💾 SAVE",
     "save_to_disk": "💾 SAVE TO DISK",
     "midi_status": "Connect MIDI and press Scan",
     "scan_presets": "⟳ SCAN PRESETS",
     "no_presets": "No presets loaded yet",
+    "footer": "Tap effect for ON/OFF · Tap ⇄ to change effect · Lower sliders = parameters · Keys 1-7 · Arrows ← → · No. + Enter",
+    // --- PESTAÑAS PRINCIPALES ---
     "backing_tracks": "🎵 MP3 BACKING TRACKS",
     "rhythms": "🥁 RHYTHMS",
     "files": "📁 FILES",
@@ -1737,19 +1968,13 @@
     "files_explore_col": "🎧 EXPLORE & LISTEN",
     "favorites_tab": "⭐ FAVORITES",
     "ai_library_tab": "🤖 AI LIBRARY",
-    "fav_save_btn": "★ SAVE CURRENT PATCH",
-    "fav_status": "Saves variants in your browser, without touching the pedal",
-    "fav_empty": "You don't have any favorites saved yet",
-    "ai_lib_status_main": "Presets generated with PresetAI, saved in your browser without needing to write them to the pedal",
-    "ai_lib_empty": "You don't have any PresetAI presets saved yet",
-    "demo_mode_btn": "🎭 Demo Mode",
-    "demo_mode_btn_title": "Edit and preview without sending anything to any real pedal",
-    "demo_mode_banner": "🎭 Demo mode active — changes show on screen but nothing is sent to any real pedal",
-    "midi_reconnect_title": "Search again for the pedal over MIDI",
+    "setlists_tab": "🎤 SETLISTS",
+    // --- PISTAS MP3 ---
     "playlist": "PLAYLIST",
     "no_songs": "No songs yet",
     "player": "PLAYER",
     "drop_zone": "Drop MP3 files here or click",
+    // --- RITMOS ---
     "bass": "BASS",
     "mid": "MID",
     "treble": "TREBLE",
@@ -1766,11 +1991,18 @@
     "change_every": "Change every",
     "measure": "measure",
     "measures": "measures",
+    "measure_1": "1 measure",
+    "measure_2": "2 measures",
     "octave": "Octave",
+    "octave_low": "Low (E1)",
+    "octave_mid": "Mid (E2)",
+    "octave_high": "High (E3)",
     "legend_root": "Root",
     "legend_third": "Third",
     "legend_fifth": "Fifth",
     "legend_octave": "Octave",
+    "legend_hint": "· Click cell to change degree",
+    // --- ARCHIVOS (guardar/cargar + explorador) ---
     "fm_save_title": "📤 Save current preset to zptc file",
     "fm_save_btn": "💾 SAVE AS ZPTC",
     "fm_save_status": "Download the active preset from the pedalboard as a .zptc file",
@@ -1788,35 +2020,60 @@
     "fx_note": "Click on a .zptc file = written directly to the active slot and heard instantly. Use \"force manual slot\" to choose another slot.",
     "fx_empty": "Choose a folder to start exploring…",
     "fx_status_init": "Choose a folder with your .zptc backups",
-    "footer": "Tap effect for ON/OFF · Tap ⇄ to change effect · Lower sliders = parameters · Keys 1-7 · Arrows ← → · No. + Enter",
-    "tuner_title": "🎸 Chromatic Tuner",
-    "tuner_close": "Close",
+    // --- PEDALBOARD Y EFECTOS ---
     "effect_modal_title": "Select an effect",
     "close": "Close",
     "unsaved": "⏳ UNSAVED",
     "unsaved_title": "Unsaved change: won't be heard until you press SAVE",
     "based_on": "Based on",
+    "change_effect": "Change effect",
+    "drag_reorder": "Drag to reorder",
+    "empty": "Empty",
+    // --- FAVORITOS ---
+    "fav_save_btn": "★ SAVE CURRENT PATCH",
+    "fav_status": "Saves variants in your browser, without touching the pedal",
+    "fav_empty": "You don't have any favorites saved yet",
     "fav_export_btn": "⬇️ Export Favorites",
     "fav_import_btn": "⬆️ Import Favorites",
-    "ai_lib_export_btn": "⬇️ Export AI Library",
-    "ai_lib_import_btn": "⬆️ Import AI Library",
-    "lib_import_ok": "✅ Imported successfully",
-    "lib_import_err": "❌ That file isn't a valid JSON export from this app",
-    "lib_import_wrong_kind": "❌ That file is from the other library (Favorites/AI), not this one",
     "fav_modal_title": "Save favorite",
     "fav_name_ph": "Name (e.g. Warm Blues)",
     "fav_tags_ph": "Comma-separated tags, or a link (e.g. blues, clean, youtube.com/...)",
     "fav_modal_save": "Save",
     "fav_modal_cancel": "Cancel",
-    "change_effect": "Change effect",
-    "drag_reorder": "Drag to reorder",
-    "empty": "Empty",
-    "measure_1": "1 measure",
-    "measure_2": "2 measures",
-    "octave_low": "Low (E1)",
-    "octave_mid": "Mid (E2)",
-    "octave_high": "High (E3)",
-    "legend_hint": "· Click cell to change degree"
+    // --- BIBLIOTECA IA ---
+    "ai_lib_status_main": "Presets generated with PresetAI, saved in your browser without needing to write them to the pedal",
+    "ai_lib_empty": "You don't have any PresetAI presets saved yet",
+    "ai_lib_export_btn": "⬇️ Export AI Library",
+    "ai_lib_import_btn": "⬆️ Import AI Library",
+    // --- IMPORTAR/EXPORTAR (compartido Favoritos y Biblioteca IA) ---
+    "lib_import_ok": "✅ Imported successfully",
+    "lib_import_err": "❌ That file isn't a valid JSON export from this app",
+    "lib_import_wrong_kind": "❌ That file is from the other library (Favorites/AI), not this one",
+    // --- MODO DEMO ---
+    "demo_mode_btn": "🎭 Demo Mode",
+    "demo_mode_btn_title": "Edit and preview without sending anything to any real pedal",
+    "demo_mode_banner": "🎭 Demo mode active — changes show on screen but nothing is sent to any real pedal",
+    "midi_reconnect_title": "Search again for the pedal over MIDI",
+    // --- SETLISTS / MODO DIRECTO ---
+    "setlist_status": "Ordered lists of real presets for live playing, with a big screen and touch navigation",
+    "setlist_name_ph": "Setlist name (e.g. Venue X Show)",
+    "setlist_create_btn": "+ New Setlist",
+    "setlist_empty": "You don't have any setlists yet",
+    "setlist_items_suffix": "presets",
+    "setlist_play": "Play",
+    "setlist_label_ph": "Label (e.g. Intro clean)",
+    "setlist_links_ph": "Comma-separated links",
+    "setlist_move_up": "Move up",
+    "setlist_move_down": "Move down",
+    "setlist_remove_item": "Remove from list",
+    "setlist_no_items": "Add your first preset below",
+    "setlist_add_placeholder": "Add a preset from the pedal…",
+    "setlist_need_scan": "Scan presets first (Presets tab)",
+    "setlist_add_btn": "Add",
+    "modo_directo_exit": "Exit Live Mode",
+    "modo_directo_presets_label": "Presets for this song",
+    "modo_directo_prev": "Previous preset",
+    "modo_directo_next": "Next preset",
   }
 };
   let currentLang = localStorage.getItem('g2four_lang') || 'es';
@@ -1962,178 +2219,121 @@
     }
   }
 
-  // Aspecto "ampli real" por marca emulada, solo para la categoría Amp
-  // (0x04xxxxxx). Cada rango de id corresponde a un modelo real distinto
-  // (ver tabla de equivalencias más abajo en el archivo); el mapa asigna
-  // el color/textura de esa marca real en vez del dorado genérico de
-  // categoría.
-  const AMP_BRAND_MAP = new Map([
-    [0x04000010, 'marshall'], [0x04000020, 'marshall'], [0x04000030, 'marshall'],
-    [0x04000040, 'fender'],   [0x04000050, 'fender'],   [0x04000060, 'fender'],   [0x04000070, 'fender'],
-    [0x04000080, 'vox'],
-    [0x04000090, 'mesa'],     [0x040000A0, 'mesa'],
-    [0x040000B0, 'mesa-recto'],
-    [0x040000C0, 'bogner'],
-    [0x040000D0, 'hiwatt'],
-    [0x040000E0, 'orange'],
-    [0x040000F0, 'diezel'],
-    [0x04000100, 'matchless'],
-    [0x04000110, 'krank'],
-    [0x04000120, 'peavey'],
-    [0x04000130, 'dumble'],
-    [0x04000140, 'supro'],
-    [0x04000150, 'evh'],
-    [0x04000160, 'friedman'],
+  // ================================================================
+  // EFFECT_INFO_MAP — fuente única de verdad de "a qué pedal/ampli real
+  // emula cada efecto". Antes esto vivía repartido en TRES mapas
+  // distintos (AMP_BRAND_MAP, EFFECT_COLOR_MAP, REAL_PEDAL_MAP), lo cual
+  // ya provocó una contradicción real entre ellos (los 3 wahs, corregida
+  // más tarde) porque el mismo dato se podía editar en un sitio y
+  // olvidarse en otro. Ahora cada id de efecto tiene una única entrada
+  // con los campos que le apliquen:
+  //   - ampBrand: solo amplis (0x04xxxxxx) — colorea+texturiza vía
+  //     .pedal.is-amp.amp-<ampBrand> (ver CSS más abajo)
+  //   - colorCls (+ light opcional): solo efectos no-ampli con pedal
+  //     real identificado — colorea vía .pedal.fx-tinted.<colorCls>
+  //   - realPedal {es, en}: para el tooltip nativo (title) al pasar el
+  //     ratón por el nombre; puede aparecer solo (sin color asignado)
+  //     cuando el efecto tiene pedal real conocido pero no se le dio un
+  //     color propio.
+  // Generado a partir de la misma tabla que usa PresetAI como contexto,
+  // así ambas fuentes quedan consistentes entre sí.
+  // ================================================================
+  const EFFECT_INFO_MAP = new Map([
+    // DYNAMICS
+    [0x01000010, { colorCls: 'fx-dynacomp', realPedal: { es: 'MXR Dyna Comp', en: 'MXR Dyna Comp' } }], // Comp
+    [0x01000030, { colorCls: 'fx-ross', light: true, realPedal: { es: 'ROSS Compressor', en: 'ROSS Compressor' } }], // GrayComp
+    [0x01000050, { colorCls: 'fx-demeter', realPedal: { es: 'Demeter COMP-1 Compulator', en: 'Demeter COMP-1 Compulator' } }], // BlackOpt
+    [0x01000060, { colorCls: 'fx-urei', realPedal: { es: 'UREI 1176LN', en: 'UREI 1176LN' } }], // 1176 LMT
+    // FILTER
+    [0x02000070, { realPedal: { es: 'Z.Vex Seek-Wah', en: 'Z.Vex Seek-Wah' } }], // SeqFLTR
+    // DRIVE
+    [0x03000010, { colorCls: 'fx-ep-drive', light: true, realPedal: { es: 'Maestro Echoplex (etapa de preamplificación)', en: 'Maestro Echoplex (preamp stage)' } }], // EP Drive
+    [0x03000020, { colorCls: 'fx-rc-drive', light: true, realPedal: { es: 'Xotic RC Booster', en: 'Xotic RC Booster' } }], // RC Drive
+    [0x03000030, { colorCls: 'fx-ts808', realPedal: { es: 'Ibanez TS808 Tube Screamer', en: 'Ibanez TS808 Tube Screamer' } }], // TS Drive
+    [0x03000040, { colorCls: 'fx-klon', light: true, realPedal: { es: 'Klon Centaur', en: 'Klon Centaur' } }], // GoldDrive
+    [0x03000050, { realPedal: { es: 'Mad Professor Sweet Honey Overdrive', en: 'Mad Professor Sweet Honey Overdrive' } }], // SweetDrv
+    [0x03000058, { realPedal: { es: 'Boss OD-1', en: 'Boss OD-1' } }], // Over Drive
+    [0x03000060, { colorCls: 'fx-zendrive', light: true, realPedal: { es: 'Hermida Audio Zendrive', en: 'Hermida Audio Zendrive' } }], // Zen O.DRV
+    [0x03000070, { colorCls: 'fx-gridslammer', realPedal: { es: 'Mesa/Boogie Grid Slammer', en: 'Mesa/Boogie Grid Slammer' } }], // BG GRID
+    [0x03000090, { colorCls: 'fx-mxr-plus', realPedal: { es: 'MXR Distortion+', en: 'MXR Distortion+' } }], // Plus DIST
+    [0x030000A0, { colorCls: 'fx-mxr-orange', realPedal: { es: 'Boss DS-1', en: 'Boss DS-1' } }], // DIST One
+    [0x030000B0, { colorCls: 'fx-rat', realPedal: { es: 'Pro Co RAT', en: 'Pro Co RAT' } }], // SqueakDST
+    [0x030000D0, { colorCls: 'fx-riot', realPedal: { es: 'Suhr Riot Reloaded', en: 'Suhr Riot Reloaded' } }], // VioletDST
+    [0x030000E0, { colorCls: 'fx-tonebender', light: true, realPedal: { es: 'Sola Sound / Tone Bender MkI.5', en: 'Sola Sound / Tone Bender MkI.5' } }], // TB MK1.5
+    [0x03000100, { colorCls: 'fx-bigmuff-nyc', realPedal: { es: 'Electro-Harmonix Big Muff Pi (versión NYC)', en: 'Electro-Harmonix Big Muff Pi (NYC version)' } }], // NYC Muff
+    [0x03000130, { colorCls: 'fx-mxr-orange', realPedal: { es: 'Boss MT-2 Metal Zone', en: 'Boss MT-2 Metal Zone' } }], // MetalWRLD
+    [0x03000140, { colorCls: 'fx-throttlebox', realPedal: { es: 'Mesa/Boogie Throttle Box', en: 'Mesa/Boogie Throttle Box' } }], // HG THRTTL
+    [0x03000150, { colorCls: 'fx-ts808', realPedal: { es: 'TS808 + booster (combinado)', en: 'TS808 + booster (combined)' } }], // TS+Boost
+    [0x03000160, { realPedal: { es: 'BluesBreaker + booster (combinado)', en: 'BluesBreaker + booster (combined)' } }], // RedCR+BST
+    [0x03000190, { realPedal: { es: 'Zoom G5n (función Output Booster)', en: 'Zoom G5n (Output Booster function)' } }], // OutputBST
+    // AMP
+    [0x04000010, { ampBrand: 'marshall', realPedal: { es: 'Marshall JTM45', en: 'Marshall JTM45' } }], // MS 45os
+    [0x04000020, { ampBrand: 'marshall', realPedal: { es: 'Marshall 1959 Super Lead ("Plexi")', en: 'Marshall 1959 Super Lead ("Plexi")' } }], // MS 1959
+    [0x04000030, { ampBrand: 'marshall', realPedal: { es: 'Marshall JCM800 2203', en: 'Marshall JCM800 2203' } }], // MS 800
+    [0x04000040, { ampBrand: 'fender', realPedal: { es: 'Fender \'59 Bassman', en: 'Fender \'59 Bassman' } }], // FD B-MAN
+    [0x04000050, { ampBrand: 'fender', realPedal: { es: 'Fender \'65 Twin Reverb', en: 'Fender \'65 Twin Reverb' } }], // FD TWIN-R
+    [0x04000060, { ampBrand: 'fender', realPedal: { es: 'Fender \'65 Deluxe Reverb', en: 'Fender \'65 Deluxe Reverb' } }], // FD DLX-R
+    [0x04000070, { ampBrand: 'fender', realPedal: { es: 'Fender Vibro-King / master volume', en: 'Fender Vibro-King / master volume' } }], // FD MASTER
+    [0x04000080, { ampBrand: 'vox', realPedal: { es: 'Vox AC30 Top Boost', en: 'Vox AC30 Top Boost' } }], // UK 30A
+    [0x04000090, { ampBrand: 'mesa', realPedal: { es: 'Mesa/Boogie Mark I', en: 'Mesa/Boogie Mark I' } }], // BG MARK1
+    [0x040000A0, { ampBrand: 'mesa', realPedal: { es: 'Mesa/Boogie Mark III', en: 'Mesa/Boogie Mark III' } }], // BG MARK3
+    [0x040000B0, { ampBrand: 'mesa-recto', realPedal: { es: 'Mesa/Boogie Dual Rectifier', en: 'Mesa/Boogie Dual Rectifier' } }], // RectiDual
+    [0x040000C0, { ampBrand: 'bogner', realPedal: { es: 'Bogner Ecstasy (canal azul)', en: 'Bogner Ecstasy (blue channel)' } }], // XtasyBlue
+    [0x040000D0, { ampBrand: 'hiwatt', realPedal: { es: 'Hiwatt DR103', en: 'Hiwatt DR103' } }], // HW 100
+    [0x040000E0, { ampBrand: 'orange', realPedal: { es: 'Orange OR120', en: 'Orange OR120' } }], // ORG120
+    [0x040000F0, { ampBrand: 'diezel', realPedal: { es: 'Diezel Herbert', en: 'Diezel Herbert' } }], // DZ Herb
+    [0x04000100, { ampBrand: 'matchless', realPedal: { es: 'Matchless DC-30', en: 'Matchless DC-30' } }], // MATCH30
+    [0x04000110, { ampBrand: 'krank', realPedal: { es: 'Krank Krampus', en: 'Krank Krampus' } }], // KRAMPUS
+    [0x04000120, { ampBrand: 'peavey', realPedal: { es: 'Peavey 6505 / 5150', en: 'Peavey 6505 / 5150' } }], // REDLOOM
+    [0x04000130, { ampBrand: 'dumble', realPedal: { es: 'Two-Rock / Dumble (tono clean)', en: 'Two-Rock / Dumble (clean tone)' } }], // VELVET
+    [0x04000140, { ampBrand: 'supro', realPedal: { es: 'Supro Thunderbolt (vintage)', en: 'Supro Thunderbolt (vintage)' } }], // MUDDY
+    [0x04000150, { ampBrand: 'evh', realPedal: { es: 'EVH 5150 III', en: 'EVH 5150 III' } }], // 7 HEAVEN
+    [0x04000160, { ampBrand: 'friedman', realPedal: { es: 'Friedman BE-100', en: 'Friedman BE-100' } }], // POLLEX
+    // MODULATION
+    [0x06000020, { colorCls: 'fx-smallclone', realPedal: { es: 'Electro-Harmonix Small Clone', en: 'Electro-Harmonix Small Clone' } }], // CloneCho
+    [0x06000030, { colorCls: 'fx-boss-ch1', realPedal: { es: 'BOSS CH-1 Super Chorus', en: 'BOSS CH-1 Super Chorus' } }], // ChorusOne
+    [0x06000040, { colorCls: 'fx-corona', realPedal: { es: 'tc electronic Corona Tri-Chorus', en: 'tc electronic Corona Tri-Chorus' } }], // TriChorus
+    [0x060000B0, { colorCls: 'fx-smallstone', realPedal: { es: 'Electro-Harmonix Small Stone', en: 'Electro-Harmonix Small Stone' } }], // StonePha
+    [0x060000E0, { realPedal: { es: 'Shin-ei Uni-Vibe', en: 'Shin-ei Uni-Vibe' } }], // TheVibe
+    [0x060000F0, { colorCls: 'fx-mxr-flanger', light: true, realPedal: { es: 'MXR M-117R', en: 'MXR M-117R' } }], // VinFLNGR
+    // SFX
+    [0x07000020, { realPedal: { es: 'Boss / DigiTech loop roll', en: 'Boss / DigiTech loop roll' } }], // LoopRoll
+    // DELAY
+    [0x08000040, { colorCls: 'fx-echoplex', light: true, realPedal: { es: 'Maestro Echoplex EP-3', en: 'Maestro Echoplex EP-3' } }], // TapeEcho3
+    [0x08000050, { colorCls: 'fx-eventide', realPedal: { es: 'Eventide TimeFactor (algoritmo DigitalDelay)', en: 'Eventide TimeFactor (DigitalDelay algorithm)' } }], // DualDelay
+    // REVERB
+    [0x09000040, { colorCls: 'fx-fender-bf', realPedal: { es: 'Reverb de muelle Fender', en: 'Fender spring reverb' } }], // FD Spring
+    [0x09000050, { realPedal: { es: 'EMT 140 (plate)', en: 'EMT 140 (plate)' } }], // Plate REV
+    [0x090000E0, { realPedal: { es: 'Reverb con gate estilo AMS (años 80)', en: '80s-style gated reverb (AMS style)' } }], // GateRevrb
+    [0x09000110, { realPedal: { es: 'Red Panda Particle', en: 'Red Panda Particle' } }], // ParticleR
+    // PEDAL
+    [0x0B000030, { colorCls: 'fx-crybaby', realPedal: { es: 'Dunlop Cry Baby', en: 'Dunlop Cry Baby' } }], // BlackWah
+    [0x0B000040, { colorCls: 'fx-chromewah', light: true, realPedal: { es: 'Vox V847', en: 'Vox V847' } }], // ChromeWah
+    [0x0B000050, { colorCls: 'fx-ibanezwah', realPedal: { es: 'Ibanez WAH10', en: 'Ibanez WAH10' } }], // WAH100
+    [0x0B000060, { realPedal: { es: 'Wah estilo talk-box', en: 'Talk-box style wah' } }], // VoiceWah
+    [0x0B000070, { realPedal: { es: 'DigiTech Whammy', en: 'DigiTech Whammy' } }], // PDL Pitch
+    [0x0B000090, { realPedal: { es: 'Altavoz rotativo Leslie 122', en: 'Leslie 122 rotary speaker' } }], // PDL Roto
+    [0x0B0000B0, { realPedal: { es: 'Uni-Vibe en formato pedal de expresión', en: 'Uni-Vibe in expression-pedal form' } }], // PDL Vibe
+    [0x0B000120, { realPedal: { es: 'Bit-crusher en formato pedal de expresión', en: 'Bit-crusher in expression-pedal form' } }], // P-BitCRSH
   ]);
 
   function getAmpBrandClass(id) {
     if (((id >>> 24) & 0xFF) !== 0x04) return null;
-    const brand = AMP_BRAND_MAP.get(id >>> 0);
-    return brand ? `amp-${brand}` : null;
+    const info = EFFECT_INFO_MAP.get(id >>> 0);
+    return info && info.ampBrand ? `amp-${info.ampBrand}` : null;
   }
-
-  // Aspecto "pedal real" para efectos NO amplificador que emulan un pedal
-  // concreto y reconocible (según el propio manual de Zoom, "Simulation of
-  // the Ibanez TS808", etc., o evidencia de color confirmada aparte cuando
-  // el manual no lo dice pero el pedal real es inconfundible, p.ej. Suhr
-  // Riot Reloaded = morado). El resto de efectos de cada categoría se
-  // quedan con el color genérico de categoría de siempre.
-  // light:true = fondo claro, hace falta texto oscuro para que se lea bien.
-  const EFFECT_COLOR_MAP = new Map([
-    // DRIVE
-    [0x03000010, { cls: 'fx-ep-drive',   light: true  }], // EP Drive → Echoplex preamp / Xotic EP Booster
-    [0x03000020, { cls: 'fx-rc-drive',   light: true  }], // RC Drive → Xotic RC Booster
-    [0x03000030, { cls: 'fx-ts808',      light: false }], // TS Drive → Ibanez TS808
-    [0x03000040, { cls: 'fx-klon',       light: true  }], // GoldDrive → Klon Centaur
-    [0x03000060, { cls: 'fx-zendrive',   light: true  }], // Zen O.DRV → Hermida Zendrive
-    [0x03000070, { cls: 'fx-gridslammer',light: false }], // BG GRID → Mesa Grid Slammer
-    [0x03000090, { cls: 'fx-mxr-plus',   light: false }], // Plus DIST → MXR Distortion+ (más amarillo que el naranja Boss)
-    [0x030000A0,{ cls: 'fx-mxr-orange', light: false }], // DIST One → Boss DS-1
-    [0x030000B0,{ cls: 'fx-rat',        light: false }], // SqueakDST → ProCo RAT
-    [0x030000D0,{ cls: 'fx-riot',       light: false }], // VioletDST → Suhr Riot Reloaded
-    [0x030000E0,{ cls: 'fx-tonebender', light: true  }], // TB MK1.5 → Tone Bender MK1.5
-    [0x03000100,{ cls: 'fx-bigmuff-nyc',light: false }], // NYC Muff → EHX Big Muff NYC
-    [0x03000130,{ cls: 'fx-mxr-orange', light: false }], // MetalWRLD → Boss MT-2
-    [0x03000140,{ cls: 'fx-throttlebox',light: false }], // HG THRTTL → Mesa Throttle Box
-    [0x03000150,{ cls: 'fx-ts808',      light: false }], // TS+Boost → basado en TS808
-    // DYNAMICS
-    [0x01000010,{ cls: 'fx-dynacomp',   light: false }], // Comp → MXR Dyna Comp
-    [0x01000030,{ cls: 'fx-ross',       light: true  }], // GrayComp → Ross Compressor
-    [0x01000050,{ cls: 'fx-demeter',    light: false }], // BlackOpt → Demeter Compulator
-    [0x01000060,{ cls: 'fx-urei',       light: false }], // 1176 LMT → UREI 1176LN
-    // MODULATION
-    [0x06000020,{ cls: 'fx-smallclone', light: false }], // CloneCho → EHX Small Clone
-    [0x06000030,{ cls: 'fx-boss-ch1',   light: false }], // ChorusOne → Boss CH-1
-    [0x06000040,{ cls: 'fx-corona',     light: false }], // TriChorus → TC Corona Chorus
-    [0x060000B0,{ cls: 'fx-smallstone', light: false }], // StonePha → EHX Small Stone
-    [0x060000F0,{ cls: 'fx-mxr-flanger',light: true  }], // VinFLNGR → MXR Flanger M117R
-    // DELAY
-    [0x08000040,{ cls: 'fx-echoplex',   light: true  }], // TapeEcho3 → Maestro Echoplex EP-3
-    [0x08000050,{ cls: 'fx-eventide',   light: false }], // DualDelay → Eventide TimeFactor
-    // REVERB
-    [0x09000040,{ cls: 'fx-fender-bf',  light: false }], // FD Spring → Fender '65 Twin (blackface)
-    // PEDAL
-    [0x0B000030,{ cls: 'fx-crybaby',    light: false }], // BlackWah → Dunlop Cry Baby
-    [0x0B000040,{ cls: 'fx-chromewah',  light: true  }], // ChromeWah → Vox V847
-    [0x0B000050,{ cls: 'fx-ibanezwah',  light: false }], // WAH100 → Ibanez WAH10
-  ]);
 
   function getEffectColorClass(id) {
-    const entry = EFFECT_COLOR_MAP.get(id >>> 0);
-    if (!entry) return '';
-    return `fx-tinted ${entry.cls}${entry.light ? ' fx-light' : ''}`;
+    const info = EFFECT_INFO_MAP.get(id >>> 0);
+    if (!info || !info.colorCls) return '';
+    return `fx-tinted ${info.colorCls}${info.light ? ' fx-light' : ''}`;
   }
 
-  // Mapa de "a qué pedal/ampli real emula cada efecto", para el tooltip
-  // nativo (title) al pasar el ratón por el nombre. Generado a partir de
-  // la misma tabla que ya usa PresetAI como contexto (columna "Modelo
-  // emulado"), así que las dos fuentes quedan consistentes entre sí. Solo
-  // incluye los efectos con un pedal real identificado; el resto no
-  // llevan tooltip.
-  const REAL_PEDAL_MAP = new Map([
-    // DYNAMICS
-    [0x01000010, { es: 'MXR Dyna Comp', en: 'MXR Dyna Comp' }], // Comp
-    [0x01000030, { es: 'ROSS Compressor', en: 'ROSS Compressor' }], // GrayComp
-    [0x01000050, { es: 'Demeter COMP-1 Compulator', en: 'Demeter COMP-1 Compulator' }], // BlackOpt
-    [0x01000060, { es: 'UREI 1176LN', en: 'UREI 1176LN' }], // 1176 LMT
-    // FILTER
-    [0x02000070, { es: 'Z.Vex Seek-Wah', en: 'Z.Vex Seek-Wah' }], // SeqFLTR
-    // DRIVE
-    [0x03000010, { es: 'Maestro Echoplex (etapa de preamplificación)', en: 'Maestro Echoplex (preamp stage)' }], // EP Drive
-    [0x03000020, { es: 'Xotic RC Booster', en: 'Xotic RC Booster' }], // RC Drive
-    [0x03000030, { es: 'Ibanez TS808 Tube Screamer', en: 'Ibanez TS808 Tube Screamer' }], // TS Drive
-    [0x03000040, { es: 'Klon Centaur', en: 'Klon Centaur' }], // GoldDrive
-    [0x03000050, { es: 'Mad Professor Sweet Honey Overdrive', en: 'Mad Professor Sweet Honey Overdrive' }], // SweetDrv
-    [0x03000058, { es: 'Boss OD-1', en: 'Boss OD-1' }], // Over Drive
-    [0x03000060, { es: 'Hermida Audio Zendrive', en: 'Hermida Audio Zendrive' }], // Zen O.DRV
-    [0x03000070, { es: 'Mesa/Boogie Grid Slammer', en: 'Mesa/Boogie Grid Slammer' }], // BG GRID
-    [0x03000090, { es: 'MXR Distortion+', en: 'MXR Distortion+' }], // Plus DIST
-    [0x030000A0, { es: 'Boss DS-1', en: 'Boss DS-1' }], // DIST One
-    [0x030000B0, { es: 'Pro Co RAT', en: 'Pro Co RAT' }], // SqueakDST
-    [0x030000D0, { es: 'Suhr Riot Reloaded', en: 'Suhr Riot Reloaded' }], // VioletDST
-    [0x030000E0, { es: 'Sola Sound / Tone Bender MkI.5', en: 'Sola Sound / Tone Bender MkI.5' }], // TB MK1.5
-    [0x03000100, { es: 'Electro-Harmonix Big Muff Pi (versión NYC)', en: 'Electro-Harmonix Big Muff Pi (NYC version)' }], // NYC Muff
-    [0x03000130, { es: 'Boss MT-2 Metal Zone', en: 'Boss MT-2 Metal Zone' }], // MetalWRLD
-    [0x03000140, { es: 'Mesa/Boogie Throttle Box', en: 'Mesa/Boogie Throttle Box' }], // HG THRTTL
-    [0x03000150, { es: 'TS808 + booster (combinado)', en: 'TS808 + booster (combined)' }], // TS+Boost
-    [0x03000160, { es: 'BluesBreaker + booster (combinado)', en: 'BluesBreaker + booster (combined)' }], // RedCR+BST
-    [0x03000190, { es: 'Zoom G5n (función Output Booster)', en: 'Zoom G5n (Output Booster function)' }], // OutputBST
-    // AMP
-    [0x04000010, { es: 'Marshall JTM45', en: 'Marshall JTM45' }], // MS 45os
-    [0x04000020, { es: 'Marshall 1959 Super Lead ("Plexi")', en: 'Marshall 1959 Super Lead ("Plexi")' }], // MS 1959
-    [0x04000030, { es: 'Marshall JCM800 2203', en: 'Marshall JCM800 2203' }], // MS 800
-    [0x04000040, { es: 'Fender \'59 Bassman', en: 'Fender \'59 Bassman' }], // FD B-MAN
-    [0x04000050, { es: 'Fender \'65 Twin Reverb', en: 'Fender \'65 Twin Reverb' }], // FD TWIN-R
-    [0x04000060, { es: 'Fender \'65 Deluxe Reverb', en: 'Fender \'65 Deluxe Reverb' }], // FD DLX-R
-    [0x04000070, { es: 'Fender Vibro-King / master volume', en: 'Fender Vibro-King / master volume' }], // FD MASTER
-    [0x04000080, { es: 'Vox AC30 Top Boost', en: 'Vox AC30 Top Boost' }], // UK 30A
-    [0x04000090, { es: 'Mesa/Boogie Mark I', en: 'Mesa/Boogie Mark I' }], // BG MARK1
-    [0x040000A0, { es: 'Mesa/Boogie Mark III', en: 'Mesa/Boogie Mark III' }], // BG MARK3
-    [0x040000B0, { es: 'Mesa/Boogie Dual Rectifier', en: 'Mesa/Boogie Dual Rectifier' }], // RectiDual
-    [0x040000C0, { es: 'Bogner Ecstasy (canal azul)', en: 'Bogner Ecstasy (blue channel)' }], // XtasyBlue
-    [0x040000D0, { es: 'Hiwatt DR103', en: 'Hiwatt DR103' }], // HW 100
-    [0x040000E0, { es: 'Orange OR120', en: 'Orange OR120' }], // ORG120
-    [0x040000F0, { es: 'Diezel Herbert', en: 'Diezel Herbert' }], // DZ Herb
-    [0x04000100, { es: 'Matchless DC-30', en: 'Matchless DC-30' }], // MATCH30
-    [0x04000110, { es: 'Krank Krampus', en: 'Krank Krampus' }], // KRAMPUS
-    [0x04000120, { es: 'Peavey 6505 / 5150', en: 'Peavey 6505 / 5150' }], // REDLOOM
-    [0x04000130, { es: 'Two-Rock / Dumble (tono clean)', en: 'Two-Rock / Dumble (clean tone)' }], // VELVET
-    [0x04000140, { es: 'Supro Thunderbolt (vintage)', en: 'Supro Thunderbolt (vintage)' }], // MUDDY
-    [0x04000150, { es: 'EVH 5150 III', en: 'EVH 5150 III' }], // 7 HEAVEN
-    [0x04000160, { es: 'Friedman BE-100', en: 'Friedman BE-100' }], // POLLEX
-    // MODULATION
-    [0x06000020, { es: 'Electro-Harmonix Small Clone', en: 'Electro-Harmonix Small Clone' }], // CloneCho
-    [0x06000030, { es: 'BOSS CH-1 Super Chorus', en: 'BOSS CH-1 Super Chorus' }], // ChorusOne
-    [0x06000040, { es: 'tc electronic Corona Tri-Chorus', en: 'tc electronic Corona Tri-Chorus' }], // TriChorus
-    [0x060000B0, { es: 'Electro-Harmonix Small Stone', en: 'Electro-Harmonix Small Stone' }], // StonePha
-    [0x060000E0, { es: 'Shin-ei Uni-Vibe', en: 'Shin-ei Uni-Vibe' }], // TheVibe
-    [0x060000F0, { es: 'MXR M-117R', en: 'MXR M-117R' }], // VinFLNGR
-    // SFX
-    [0x07000020, { es: 'Boss / DigiTech loop roll', en: 'Boss / DigiTech loop roll' }], // LoopRoll
-    // DELAY
-    [0x08000040, { es: 'Maestro Echoplex EP-3', en: 'Maestro Echoplex EP-3' }], // TapeEcho3
-    [0x08000050, { es: 'Eventide TimeFactor (algoritmo DigitalDelay)', en: 'Eventide TimeFactor (DigitalDelay algorithm)' }], // DualDelay
-    // REVERB
-    [0x09000040, { es: 'Reverb de muelle Fender', en: 'Fender spring reverb' }], // FD Spring
-    [0x09000050, { es: 'EMT 140 (plate)', en: 'EMT 140 (plate)' }], // Plate REV
-    [0x090000E0, { es: 'Reverb con gate estilo AMS (años 80)', en: '80s-style gated reverb (AMS style)' }], // GateRevrb
-    [0x09000110, { es: 'Red Panda Particle', en: 'Red Panda Particle' }], // ParticleR
-    // PEDAL
-    [0x0B000030, { es: 'Dunlop Cry Baby', en: 'Dunlop Cry Baby' }], // BlackWah
-    [0x0B000040, { es: 'Vox V847', en: 'Vox V847' }], // ChromeWah
-    [0x0B000050, { es: 'Ibanez WAH10', en: 'Ibanez WAH10' }], // WAH100
-    [0x0B000060, { es: 'Wah estilo talk-box', en: 'Talk-box style wah' }], // VoiceWah
-    [0x0B000070, { es: 'DigiTech Whammy', en: 'DigiTech Whammy' }], // PDL Pitch
-    [0x0B000090, { es: 'Altavoz rotativo Leslie 122', en: 'Leslie 122 rotary speaker' }], // PDL Roto
-    [0x0B0000B0, { es: 'Uni-Vibe en formato pedal de expresión', en: 'Uni-Vibe in expression-pedal form' }], // PDL Vibe
-    [0x0B000120, { es: 'Bit-crusher en formato pedal de expresión', en: 'Bit-crusher in expression-pedal form' }], // P-BitCRSH
-  ]);
-
   function getRealPedalTooltip(id) {
-    const entry = REAL_PEDAL_MAP.get(id >>> 0);
-    if (!entry) return '';
+    const info = EFFECT_INFO_MAP.get(id >>> 0);
+    if (!info || !info.realPedal) return '';
     const label = translations[currentLang].based_on || 'Basado en';
-    return `${label}: ${entry[currentLang] || entry.es}`;
+    return `${label}: ${info.realPedal[currentLang] || info.realPedal.es}`;
   }
 
   function getCategoryName(id) {
@@ -2888,6 +3088,8 @@ DEFAULT_PARAMS_MAP.set(0x04000060, [0x00, 0x21, 0x37, 0x32, 0x5a, 0x00, 0x28]); 
   // el paramNum, que sigue siendo fijo): si el array de nombres trae Time
   // antes que Mode, se intercambia el orden de esos dos concretos para
   // que Mode salga primero; el resto de parámetros no se toca.
+  // (Existe una versión gemela orderParamsForLiveSendLocal en el panel de
+  // PresetAI, ~línea 7908 — documento aparte, no puede reutilizar esta.)
   function orderParamsForLiveSend(paramNames, fallbackLength) {
     const n = paramNames ? paramNames.length : (fallbackLength || 0);
     const order = [];
@@ -2901,6 +3103,9 @@ DEFAULT_PARAMS_MAP.set(0x04000060, [0x00, 0x21, 0x37, 0x32, 0x5a, 0x00, 0x28]); 
     return order;
   }
 
+  // (El panel de PresetAI, documento aparte, tiene su propia versión más
+  // simple de toggleSlot ~línea 7896 — no gestiona currentPatchData ni el
+  // caso especial del slot 7, porque ese panel no tiene pedalboard propio.)
   function toggleSlot(slot, enable) {
     if (currentPatchData && currentPatchData.effects[slot]) {
       currentPatchData.effects[slot].enabled = enable;
@@ -2939,6 +3144,10 @@ DEFAULT_PARAMS_MAP.set(0x04000060, [0x00, 0x21, 0x37, 0x32, 0x5a, 0x00, 0x28]); 
     }
   }
 
+  // (El panel de PresetAI, documento aparte, tiene su propia versión más
+  // simple de changeEffectType ~línea 7887 — solo manda el SysEx, sin
+  // tocar currentPatchData ni aplicar los defaults del efecto, porque el
+  // JSON generado ya trae todos los parámetros explícitos.)
   function changeEffectType(slot, effectId) {
     if (!midiOut) return;
     const id = effectId >>> 0;
@@ -3035,25 +3244,35 @@ DEFAULT_PARAMS_MAP.set(0x04000060, [0x00, 0x21, 0x37, 0x32, 0x5a, 0x00, 0x28]); 
   // navegador (localStorage), independiente de la memoria del pedal.
   // No envía nada por MIDI: solo actualiza la vista local.
   // --------------------------------------------------------------
-  const FAVORITES_KEY = 'g2four_favorites';
-
-  function getFavorites() {
-    try {
-      const raw = localStorage.getItem(FAVORITES_KEY);
-      const list = raw ? JSON.parse(raw) : [];
-      return Array.isArray(list) ? list : [];
-    } catch (e) {
-      return [];
-    }
+  // Fábrica genérica de almacenamiento: Favoritos, Biblioteca IA y
+  // Setlists son cada una un array JSON en su propia clave de
+  // localStorage, con el mismo get/save (leer, parsear, valores por
+  // defecto seguros ante error) repetido tres veces. Ahora es una única
+  // función que genera el par {get, save} para cualquier clave.
+  function makeJsonStore(key, errorLabel) {
+    return {
+      get() {
+        try {
+          const raw = localStorage.getItem(key);
+          const list = raw ? JSON.parse(raw) : [];
+          return Array.isArray(list) ? list : [];
+        } catch (e) {
+          return [];
+        }
+      },
+      save(list) {
+        try {
+          localStorage.setItem(key, JSON.stringify(list));
+        } catch (e) {
+          console.error(`No se pudo guardar en ${errorLabel}:`, e);
+        }
+      }
+    };
   }
 
-  function saveFavoritesList(list) {
-    try {
-      localStorage.setItem(FAVORITES_KEY, JSON.stringify(list));
-    } catch (e) {
-      console.error('No se pudo guardar el favorito en localStorage:', e);
-    }
-  }
+  const favoritesStore = makeJsonStore('g2four_favorites', 'Favoritos');
+  const getFavorites = favoritesStore.get;
+  const saveFavoritesList = favoritesStore.save;
 
   // --------------------------------------------------------------
   // EXPORTAR / IMPORTAR (Favoritos y Biblioteca IA)
@@ -3114,43 +3333,80 @@ DEFAULT_PARAMS_MAP.set(0x04000060, [0x00, 0x21, 0x37, 0x32, 0x5a, 0x00, 0x28]); 
   // tener que ir a buscarlo.
   const TAG_URL_RE = /^(https?:\/\/)?([\w-]+\.)+[a-z]{2,}(\/\S*)?$/i;
 
+  // Igual que escapeHtml() del panel de PresetAI (documento aparte, ver
+  // línea ~7495): función duplicada a propósito porque cada documento
+  // tiene su propio JS y no puede llamar a las funciones del otro
+  // directamente. Aquí con "Main" en el nombre para no chocar si algún
+  // día se comparte contexto.
   function escapeHtmlMain(str) {
     return String(str).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+  }
+
+  // Icono (y un ligero acento de color) según el sitio del enlace, para
+  // reconocer de un vistazo qué tipo de referencia es sin tener que leer
+  // la URL entera.
+  const LINK_SITE_MAP = [
+    { re: /(^|\.)youtube\.com$|^youtu\.be$/i,        icon: '▶️', cls: 'fav-tag-youtube' },
+    { re: /(^|\.)spotify\.com$/i,                    icon: '🎵', cls: 'fav-tag-spotify' },
+    { re: /(^|\.)(ultimate-guitar|songsterr|tabs)\./i, icon: '🎼', cls: 'fav-tag-tabs' },
+    { re: /(^|\.)soundcloud\.com$/i,                 icon: '☁️', cls: 'fav-tag-soundcloud' },
+    { re: /(^|\.)(instagram|tiktok)\.com$/i,         icon: '📸', cls: 'fav-tag-social' },
+  ];
+
+  function getLinkSite(href) {
+    let host = '';
+    try { host = new URL(href).hostname.replace(/^www\./, ''); } catch (e) { return null; }
+    return LINK_SITE_MAP.find(s => s.re.test(host)) || null;
   }
 
   function renderFavTag(rawTag) {
     const tag = (rawTag || '').trim();
     if (TAG_URL_RE.test(tag)) {
       const href = /^https?:\/\//i.test(tag) ? tag : `https://${tag}`;
-      return `<a class="fav-tag fav-tag-link" href="${escapeHtmlMain(href)}" target="_blank" rel="noopener noreferrer" title="${escapeHtmlMain(tag)}">🔗 ${escapeHtmlMain(tag)}</a>`;
+      const site = getLinkSite(href);
+      const icon = site ? site.icon : '🔗';
+      const extraCls = site ? ` ${site.cls}` : '';
+      return `<a class="fav-tag fav-tag-link${extraCls}" href="${escapeHtmlMain(href)}" target="_blank" rel="noopener noreferrer" title="${escapeHtmlMain(tag)}">${icon} ${escapeHtmlMain(tag)}</a>`;
     }
     return `<span class="fav-tag">${escapeHtmlMain(tag)}</span>`;
   }
 
-  function renderFavoritesGrid() {
-    const grid = document.getElementById('favoritesGrid');
+  // Motor genérico de tarjeta: Favoritos y Biblioteca IA son dos listas
+  // de "presets guardados en el navegador" con la misma forma de tarjeta
+  // (nombre, tags/subtítulo, Cargar, Borrar) — antes eran dos funciones
+  // casi idénticas por separado; ahora una sola parametrizada por lista,
+  // clave de "vacío", cómo pintar sus tags, y qué hacer al cargar/borrar.
+  function renderLibraryGrid(gridId, list, emptyKey, tagsHtmlFn, onLoad, onDelete) {
+    const grid = document.getElementById(gridId);
     if (!grid) return;
-    const favorites = getFavorites();
     grid.innerHTML = '';
-    if (favorites.length === 0) {
-      grid.innerHTML = `<div class="presets-empty" data-i18n="fav_empty">${translations[currentLang].fav_empty}</div>`;
+    if (list.length === 0) {
+      grid.innerHTML = `<div class="presets-empty" data-i18n="${emptyKey}">${translations[currentLang][emptyKey]}</div>`;
       return;
     }
-    favorites.slice().reverse().forEach(fav => {
+    list.slice().reverse().forEach(item => {
       const card = document.createElement('div');
       card.className = 'fav-card';
-      const tagsHtml = (fav.tags || []).map(renderFavTag).join('');
       card.innerHTML = `
-        <div class="fav-card-name" title="${escapeHtmlMain(fav.name)}">${escapeHtmlMain(fav.name)}</div>
-        <div class="fav-tags">${tagsHtml}</div>
+        <div class="fav-card-name" title="${escapeHtmlMain(item.name)}">${escapeHtmlMain(item.name)}</div>
+        <div class="fav-tags">${tagsHtmlFn(item)}</div>
         <div class="fav-actions">
           <button type="button" class="fav-btn fav-btn-load">▶ Load/Cargar</button>
           <button type="button" class="fav-btn fav-btn-delete">🗑</button>
         </div>`;
-      card.querySelector('.fav-btn-load').addEventListener('click', () => loadFavorite(fav.id));
-      card.querySelector('.fav-btn-delete').addEventListener('click', () => deleteFavorite(fav.id));
+      card.querySelector('.fav-btn-load').addEventListener('click', () => onLoad(item));
+      card.querySelector('.fav-btn-delete').addEventListener('click', () => onDelete(item.id));
       grid.appendChild(card);
     });
+  }
+
+  function renderFavoritesGrid() {
+    renderLibraryGrid(
+      'favoritesGrid', getFavorites(), 'fav_empty',
+      fav => (fav.tags || []).map(renderFavTag).join(''),
+      fav => loadFavorite(fav.id),
+      id => deleteFavorite(id)
+    );
   }
 
   // Los favoritos son variantes rápidas del MISMO parche (mismo ampli,
@@ -3230,25 +3486,9 @@ DEFAULT_PARAMS_MAP.set(0x04000060, [0x00, 0x21, 0x37, 0x32, 0x5a, 0x00, 0x28]); 
   // PresetAI (más abajo, en <template id="presetAiTemplate">); aquí solo
   // se lee/pinta/carga lo que ya se haya guardado desde allí.
   // --------------------------------------------------------------
-  const AI_LIBRARY_KEY = 'g2four_ai_library';
-
-  function getAiLibrary() {
-    try {
-      const raw = localStorage.getItem(AI_LIBRARY_KEY);
-      const list = raw ? JSON.parse(raw) : [];
-      return Array.isArray(list) ? list : [];
-    } catch (e) {
-      return [];
-    }
-  }
-
-  function saveAiLibraryList(list) {
-    try {
-      localStorage.setItem(AI_LIBRARY_KEY, JSON.stringify(list));
-    } catch (e) {
-      console.error('No se pudo guardar en la Biblioteca IA:', e);
-    }
-  }
+  const aiLibraryStore = makeJsonStore('g2four_ai_library', 'la Biblioteca IA');
+  const getAiLibrary = aiLibraryStore.get;
+  const saveAiLibraryList = aiLibraryStore.save;
 
   function deleteAiLibraryEntry(id) {
     saveAiLibraryList(getAiLibrary().filter(e => e.id !== id));
@@ -3256,28 +3496,12 @@ DEFAULT_PARAMS_MAP.set(0x04000060, [0x00, 0x21, 0x37, 0x32, 0x5a, 0x00, 0x28]); 
   }
 
   function renderAiLibraryGrid() {
-    const grid = document.getElementById('aiLibraryGrid');
-    if (!grid) return;
-    const list = getAiLibrary();
-    grid.innerHTML = '';
-    if (list.length === 0) {
-      grid.innerHTML = `<div class="presets-empty" data-i18n="ai_lib_empty">${translations[currentLang].ai_lib_empty}</div>`;
-      return;
-    }
-    list.slice().reverse().forEach(entry => {
-      const card = document.createElement('div');
-      card.className = 'fav-card';
-      card.innerHTML = `
-        <div class="fav-card-name" title="${entry.name}">${entry.name}</div>
-        <div class="fav-tags">${entry.subtitle ? `<span class="fav-tag">${entry.subtitle}</span>` : ''}</div>
-        <div class="fav-actions">
-          <button type="button" class="fav-btn fav-btn-load">▶ Load/Cargar</button>
-          <button type="button" class="fav-btn fav-btn-delete">🗑</button>
-        </div>`;
-      card.querySelector('.fav-btn-load').addEventListener('click', () => loadAiPreset(entry));
-      card.querySelector('.fav-btn-delete').addEventListener('click', () => deleteAiLibraryEntry(entry.id));
-      grid.appendChild(card);
-    });
+    renderLibraryGrid(
+      'aiLibraryGrid', getAiLibrary(), 'ai_lib_empty',
+      entry => entry.subtitle ? `<span class="fav-tag">${escapeHtmlMain(entry.subtitle)}</span>` : '',
+      entry => loadAiPreset(entry),
+      id => deleteAiLibraryEntry(id)
+    );
   }
 
   // El formato que guarda PresetAI (data.slots: effectId en hex, params
@@ -3341,6 +3565,331 @@ DEFAULT_PARAMS_MAP.set(0x04000060, [0x00, 0x21, 0x37, 0x32, 0x5a, 0x00, 0x28]); 
     const list = getFavorites().filter(f => f.id !== id);
     saveFavoritesList(list);
     renderFavoritesGrid();
+  }
+
+  // ================================================================
+  // SETLISTS / MODO DIRECTO
+  // Jerarquía de tres niveles: Setlist (evento/grupo) → Canción o Banco →
+  // Presets reales del pedal (los ya escaneados en la pestaña Presets).
+  // Cada canción/banco puede tener varios presets dentro (intro, verso,
+  // solo...) y sus propios enlaces de referencia (mismo sistema de
+  // tags-link que Favoritos). El Modo Directo es una pantalla grande a
+  // pantalla completa que recorre las CANCIONES con ◀▶ (salta siempre a
+  // la primera preset de la siguiente), usando el mecanismo real de
+  // cambio de patch (_g2LoadPresetBySlot, el mismo Program Change que
+  // usan las flechas ◀▶ de la cabecera) — no es una simulación.
+  // ================================================================
+  const setlistsStore = makeJsonStore('g2four_setlists', 'el Setlist');
+
+  // Los setlists creados antes de esta jerarquía de 3 niveles tenían un
+  // array plano `items: [{slot,label,links}]`. Al leerlos, cada item
+  // suelto se convierte en su propia canción de un solo preset, para no
+  // perder nada de lo que ya tuvieras guardado.
+  function migrateSetlistIfNeeded(sl) {
+    if (sl.songs) return false;
+    sl.songs = (sl.items || []).map(it => ({
+      id: Date.now() + Math.random(),
+      name: it.label,
+      links: it.links || [],
+      presets: [{ slot: it.slot, label: it.label }]
+    }));
+    delete sl.items;
+    return true;
+  }
+
+  function getSetlists() {
+    const list = setlistsStore.get();
+    let migrated = false;
+    list.forEach(sl => { if (migrateSetlistIfNeeded(sl)) migrated = true; });
+    if (migrated) setlistsStore.save(list);
+    return list;
+  }
+  const saveSetlistsList = setlistsStore.save;
+
+  let editingSetlistId = null; // qué setlist se está editando ahora mismo en la pestaña
+
+  function createSetlist(name) {
+    const list = getSetlists();
+    const entry = { id: Date.now(), name: name.trim() || 'Setlist sin nombre', songs: [] };
+    list.push(entry);
+    saveSetlistsList(list);
+    editingSetlistId = entry.id;
+    renderSetlistsGrid();
+  }
+
+  function deleteSetlist(id) {
+    if (!confirm('¿Borrar este setlist entero? No se puede deshacer.')) return;
+    saveSetlistsList(getSetlists().filter(s => s.id !== id));
+    if (editingSetlistId === id) editingSetlistId = null;
+    renderSetlistsGrid();
+  }
+
+  function updateSetlist(id, mutateFn) {
+    const list = getSetlists();
+    const sl = list.find(s => s.id === id);
+    if (!sl) return;
+    mutateFn(sl);
+    saveSetlistsList(list);
+    renderSetlistsGrid();
+  }
+
+  function countSetlistPresets(sl) {
+    return sl.songs.reduce((n, song) => n + song.presets.length, 0);
+  }
+
+  function addSongToSetlist(setlistId, name) {
+    updateSetlist(setlistId, sl => {
+      sl.songs.push({ id: Date.now() + Math.random(), name: name.trim() || 'Canción sin nombre', links: [], presets: [] });
+    });
+  }
+
+  function addPresetToSong(setlistId, songId, slot, presetName) {
+    updateSetlist(setlistId, sl => {
+      const song = sl.songs.find(s => s.id === songId);
+      if (song) song.presets.push({ slot, label: presetName });
+    });
+  }
+
+  function renderSetlistsGrid() {
+    const grid = document.getElementById('setlistsGrid');
+    if (!grid) return;
+    const list = getSetlists();
+    grid.innerHTML = '';
+    if (list.length === 0) {
+      grid.innerHTML = `<div class="presets-empty" data-i18n="setlist_empty">${translations[currentLang].setlist_empty}</div>`;
+      return;
+    }
+    list.slice().reverse().forEach(sl => {
+      const totalPresets = countSetlistPresets(sl);
+      const playable = sl.songs.some(s => s.presets.length > 0);
+      const card = document.createElement('div');
+      card.className = 'fav-card setlist-card' + (editingSetlistId === sl.id ? ' editing' : '');
+      card.innerHTML = `
+        <div class="fav-card-name" title="${escapeHtmlMain(sl.name)}">${escapeHtmlMain(sl.name)}</div>
+        <div class="fav-tags"><span class="fav-tag">${sl.songs.length} ${translations[currentLang].setlist_songs_suffix}</span><span class="fav-tag">${totalPresets} ${translations[currentLang].setlist_items_suffix}</span></div>
+        <div class="fav-actions">
+          <button type="button" class="fav-btn setlist-play-btn" ${playable ? '' : 'disabled'}>▶ ${translations[currentLang].setlist_play}</button>
+          <button type="button" class="fav-btn setlist-edit-btn">✏️</button>
+          <button type="button" class="fav-btn fav-btn-delete">🗑</button>
+        </div>
+        ${editingSetlistId === sl.id ? renderSetlistEditor(sl) : ''}`;
+      card.querySelector('.setlist-play-btn').addEventListener('click', () => enterModoDirecto(sl.id));
+      card.querySelector('.setlist-edit-btn').addEventListener('click', () => {
+        editingSetlistId = editingSetlistId === sl.id ? null : sl.id;
+        renderSetlistsGrid();
+      });
+      card.querySelector('.fav-btn-delete').addEventListener('click', () => deleteSetlist(sl.id));
+      grid.appendChild(card);
+      if (editingSetlistId === sl.id) wireSetlistEditorEvents(card, sl);
+    });
+  }
+
+  function renderSetlistEditor(sl) {
+    const presetOptions = presetList.length
+      ? presetList.map(p => `<option value="${p.slot}">${String(p.slot + 1).padStart(3, '0')} - ${escapeHtmlMain(p.name)}</option>`).join('')
+      : '';
+    const songsHtml = sl.songs.map((song, sIdx) => {
+      const presetsHtml = song.presets.map((p, pIdx) => `
+        <div class="setlist-item-row" data-sidx="${sIdx}" data-pidx="${pIdx}">
+          <span class="setlist-item-num sub">${pIdx + 1}</span>
+          <div class="setlist-item-main">
+            <input type="text" class="setlist-label-input" value="${escapeHtmlMain(p.label)}" placeholder="${translations[currentLang].setlist_label_ph}">
+            <div class="setlist-item-preset">${String(p.slot + 1).padStart(3, '0')}</div>
+          </div>
+          <button type="button" class="setlist-mini-btn preset-up-btn" ${pIdx === 0 ? 'disabled' : ''} title="${translations[currentLang].setlist_move_up}">▲</button>
+          <button type="button" class="setlist-mini-btn preset-down-btn" ${pIdx === song.presets.length - 1 ? 'disabled' : ''} title="${translations[currentLang].setlist_move_down}">▼</button>
+          <button type="button" class="setlist-mini-btn preset-del-btn" title="${translations[currentLang].setlist_remove_item}">✕</button>
+        </div>`).join('');
+      return `
+        <div class="setlist-song-block" data-sidx="${sIdx}">
+          <div class="setlist-song-header">
+            <span class="setlist-item-num">${sIdx + 1}</span>
+            <input type="text" class="setlist-song-name-input" value="${escapeHtmlMain(song.name)}" placeholder="${translations[currentLang].setlist_song_name_ph}">
+            <input type="text" class="setlist-song-links-input" value="${escapeHtmlMain((song.links || []).join(', '))}" placeholder="${translations[currentLang].setlist_links_ph}">
+            <button type="button" class="setlist-mini-btn song-up-btn" ${sIdx === 0 ? 'disabled' : ''} title="${translations[currentLang].setlist_move_up}">▲</button>
+            <button type="button" class="setlist-mini-btn song-down-btn" ${sIdx === sl.songs.length - 1 ? 'disabled' : ''} title="${translations[currentLang].setlist_move_down}">▼</button>
+            <button type="button" class="setlist-mini-btn song-del-btn" title="${translations[currentLang].setlist_remove_item}">✕</button>
+          </div>
+          <div class="setlist-song-presets">
+            ${presetsHtml || `<div class="fx-tree-empty">${translations[currentLang].setlist_no_items}</div>`}
+            <div class="setlist-add-row">
+              <select class="setlist-add-select" ${presetList.length ? '' : 'disabled'}>
+                <option value="">${presetList.length ? translations[currentLang].setlist_add_placeholder : translations[currentLang].setlist_need_scan}</option>
+                ${presetOptions}
+              </select>
+              <button type="button" class="fm-btn setlist-add-preset-btn" ${presetList.length ? '' : 'disabled'}>+ ${translations[currentLang].setlist_add_btn}</button>
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+    return `
+      <div class="setlist-editor">
+        <div class="setlist-songs-list">${songsHtml || `<div class="fx-tree-empty">${translations[currentLang].setlist_no_songs}</div>`}</div>
+        <div class="setlist-add-row setlist-add-song-row">
+          <input type="text" class="setlist-new-song-input" placeholder="${translations[currentLang].setlist_song_name_ph}">
+          <button type="button" class="fm-btn setlist-add-song-btn">+ ${translations[currentLang].setlist_add_song_btn}</button>
+        </div>
+      </div>`;
+  }
+
+  function wireSetlistEditorEvents(card, sl) {
+    const editor = card.querySelector('.setlist-editor');
+    if (!editor) return;
+    editor.querySelectorAll('.setlist-song-block').forEach(block => {
+      const sIdx = parseInt(block.dataset.sidx, 10);
+      block.querySelector('.setlist-song-name-input').addEventListener('change', e => {
+        updateSetlist(sl.id, s => { s.songs[sIdx].name = e.target.value.trim() || s.songs[sIdx].name; });
+      });
+      block.querySelector('.setlist-song-links-input').addEventListener('change', e => {
+        updateSetlist(sl.id, s => { s.songs[sIdx].links = e.target.value.split(',').map(t => t.trim()).filter(Boolean); });
+      });
+      block.querySelector('.song-up-btn')?.addEventListener('click', () => {
+        updateSetlist(sl.id, s => { [s.songs[sIdx - 1], s.songs[sIdx]] = [s.songs[sIdx], s.songs[sIdx - 1]]; });
+      });
+      block.querySelector('.song-down-btn')?.addEventListener('click', () => {
+        updateSetlist(sl.id, s => { [s.songs[sIdx + 1], s.songs[sIdx]] = [s.songs[sIdx], s.songs[sIdx + 1]]; });
+      });
+      block.querySelector('.song-del-btn').addEventListener('click', () => {
+        if (!confirm('¿Quitar esta canción/banco y todos sus presets del setlist?')) return;
+        updateSetlist(sl.id, s => { s.songs.splice(sIdx, 1); });
+      });
+      block.querySelectorAll('.setlist-item-row').forEach(row => {
+        const pIdx = parseInt(row.dataset.pidx, 10);
+        row.querySelector('.setlist-label-input').addEventListener('change', e => {
+          updateSetlist(sl.id, s => { s.songs[sIdx].presets[pIdx].label = e.target.value.trim() || s.songs[sIdx].presets[pIdx].label; });
+        });
+        row.querySelector('.preset-up-btn')?.addEventListener('click', () => {
+          updateSetlist(sl.id, s => { const ps = s.songs[sIdx].presets; [ps[pIdx - 1], ps[pIdx]] = [ps[pIdx], ps[pIdx - 1]]; });
+        });
+        row.querySelector('.preset-down-btn')?.addEventListener('click', () => {
+          updateSetlist(sl.id, s => { const ps = s.songs[sIdx].presets; [ps[pIdx + 1], ps[pIdx]] = [ps[pIdx], ps[pIdx + 1]]; });
+        });
+        row.querySelector('.preset-del-btn').addEventListener('click', () => {
+          updateSetlist(sl.id, s => { s.songs[sIdx].presets.splice(pIdx, 1); });
+        });
+      });
+      const addSelect = block.querySelector('.setlist-add-select');
+      block.querySelector('.setlist-add-preset-btn')?.addEventListener('click', () => {
+        const slot = parseInt(addSelect.value, 10);
+        if (!Number.isFinite(slot)) return;
+        const preset = presetList.find(p => p.slot === slot);
+        addPresetToSong(sl.id, sl.songs[sIdx].id, slot, preset ? preset.name : `Preset ${slot + 1}`);
+      });
+    });
+    const newSongInput = editor.querySelector('.setlist-new-song-input');
+    editor.querySelector('.setlist-add-song-btn')?.addEventListener('click', () => {
+      if (!newSongInput.value.trim()) { newSongInput.focus(); return; }
+      addSongToSetlist(sl.id, newSongInput.value);
+    });
+  }
+
+  // ----------------------------------------------------------------
+  // MODO DIRECTO — pantalla grande a pantalla completa para tocar en
+  // directo. ◀▶ avanzan entre CANCIONES/BANCOS, saltando siempre a la
+  // primera preset de la canción destino; para elegir una preset
+  // concreta dentro de la canción actual (si tiene varias) se usan los
+  // chips que aparecen bajo el nombre, o se toca directamente en la tira
+  // de abajo.
+  // ----------------------------------------------------------------
+  let currentModoDirecto = null; // { setlistId, songIndex, presetIndex }
+  let modoDirectoCols = parseInt(localStorage.getItem('g2four_modo_directo_cols') || '4', 10);
+
+  function modoDirectoPlayableSongs(sl) {
+    return sl.songs.filter(s => s.presets.length > 0);
+  }
+
+  function enterModoDirecto(setlistId) {
+    const sl = getSetlists().find(s => s.id === setlistId);
+    if (!sl || modoDirectoPlayableSongs(sl).length === 0) return;
+    currentModoDirecto = { setlistId, songIndex: sl.songs.findIndex(s => s.presets.length > 0), presetIndex: 0 };
+    document.getElementById('modoDirectoOverlay').classList.add('open');
+    renderModoDirecto();
+  }
+
+  function exitModoDirecto() {
+    document.getElementById('modoDirectoOverlay').classList.remove('open');
+    currentModoDirecto = null;
+  }
+
+  // Avanza entre canciones (no entre presets sueltas): salta siempre a la
+  // primera preset de la canción siguiente/anterior, saltándose las que
+  // no tengan ninguna preset cargada.
+  function modoDirectoStep(delta) {
+    if (!currentModoDirecto) return;
+    const sl = getSetlists().find(s => s.id === currentModoDirecto.setlistId);
+    if (!sl) return;
+    const n = sl.songs.length;
+    let idx = currentModoDirecto.songIndex;
+    for (let i = 0; i < n; i++) {
+      idx = (idx + delta + n) % n;
+      if (sl.songs[idx].presets.length > 0) break;
+    }
+    currentModoDirecto.songIndex = idx;
+    currentModoDirecto.presetIndex = 0;
+    renderModoDirecto();
+  }
+
+  // Salto directo a una canción (sidebar, teclado numérico) o a una
+  // preset concreta dentro de la canción actual (grid de presets).
+  function modoDirectoGoTo(songIndex, presetIndex) {
+    if (!currentModoDirecto) return;
+    currentModoDirecto.songIndex = songIndex;
+    currentModoDirecto.presetIndex = presetIndex || 0;
+    renderModoDirecto();
+  }
+
+  function setModoDirectoCols(n) {
+    modoDirectoCols = n;
+    try { localStorage.setItem('g2four_modo_directo_cols', String(n)); } catch (e) {}
+    renderModoDirecto();
+  }
+
+  function renderModoDirecto() {
+    if (!currentModoDirecto) return;
+    const sl = getSetlists().find(s => s.id === currentModoDirecto.setlistId);
+    if (!sl) { exitModoDirecto(); return; }
+    const song = sl.songs[currentModoDirecto.songIndex];
+    const preset = song.presets[currentModoDirecto.presetIndex] || song.presets[0];
+    const playableSongs = modoDirectoPlayableSongs(sl);
+    const songPos = playableSongs.indexOf(song) + 1;
+    document.getElementById('modoDirectoSetlistName').textContent = sl.name;
+    document.getElementById('modoDirectoPos').textContent = `${songPos} / ${playableSongs.length}`;
+    document.getElementById('modoDirectoLabel').textContent = song.name;
+    const linksHtml = (song.links || []).map(renderFavTag).join('');
+    document.getElementById('modoDirectoLinks').innerHTML = linksHtml;
+
+    // Sidebar fija con TODAS las canciones del setlist — navegación
+    // persistente, no depende de ◀▶ ni cabe solo un vistazo temporal.
+    const sidebar = document.getElementById('modoDirectoSongsSidebar');
+    sidebar.innerHTML = sl.songs.map((s, sIdx) => `
+      <div class="modo-directo-sidebar-item${sIdx === currentModoDirecto.songIndex ? ' active' : ''}${s.presets.length === 0 ? ' disabled' : ''}" data-sidx="${sIdx}" title="${escapeHtmlMain(s.name)}">
+        <span class="modo-directo-sidebar-num">${sIdx + 1}</span>${escapeHtmlMain(s.name)}
+      </div>`).join('');
+    sidebar.querySelectorAll('.modo-directo-sidebar-item:not(.disabled)').forEach(el => {
+      el.addEventListener('click', () => modoDirectoGoTo(parseInt(el.dataset.sidx, 10), 0));
+    });
+
+    // Botón de 3/4 columnas, según el pedal (físico de 3, o externo de 4)
+    // que uses para tocar los presets de la canción.
+    document.querySelectorAll('.modo-directo-cols-btn').forEach(btn => {
+      btn.classList.toggle('active', parseInt(btn.dataset.cols, 10) === modoDirectoCols);
+      btn.onclick = () => setModoDirectoCols(parseInt(btn.dataset.cols, 10));
+    });
+
+    // Grid de presets de la CANCIÓN ACTUAL (no de todo el setlist), en
+    // botones grandes tipo footswitch — pensado para tocarlos con el pie
+    // desde la propia pedalera o desde un controlador externo.
+    const strip = document.getElementById('modoDirectoStrip');
+    const cols = Math.min(modoDirectoCols, Math.max(1, song.presets.length));
+    strip.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+    strip.innerHTML = song.presets.map((p, pIdx) => `
+      <div class="modo-directo-strip-item${pIdx === currentModoDirecto.presetIndex ? ' active' : ''}" data-pidx="${pIdx}" title="${escapeHtmlMain(p.label)}"><span class="modo-directo-strip-num">${pIdx + 1}</span>${escapeHtmlMain(p.label)}</div>
+    `).join('');
+    strip.querySelectorAll('.modo-directo-strip-item').forEach(el => {
+      el.addEventListener('click', () => modoDirectoGoTo(currentModoDirecto.songIndex, parseInt(el.dataset.pidx, 10)));
+    });
+
+    if (typeof window._g2LoadPresetBySlot === 'function') window._g2LoadPresetBySlot(preset.slot);
   }
 
   // Construye el registro EDTB de 24 bytes del slot 7 a partir del estado
@@ -3982,6 +4531,8 @@ DEFAULT_PARAMS_MAP.set(0x04000060, [0x00, 0x21, 0x37, 0x32, 0x5a, 0x00, 0x28]); 
   //      pantalla de la pedalera.
   //   6) Releer el parche real (syncCurrentPatch) para refrescar la UI.
   // --------------------------------------------------------------
+  // (El panel de PresetAI, documento aparte, tiene su propia copia idéntica
+  // de sleep() ~línea 7862 — trivial pero no compartible entre documentos.)
   function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 
   // --- Lee el ID de efecto (4 bytes, categoría+índice) de un slot concreto
@@ -4474,6 +5025,7 @@ DEFAULT_PARAMS_MAP.set(0x04000060, [0x00, 0x21, 0x37, 0x32, 0x5a, 0x00, 0x28]); 
     });
 
     document.addEventListener('keydown', (e) => {
+      if (currentModoDirecto) return; // en Modo Directo, los números navegan el setlist, no encienden/apagan pedales
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
       const key = e.key;
       if (key >= '1' && key <= '7') {
@@ -4507,6 +5059,9 @@ DEFAULT_PARAMS_MAP.set(0x04000060, [0x00, 0x21, 0x37, 0x32, 0x5a, 0x00, 0x28]); 
       // documento, mismo localStorage): repintar al abrir la pestaña por
       // si se guardó algo nuevo desde allí en lo que iba de sesión.
       if (tab.dataset.zone === 'ailibrary') renderAiLibraryGrid();
+      // Setlists: el desplegable de "añadir preset" depende de presetList,
+      // que puede haber cambiado si escaneaste presets en otra pestaña.
+      if (tab.dataset.zone === 'setlists') renderSetlistsGrid();
     });
   });
 
@@ -4528,6 +5083,41 @@ DEFAULT_PARAMS_MAP.set(0x04000060, [0x00, 0x21, 0x37, 0x32, 0x5a, 0x00, 0x28]); 
     const file = e.target.files[0];
     if (file) importLibraryFromFile('ai_library', file, getAiLibrary, saveAiLibraryList, renderAiLibraryGrid, document.getElementById('aiLibStatus'));
     e.target.value = '';
+  });
+
+  // Setlists / Modo Directo
+  renderSetlistsGrid();
+  document.getElementById('setlistCreateBtn').addEventListener('click', () => {
+    const input = document.getElementById('setlistNameInput');
+    if (!input.value.trim()) { input.focus(); return; }
+    createSetlist(input.value);
+    input.value = '';
+  });
+  document.getElementById('modoDirectoExitBtn').addEventListener('click', exitModoDirecto);
+  document.getElementById('modoDirectoPrevBtn').addEventListener('click', () => modoDirectoStep(-1));
+  document.getElementById('modoDirectoNextBtn').addEventListener('click', () => modoDirectoStep(1));
+  // Flechas del teclado (útil con pedales bluetooth tipo AirTurn que las emulan)
+  // + navegación numérica: teclea el número de CANCIÓN (1, 2, 3...) para
+  // saltar directo a su primera preset, como en el software de directo de
+  // verdad. Con buffer breve para poder teclear "12" y no solo dígitos
+  // sueltos del 1 al 9.
+  let modoDirectoNumBuffer = '';
+  let modoDirectoNumTimer = null;
+  document.addEventListener('keydown', (e) => {
+    if (!currentModoDirecto) return;
+    if (e.key === 'ArrowLeft') { modoDirectoStep(-1); return; }
+    if (e.key === 'ArrowRight') { modoDirectoStep(1); return; }
+    if (e.key === 'Escape') { exitModoDirecto(); return; }
+    if (e.key >= '0' && e.key <= '9') {
+      modoDirectoNumBuffer += e.key;
+      clearTimeout(modoDirectoNumTimer);
+      modoDirectoNumTimer = setTimeout(() => {
+        const n = parseInt(modoDirectoNumBuffer, 10);
+        modoDirectoNumBuffer = '';
+        const sl = getSetlists().find(s => s.id === currentModoDirecto.setlistId);
+        if (sl && n >= 1 && n <= sl.songs.length && sl.songs[n - 1].presets.length > 0) modoDirectoGoTo(n - 1, 0);
+      }, 600);
+    }
   });
 
   // Modo Demo: botón manual, recuerda la última preferencia entre sesiones.
@@ -7112,6 +7702,9 @@ function setStatus(id, cls, msg) {
   el.textContent = msg;
   el.style.display = 'block';
 }
+// Este panel de PresetAI vive en su propio <iframe srcdoc> (documento
+// aparte, JS aislado del resto de la app), así que no puede reutilizar
+// escapeHtmlMain() del editor principal aunque hagan lo mismo.
 function escapeHtml(str) {
   return String(str ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
@@ -7465,6 +8058,8 @@ function updateSlotDisplay() {
   el.textContent = currentPresetSlot>=0 ? String(currentPresetSlot+1) : '—';
 }
 
+// Copia trivial de sleep() del editor principal — documento aparte
+// (iframe), no comparte JS con él.
 function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
 function fmWaitSysex(matchFn, timeoutMs) {
   return new Promise(resolve => {
@@ -7503,6 +8098,9 @@ function sendLogAppend(msg) {
 
 // ================================================================
 // PASO 6: enviar cadena de efectos en vivo
+// (Versiones mínimas propias de este iframe — solo mandan el SysEx, sin
+// tocar currentPatchData ni el caso especial del slot 7 del editor
+// principal, porque este panel no tiene pedalboard ni ese slot 7.)
 // ================================================================
 function changeEffectType(slot, effectId) {
   const id = effectId>>>0;
