@@ -1717,7 +1717,7 @@ document.getElementById('fileload').onchange=e=>{
   }
   async function startTuner(){
     try{
-      mediaStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false},video:false});
+      mediaStream=await navigator.mediaDevices.getUserMedia({audio:true,video:false});
       if(modal.style.display!=='flex'){mediaStream.getTracks().forEach(t=>t.stop());mediaStream=null;return;} // se cerró mientras se pedía el permiso
       audioCtx=new (window.AudioContext||window.webkitAudioContext)();
       analyser=audioCtx.createAnalyser();analyser.fftSize=2048;
