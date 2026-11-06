@@ -196,6 +196,7 @@ select,input[type=text]{font-family:inherit}
 .tuner-needle{position:absolute;top:50%;left:50%;width:18px;height:18px;border-radius:50%;background:#777;border:2px solid #000;transform:translate(-50%,-50%);transition:left .12s ease,background .2s,box-shadow .2s}
 .tuner-needle.in-tune{background:#2ecc71;box-shadow:0 0 16px 3px rgba(46,204,113,.8)}
 .tuner-needle.out-of-tune{background:var(--acc);box-shadow:0 0 12px 2px rgba(255,74,46,.7)}
+.tuner-content select{width:100%;max-width:100%;margin:0 0 14px;font-size:13px}
 .tuner-freq{font:600 14px var(--disp);letter-spacing:.08em;opacity:.6;margin-bottom:20px}
 
 /* Práctica: MP3 · Ritmos · Favoritos */
@@ -432,6 +433,7 @@ select,input[type=text]{font-family:inherit}
     <div class="tuner-cents" id="tunerCents">—</div>
     <div class="tuner-bar-wrap"><div class="tuner-bar-center"></div><div class="tuner-needle" id="tunerNeedle"></div></div>
     <div class="tuner-freq" id="tunerFreq">— Hz</div>
+    <select id="tunerInput" title="Entrada de audio"></select>
     <button id="tunerCloseBtn" type="button">Cerrar</button>
   </div>
 </div>
@@ -1674,32 +1676,40 @@ document.getElementById('fileload').onchange=e=>{
   r.readAsText(f);
 };
 
-// ---- Afinador cromático (portado del editor G2Four): autocorrelación sobre el micrófono ----
+// ---- Afinador cromático: detección YIN (independiente del volumen), suavizado y retención de la lectura ----
 (function(){
   const NOTE_NAMES=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
-  let audioCtx=null,analyser=null,mediaStream=null,animFrameId=null;
-  const modal=document.getElementById('tunerModal');
+  const modal=document.getElementById('tunerModal'),devSel=document.getElementById('tunerInput');
+  const DEV_KEY='kat_tuner_dev', FRAME_MS=40, HOLD_MS=1500;
+  let audioCtx=null,analyser=null,mediaStream=null,rafId=null,runId=0;
+  let hist=[],lastGood=0,lastRun=0;
   function freqToNote(freq){
     if(!freq||freq<20)return null;
     const semitones=12*Math.log2(freq/440),midi=Math.round(semitones)+69,cents=Math.round((semitones-Math.round(semitones))*100);
     return {noteName:NOTE_NAMES[((midi%12)+12)%12],octave:Math.floor(midi/12)-1,cents,midi};
   }
-  function autoCorrelate(buffer,sampleRate){
-    const SIZE=buffer.length;let rms=0;
-    for(let i=0;i<SIZE;i++)rms+=buffer[i]*buffer[i];
-    rms=Math.sqrt(rms/SIZE);if(rms<0.01)return -1;
-    let r1=0,r2=SIZE-1;const threshold=0.2;
-    for(let i=0;i<SIZE/2;i++){if(Math.abs(buffer[i])<threshold){r1=i;break;}}
-    for(let i=1;i<SIZE/2;i++){if(Math.abs(buffer[SIZE-i])<threshold){r2=SIZE-i;break;}}
-    const buf2=buffer.slice(r1,r2),c=new Float32Array(buf2.length);
-    for(let i=0;i<buf2.length;i++)for(let j=0;j<buf2.length-i;j++)c[i]+=buf2[j]*buf2[j+i];
-    let d=0;while(c[d]>c[d+1])d++;
-    let maxVal=-1,maxPos=-1;
-    for(let i=d;i<buf2.length;i++){if(c[i]>maxVal){maxVal=c[i];maxPos=i;}}
-    let T0=maxPos;const x1=c[T0-1],x2=c[T0],x3=c[T0+1],a=(x1+x3-2*x2)/2,b2=(x3-x1)/2;
-    if(a)T0=T0-b2/(2*a);
-    return sampleRate/T0;
+  /*YIN-START*/
+  // YIN: compara la señal consigo misma desplazada; no depende de la amplitud, así que funciona igual con una señal muy débil.
+  function detectPitch(x,sr){
+    const n=x.length;let e=0,mean=0;
+    for(let i=0;i<n;i++)mean+=x[i];mean/=n;
+    for(let i=0;i<n;i++){const v=x[i]-mean;e+=v*v;}
+    const rms=Math.sqrt(e/n);
+    if(rms<0.0015)return {freq:-1,rms};
+    const W=n>>1,maxTau=Math.min(W-1,Math.floor(sr/55)),minTau=Math.max(2,Math.floor(sr/1100));
+    const cm=new Float32Array(maxTau+2);cm[0]=1;let run=0;
+    for(let t=1;t<=maxTau;t++){let sum=0;for(let j=0;j<W;j++){const d=x[j]-x[j+t];sum+=d*d;}run+=sum;cm[t]=run>0?sum*t/run:1;}
+    let tau=-1;
+    for(let t=minTau;t<=maxTau;t++){if(cm[t]<0.15){while(t+1<=maxTau&&cm[t+1]<cm[t])t++;tau=t;break;}}
+    if(tau<0){let m=1,mt=-1;for(let t=minTau;t<=maxTau;t++){if(cm[t]<m){m=cm[t];mt=t;}}if(mt>0&&m<0.3)tau=mt;}
+    if(tau<0)return {freq:-1,rms};
+    let better=tau;
+    if(tau>1&&tau<maxTau){const a=cm[tau-1],b=cm[tau],c=cm[tau+1],den=a+c-2*b;if(den)better=tau+(a-c)/(2*den);}
+    return {freq:sr/better,rms};
   }
+  /*YIN-END*/
+  const median=a=>{const b=a.slice().sort((x,y)=>x-y),m=b.length>>1;return b.length%2?b[m]:(b[m-1]+b[m])/2;};
+  function setHint(txt){document.getElementById('tunerOctave').textContent=txt;}
   function updateTunerUI(freq){
     const noteEl=document.getElementById('tunerNote'),octEl=document.getElementById('tunerOctave'),centsEl=document.getElementById('tunerCents'),freqEl=document.getElementById('tunerFreq'),needle=document.getElementById('tunerNeedle');
     if(!freq||freq<0){noteEl.textContent='—';octEl.textContent='';centsEl.textContent='—';freqEl.textContent='— Hz';needle.style.left='50%';needle.className='tuner-needle';return;}
@@ -1709,32 +1719,60 @@ document.getElementById('fileload').onchange=e=>{
     needle.style.left=Math.max(2,Math.min(98,50+(info.cents/50)*50))+'%';
     needle.className='tuner-needle '+(Math.abs(info.cents)<=5?'in-tune':'out-of-tune');
   }
-  function tunerLoop(){
+  function tunerLoop(ts){
     if(!analyser)return;
+    rafId=requestAnimationFrame(tunerLoop);
+    if(ts-lastRun<FRAME_MS)return;lastRun=ts;
     const buf=new Float32Array(analyser.fftSize);analyser.getFloatTimeDomainData(buf);
-    updateTunerUI(autoCorrelate(buf,audioCtx.sampleRate));
-    animFrameId=requestAnimationFrame(tunerLoop);
-  }
-  async function startTuner(){
-    try{
-      mediaStream=await navigator.mediaDevices.getUserMedia({audio:true,video:false});
-      if(modal.style.display!=='flex'){mediaStream.getTracks().forEach(t=>t.stop());mediaStream=null;return;} // se cerró mientras se pedía el permiso
-      audioCtx=new (window.AudioContext||window.webkitAudioContext)();
-      analyser=audioCtx.createAnalyser();analyser.fftSize=2048;
-      audioCtx.createMediaStreamSource(mediaStream).connect(analyser);
-      tunerLoop();
-    }catch(e){
-      document.getElementById('tunerNote').textContent='⚠';
-      document.getElementById('tunerOctave').textContent='Sin acceso al micrófono';
+    const r=detectPitch(buf,audioCtx.sampleRate),now=performance.now();
+    if(r.freq>0){
+      // Suavizado: mediana de las últimas 5 lecturas; si salta más de 80 cents es otra nota y se reinicia
+      if(hist.length&&Math.abs(1200*Math.log2(r.freq/median(hist)))>80)hist=[];
+      hist.push(r.freq);if(hist.length>5)hist.shift();
+      lastGood=now;updateTunerUI(median(hist));
+    }else if(now-lastGood>HOLD_MS){ // retiene la última lectura 1,5 s antes de borrarla
+      hist=[];updateTunerUI(null);
+      setHint(r.rms<0.0004?'Señal muy débil: revisa la entrada de audio':'Toca una cuerda…');
     }
   }
-  function stopTuner(){
-    if(animFrameId)cancelAnimationFrame(animFrameId);
+  function stopStream(){
+    if(rafId)cancelAnimationFrame(rafId);
     if(mediaStream)mediaStream.getTracks().forEach(t=>t.stop());
     if(audioCtx)audioCtx.close();
-    analyser=audioCtx=mediaStream=animFrameId=null;updateTunerUI(null);
+    analyser=audioCtx=mediaStream=rafId=null;
   }
-  function closeTuner(){modal.style.display='none';stopTuner();}
+  async function fillDevices(){
+    try{
+      const devs=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='audioinput');
+      const cur=mediaStream&&mediaStream.getAudioTracks()[0]?mediaStream.getAudioTracks()[0].getSettings().deviceId:'';
+      devSel.innerHTML='<option value="">Predeterminada</option>'+devs.map(d=>`<option value="${d.deviceId}" ${d.deviceId===cur?'selected':''}>${(d.label||'Micrófono').replace(/</g,'&lt;')}</option>`).join('');
+      if(cur&&devs.some(d=>d.deviceId===cur))devSel.value=cur;
+    }catch(e){}
+  }
+  async function openStream(deviceId){
+    const my=++runId;stopStream();
+    let stream;
+    try{
+      try{stream=await navigator.mediaDevices.getUserMedia({audio:deviceId?{deviceId:{exact:deviceId}}:true,video:false});}
+      catch(e){if(deviceId)stream=await navigator.mediaDevices.getUserMedia({audio:true,video:false});else throw e;}
+    }catch(e){
+      document.getElementById('tunerNote').textContent='⚠';
+      setHint('Sin acceso al micrófono');return;
+    }
+    if(my!==runId||modal.style.display!=='flex'){stream.getTracks().forEach(t=>t.stop());return;} // se cerró o cambió mientras se pedía el permiso
+    mediaStream=stream;
+    audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    if(audioCtx.resume)audioCtx.resume(); // el navegador puede arrancarlo en pausa
+    analyser=audioCtx.createAnalyser();analyser.fftSize=4096;
+    audioCtx.createMediaStreamSource(stream).connect(analyser);
+    hist=[];lastGood=0;lastRun=0;
+    await fillDevices();
+    if(my!==runId||!analyser)return;
+    rafId=requestAnimationFrame(tunerLoop);
+  }
+  function startTuner(){let d='';try{d=localStorage.getItem(DEV_KEY)||'';}catch(e){}openStream(d);}
+  function closeTuner(){modal.style.display='none';runId++;stopStream();updateTunerUI(null);}
+  devSel.addEventListener('change',()=>{try{localStorage.setItem(DEV_KEY,devSel.value);}catch(e){}openStream(devSel.value);});
   document.getElementById('tunerBtn').addEventListener('click',e=>{e.stopPropagation();modal.style.display='flex';startTuner();});
   document.getElementById('tunerCloseBtn').addEventListener('click',closeTuner);
   modal.addEventListener('click',e=>{if(e.target===modal)closeTuner();});
@@ -2303,7 +2341,7 @@ renderChannels(); renderChainBtns(); renderAll(); renderLibTree();
 // ---- Idioma ESP/ENG: traduce el texto de la interfaz (los datos del ampli no cambian) ----
 const I18N={'Nombre del preset':'Preset name','9 canales (50EX/100)':'9 channels (50EX/100)','5 canales (Katana\u201150)':'5 channels (Katana\u201150)','Conectar MIDI':'Connect MIDI','Sin conectar':'Not connected','Librería':'Library','Elegir carpeta':'Choose folder','Sin carpeta elegida':'No folder chosen','Canales — clic recupera, 💾 guarda el patch actual ahí':'Channels — click recalls, 💾 saves the current patch there','Guardar aquí':'Save here','(vacío)':'(empty)','Seleccionar archivo':'Choose file','Ningún archivo seleccionado':'No file selected','Convertir y guardar todo como ZIP':'Convert and save all as ZIP','Convertir a MK1':'Convert to MK1','Equivalencias MK2 → MK1':'MK2 → MK1 mappings','La columna izquierda muestra el tipo del preset MK2. El desplegable indica el tipo que se escribirá en el MK1. Los cambios se guardan en este navegador y se aplican al convertir o enviar un preset MK2 hacia MK1.':'The left column shows the type used by the MK2 preset. The dropdown sets the type that will be written to the MK1. Changes are saved in this browser and applied when converting or sending an MK2 preset to MK1.','Efecto o ampli MK2':'MK2 effect or amp','Sustitución MK1':'MK1 replacement','Restaurar valores predeterminados':'Restore defaults','Cancelar':'Cancel','Guardar equivalencias':'Save mappings','Descarga el preset actual convertido al formato MK1':'Downloads the current preset converted to MK1 format','Configurar equivalencias de conversión':'Configure conversion mappings','Guardar como .tsl (MK2)':'Save as .tsl (MK2)','Orden de la cadena':'Chain order','señal → izquierda a derecha · toca un pedal o el ampli para ver sus controles':'signal → left to right · tap a pedal or the amp to see its controls','Consola SysEx':'SysEx console','🎸 Afinador':'🎸 Tuner','🎸 Afinador Cromático':'🎸 Chromatic Tuner','Afinador Cromático':'Chromatic Tuner','Cerrar':'Close','Sin acceso al micrófono':'No microphone access','Afinador cromático (usa el micrófono)':'Chromatic tuner (uses the microphone)','FX1/FX2 muestran los parámetros propios del tipo de efecto seleccionado. Las asignaciones de pedal/GAFC y el detalle interno de algunos tipos menos comunes se conservan intactos al cargar/guardar un .tsl aunque aún no tengan control aquí.':'FX1/FX2 show the parameters of the selected effect type. Pedal/GAFC assignments and the internal detail of some less common types are kept intact when loading/saving a .tsl even if they have no control here yet.',
 'Amplificador':'Amplifier','Efecto':'Effect','Tipo':'Type','Tiempo':'Time','Tiempo 1':'Time 1','Tiempo 2':'Time 2','Nivel':'Level','Nivel de patch':'Patch level','Nivel de solo':'Solo level','Nivel EQ':'EQ level','Nivel1':'Level 1','Nivel2':'Level 2','Posición':'Position','Modo':'Mode','Modo1':'Mode 1','Modo2':'Mode 2','Fase feedback':'Feedback phase','Fase efecto':'Effect phase','Modulación':'Modulation','Filtro':'Filter','Tipo custom':'Custom type','Custom (avanzado)':'Custom (advanced)','Preamp tipo':'Preamp type','Reverb tipo':'Reverb type','Tipo de wah':'Wah type','Volumen de pedal':'Pedal volume','Tonalidad':'Key','Respuesta EQ':'EQ response','Paramétrico':'Parametric','Gráfico':'Graphic','Polaridad':'Polarity','Onda':'Wave','Reson':'Reson.','Rango':'Range','Octava':'Octave','Patron':'Pattern','Separ':'Separation','Cambiar modo':'Switch mode','(sin mapear aún)':'(not mapped yet)','—sin salidas—':'—no outputs—','—sin entradas—':'—no inputs—','Idioma / Language':'Language','Copiar log':'Copy log','Limpiar':'Clear','Todos':'All','Sin archivos de este tipo':'No files of this type','Escala de usuario · Voz 1':'User scale · Voice 1','Escala de usuario · Voz 2':'User scale · Voice 2','Variaciones':'Variations','Variaciones Reverb/Delay2':'Reverb/Delay2 variations','Capa':'Layer','KATANA Mk1 (este editor es para Mk2)':'KATANA Mk1 (this editor is for Mk2)','Dispositivo no Katana':'Not a Katana device','Convertido del Katana original (MK1)':'Converted from original Katana (MK1)','⚠ Archivo de Katana Gen3: el MkII no puede leerlo (solo el Gen3 lee todos los formatos).':'⚠ Katana Gen3 file: the MkII cannot read it (only the Gen3 reads every format).','⚠ Archivo de Katana original (MK1): el MkII puede leerlo, pero este editor aún no convierte ese formato.':'⚠ Original Katana (MK1) file: the MkII can read it, but this editor does not convert that format yet.','⚠ Formato .tsl no reconocido.':'⚠ Unrecognized .tsl format.','Este navegador no soporta Web MIDI (usa Chrome o Edge)':'This browser does not support Web MIDI (use Chrome or Edge)','Esperando al Katana… (conéctalo por USB y enciéndelo)':'Waiting for the Katana… (plug it in via USB and switch it on)','MIDI bloqueado en el navegador: permite el acceso MIDI/SysEx y pulsa Conectar MIDI':'MIDI is blocked in the browser: allow MIDI/SysEx access and press Connect MIDI'};
-Object.assign(I18N,{"Arrastra para ajustar el ancho · doble clic para restablecer":"Drag to adjust the width · double-click to reset","Reproductor multimedia: carga tus archivos de audio, dale al play y toca encima con el ampli.":"Media player: load your audio files, hit play and play along with the amp.","Caja de ritmos: elige un groove, ajusta el tempo (BPM) y el volumen, y dale a Iniciar para practicar sobre la base.":"Drum machine: pick a groove, set the tempo (BPM) and volume, and press Start to practice over the backing.","Guarda la configuración o modificaciones actuales como favorito; se guarda en el localStorage de Chrome; puedes poner un nombre descriptivo.":"Saves the current settings or changes as a favorite; stored in Chrome's localStorage; you can give it a descriptive name.","Práctica": "Practice", "Volumen del ritmo": "Rhythm volume", "🥁 RITMOS": "🥁 RHYTHMS", "⭐ FAVORITOS": "⭐ FAVORITES", "LISTA": "PLAYLIST", "REPRODUCTOR": "PLAYER", "Sin canciones aún": "No songs yet", "Arrastra archivos MP3 aquí o haz click": "Drop MP3 files here or click", "Anterior": "Previous", "Siguiente": "Next", "GRAVES": "BASS", "MEDIOS": "MID", "AGUDOS": "TREBLE", "Graves": "Bass", "Medios": "Mid", "Agudos": "Treble", "Volumen": "Volume", "▶ INICIAR": "▶ START", "⏹ DETENER": "⏹ STOP", "🥁 Percusión": "🥁 Percussion", "SILENCIAR": "MUTE", "SEGUIR": "FOLLOW", "🎸 Bajo": "🎸 Bass", "Bajo": "Bass", "Tonalidad": "Key", "Progresión": "Progression", "Cambio cada": "Change every", "1 compás": "1 measure", "2 compases": "2 measures", "Octava": "Octave", "Grave (E1)": "Low (E1)", "Media (E2)": "Mid (E2)", "Alta (E3)": "High (E3)", "Fundamental": "Root", "Tercera": "Third", "Quinta": "Fifth", "· Clic en celda para cambiar el grado": "· Click cell to change degree", "Compás 1": "Bar 1", "Compás 2": "Bar 2", "Compás 3": "Bar 3", "Compás 4 · Fill": "Bar 4 · Fill", "🎲 Nuevo fill": "🎲 New fill", "Genera un redoble/fill distinto para el compás 4": "Generates a different fill for bar 4", "Tom alto": "High tom", "Tom bajo": "Low tom", "Caja": "Snare", "Bombo": "Kick", "Rock 1 – básico": "Rock 1 – basic", "Rock 2 – abierto": "Rock 2 – open", "Rock 3 – doble bombo": "Rock 3 – double kick", "Rock 4 – medio tiempo": "Rock 4 – half-time", "Blues 2 – lento": "Blues 2 – slow", "Pop 1 – básico": "Pop 1 – basic", "Pop 3 – medio tiempo": "Pop 3 – half-time", "Funk 1 – clásico": "Funk 1 – classic", "Funk 2 – pesado": "Funk 2 – heavy", "Funk 3 – 16vos": "Funk 3 – 16ths", "Metal 1 – básico": "Metal 1 – basic", "Balada 6/8": "Ballad 6/8", "Nombre (ej: Blues cálido)": "Name (e.g. Warm Blues)", "Etiquetas separadas por coma, o un enlace (ej: blues, limpio, youtube.com/...)": "Comma-separated tags, or a link (e.g. blues, clean, youtube.com/...)", "★ GUARDAR PATCH ACTUAL": "★ SAVE CURRENT PATCH", "⬇️ Exportar favoritos": "⬇️ Export favorites", "⬆️ Importar favoritos": "⬆️ Import favorites", "Guarda patches completos en tu navegador; al cargar uno se envía al ampli": "Saves full patches in your browser; loading one sends it to the amp", "Aún no tienes favoritos guardados": "You don't have any favorites saved yet", "▶ Cargar": "▶ Load", "Descargar .tsl": "Download .tsl", "Borrar": "Delete", "✅ Favorito guardado": "✅ Favorite saved", "▶ Favorito cargado": "▶ Favorite loaded", "❌ No se pudo cargar el favorito": "❌ Could not load the favorite", "❌ No se pudo guardar en este navegador": "❌ Could not save in this browser", "✅ Importado correctamente": "✅ Imported successfully", "❌ El archivo no es un JSON válido de esta app": "❌ That file isn't a valid JSON export from this app", "❌ Ese archivo no es una exportación de favoritos": "❌ That file isn't a favorites export"});
+Object.assign(I18N,{"Entrada de audio":"Audio input","Predeterminada":"Default","Toca una cuerda…":"Play a string…","Señal muy débil: revisa la entrada de audio":"Very weak signal: check the audio input","Arrastra para ajustar el ancho · doble clic para restablecer":"Drag to adjust the width · double-click to reset","Reproductor multimedia: carga tus archivos de audio, dale al play y toca encima con el ampli.":"Media player: load your audio files, hit play and play along with the amp.","Caja de ritmos: elige un groove, ajusta el tempo (BPM) y el volumen, y dale a Iniciar para practicar sobre la base.":"Drum machine: pick a groove, set the tempo (BPM) and volume, and press Start to practice over the backing.","Guarda la configuración o modificaciones actuales como favorito; se guarda en el localStorage de Chrome; puedes poner un nombre descriptivo.":"Saves the current settings or changes as a favorite; stored in Chrome's localStorage; you can give it a descriptive name.","Práctica": "Practice", "Volumen del ritmo": "Rhythm volume", "🥁 RITMOS": "🥁 RHYTHMS", "⭐ FAVORITOS": "⭐ FAVORITES", "LISTA": "PLAYLIST", "REPRODUCTOR": "PLAYER", "Sin canciones aún": "No songs yet", "Arrastra archivos MP3 aquí o haz click": "Drop MP3 files here or click", "Anterior": "Previous", "Siguiente": "Next", "GRAVES": "BASS", "MEDIOS": "MID", "AGUDOS": "TREBLE", "Graves": "Bass", "Medios": "Mid", "Agudos": "Treble", "Volumen": "Volume", "▶ INICIAR": "▶ START", "⏹ DETENER": "⏹ STOP", "🥁 Percusión": "🥁 Percussion", "SILENCIAR": "MUTE", "SEGUIR": "FOLLOW", "🎸 Bajo": "🎸 Bass", "Bajo": "Bass", "Tonalidad": "Key", "Progresión": "Progression", "Cambio cada": "Change every", "1 compás": "1 measure", "2 compases": "2 measures", "Octava": "Octave", "Grave (E1)": "Low (E1)", "Media (E2)": "Mid (E2)", "Alta (E3)": "High (E3)", "Fundamental": "Root", "Tercera": "Third", "Quinta": "Fifth", "· Clic en celda para cambiar el grado": "· Click cell to change degree", "Compás 1": "Bar 1", "Compás 2": "Bar 2", "Compás 3": "Bar 3", "Compás 4 · Fill": "Bar 4 · Fill", "🎲 Nuevo fill": "🎲 New fill", "Genera un redoble/fill distinto para el compás 4": "Generates a different fill for bar 4", "Tom alto": "High tom", "Tom bajo": "Low tom", "Caja": "Snare", "Bombo": "Kick", "Rock 1 – básico": "Rock 1 – basic", "Rock 2 – abierto": "Rock 2 – open", "Rock 3 – doble bombo": "Rock 3 – double kick", "Rock 4 – medio tiempo": "Rock 4 – half-time", "Blues 2 – lento": "Blues 2 – slow", "Pop 1 – básico": "Pop 1 – basic", "Pop 3 – medio tiempo": "Pop 3 – half-time", "Funk 1 – clásico": "Funk 1 – classic", "Funk 2 – pesado": "Funk 2 – heavy", "Funk 3 – 16vos": "Funk 3 – 16ths", "Metal 1 – básico": "Metal 1 – basic", "Balada 6/8": "Ballad 6/8", "Nombre (ej: Blues cálido)": "Name (e.g. Warm Blues)", "Etiquetas separadas por coma, o un enlace (ej: blues, limpio, youtube.com/...)": "Comma-separated tags, or a link (e.g. blues, clean, youtube.com/...)", "★ GUARDAR PATCH ACTUAL": "★ SAVE CURRENT PATCH", "⬇️ Exportar favoritos": "⬇️ Export favorites", "⬆️ Importar favoritos": "⬆️ Import favorites", "Guarda patches completos en tu navegador; al cargar uno se envía al ampli": "Saves full patches in your browser; loading one sends it to the amp", "Aún no tienes favoritos guardados": "You don't have any favorites saved yet", "▶ Cargar": "▶ Load", "Descargar .tsl": "Download .tsl", "Borrar": "Delete", "✅ Favorito guardado": "✅ Favorite saved", "▶ Favorito cargado": "▶ Favorite loaded", "❌ No se pudo cargar el favorito": "❌ Could not load the favorite", "❌ No se pudo guardar en este navegador": "❌ Could not save in this browser", "✅ Importado correctamente": "✅ Imported successfully", "❌ El archivo no es un JSON válido de esta app": "❌ That file isn't a valid JSON export from this app", "❌ Ese archivo no es una exportación de favoritos": "❌ That file isn't a favorites export"});
 const I18N_RX=[
  [/^✅ Importado correctamente \((\d+)\)$/,m=>'✅ Imported successfully ('+m[1]+')'],
  [/^Octava (-?\d+)$/,m=>'Octave '+m[1]],
