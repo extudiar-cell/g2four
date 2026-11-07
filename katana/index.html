@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="es"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@400;500;600;700&display=swap" rel="stylesheet">
 <title>Boss Katana Editor MK1 / MK2</title>
 <style>
 :root{--bg:#f4f3f1;--fg:#1c1a18;--card:#fff;--bd:#ddd9d4;--acc:#b5321f;--acc2:#3a6b52;
@@ -38,7 +38,7 @@ background-image:linear-gradient(180deg,rgba(255,255,255,.16),rgba(0,0,0,.18));
 box-shadow:inset 0 2px 0 rgba(255,255,255,.30),inset 0 -14px 18px rgba(0,0,0,.42);transition:transform .06s,box-shadow .06s}
 .chgrp button:hover{filter:brightness(1.12)}
 .chgrp button:active{transform:translateY(2px);box-shadow:inset 0 2px 6px rgba(0,0,0,.6)}
-.chgrp button small{display:block;font-weight:400;opacity:.85;font-size:9.5px;max-width:108px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chgrp button small{display:block;font:500 11.5px 'Barlow Semi Condensed','Barlow',sans-serif;opacity:.9;max-width:108px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .chgrp button:first-child{border-radius:10px 0 0 10px;border-right:0}
 .chgrp button.store{border-radius:0 10px 10px 0;padding:7px 10px}
 .card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;margin:10px 0}
@@ -52,7 +52,7 @@ box-shadow:inset 0 2px 0 rgba(255,255,255,.30),inset 0 -14px 18px rgba(0,0,0,.42
 .fbank{display:flex;flex-wrap:wrap;gap:4px 2px;padding:8px 0 4px;border-bottom:1px solid var(--bd)}
 .fbank:last-child{border-bottom:0}
 .vf{display:flex;flex-direction:column;align-items:center;width:58px;padding:2px 0}
-.vf span{order:1;font-size:11px;min-width:34px;text-align:center;font-variant-numeric:tabular-nums;color:var(--fg);background:var(--bg);border:1px solid var(--bd);border-radius:4px;padding:1px 3px;margin-bottom:4px;white-space:nowrap}
+.vf span{order:1;font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:12px;min-width:34px;text-align:center;font-variant-numeric:tabular-nums;color:var(--fg);background:var(--bg);border:1px solid var(--bd);border-radius:4px;padding:1px 3px;margin-bottom:4px;white-space:nowrap}
 .vf input[type=range]{order:2;writing-mode:vertical-lr;direction:rtl;-webkit-appearance:slider-vertical;appearance:slider-vertical;width:24px;height:104px;margin:0;padding:0;flex:none;cursor:pointer;accent-color:var(--acc)}
 .cbox{display:flex;align-items:center;gap:12px;margin-left:28px;padding:2px 0 2px 22px;border-left:1px solid var(--bd)}
 .cleft{display:flex;flex-direction:column;gap:4px}
@@ -71,7 +71,7 @@ box-shadow:inset 0 2px 0 rgba(255,255,255,.30),inset 0 -14px 18px rgba(0,0,0,.42
 .sgrp:first-child{border-left:0;padding-left:0}
 .sgrp .ssel{align-items:center}
 .sgrp .ssel select{min-width:96px}
-.vf label{order:3;margin-top:5px;font-size:10px;line-height:1.15;text-align:center;opacity:.85;max-width:56px;overflow-wrap:anywhere}
+.vf label{order:3;margin-top:5px;font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:11.5px;line-height:1.15;text-align:center;opacity:.85;max-width:56px;overflow-wrap:anywhere}
 #status{font-size:12px;opacity:.9}
 #log{background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:8px;font:11px/1.4 ui-monospace,monospace;max-height:420px;min-height:140px;overflow:auto;resize:vertical;white-space:pre-wrap;word-break:break-all;margin:0}
 .filebar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
@@ -79,12 +79,40 @@ box-shadow:inset 0 2px 0 rgba(255,255,255,.30),inset 0 -14px 18px rgba(0,0,0,.42
 .pedal,.amp{flex:0 0 112px;border-radius:10px;padding:10px 6px 14px;text-align:center;cursor:pointer;color:#fff;user-select:none;
 background:var(--pc);box-shadow:inset 0 2px 0 rgba(255,255,255,.28),inset 0 -16px 20px rgba(0,0,0,.4),0 4px 8px rgba(0,0,0,.3);border:1px solid rgba(0,0,0,.45)}
 .pedal h3,.amp h3{margin:0;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em;text-shadow:0 1px 2px rgba(0,0,0,.5)}
-.pedtype{font-size:9px;color:#fff;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+.pedtype{font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:11.5px;color:#fff;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;text-shadow:0 1px 2px rgba(0,0,0,.5)}
 .pedal.sel,.amp.sel{outline:3px solid #ffd23f;outline-offset:2px}
 .fsw{width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#888,#0a0a0a);margin:12px auto 0;border:2px solid #000}
 .fsw.on{background:radial-gradient(circle at 35% 30%,#ffe27a,#e8b400);box-shadow:0 0 8px #ffcf4a}
 .amp{flex:0 0 168px;background:linear-gradient(180deg,#4a3927,#211a12)}
 .amp:after{content:'●  ●  ●  ●';display:block;margin-top:16px;letter-spacing:5px;font-size:9px;opacity:.55}
+.pedal,.amp{position:relative;display:flex;flex-direction:column}
+.amp:after{margin-top:auto;padding-top:16px}
+.fswwrap{margin-top:auto;padding-top:12px}
+.fswwrap .fsw{margin:0 auto}
+.pedal-stack{flex:0 0 112px;width:112px;align-self:stretch;min-height:180px;padding:5px;display:flex;flex-direction:column;gap:4px;border-radius:10px;background:linear-gradient(180deg,#2b2522,#171311);border:1px solid rgba(0,0,0,.65);box-shadow:inset 0 2px 0 rgba(255,255,255,.18),inset 0 -10px 14px rgba(0,0,0,.4),0 4px 8px rgba(0,0,0,.3)}
+.pedal-stack-row{flex:1 1 0;min-height:0;display:flex;align-items:stretch;gap:4px}
+.pedal-stack-label{flex:1;min-width:0;padding:0 8px;text-align:left;font:700 14px var(--disp);letter-spacing:.05em;border:1px solid rgba(0,0,0,.55);border-radius:5px;background:linear-gradient(180deg,#55504c,#302b28);box-shadow:inset 0 1px 0 rgba(255,255,255,.2);text-shadow:0 1px 2px #000}
+.pedal-stack-label.sel{outline:2px solid #ffd23f;outline-offset:-2px;color:#ffe27a}
+.pedal-stack-switch{flex:0 0 30px;padding:0;border-radius:5px;background:#262321;border:1px solid rgba(0,0,0,.7);box-shadow:none;display:flex;align-items:center;justify-content:center}
+.pedal-stack-led{width:12px;height:12px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#888,#090909);border:1px solid #000}
+.pedal-stack-switch.on .pedal-stack-led{background:radial-gradient(circle at 35% 30%,#fff2a0,#e8b400);box-shadow:0 0 6px #ffcf4a}
+@media(min-width:900px){
+  .board>.pedal,.board>.amp,.board>.pedal-stack{flex:1 1 0;min-width:112px}
+  .board>.amp{flex-basis:0}
+  .board>.pedal-stack{width:auto}
+}
+.mini{margin-top:8px;display:flex;flex-direction:column;gap:6px;text-align:left;cursor:default}
+.ml{display:flex;justify-content:space-between;gap:4px;font:600 12.5px 'Barlow Semi Condensed','Barlow',sans-serif;letter-spacing:.01em;line-height:1.1;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.ml span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ml b{font-weight:600;font-variant-numeric:tabular-nums;opacity:.9;white-space:nowrap}
+.ms{width:100%;height:14px;margin:0;padding:0;accent-color:#ffd23f;cursor:pointer;background:transparent}
+.mcfg{position:absolute;top:4px;right:4px;width:18px;height:18px;padding:0;border-radius:50%;background:rgba(0,0,0,.35);color:#fff;font-size:11px;line-height:18px;opacity:.5}
+.mcfg:hover{opacity:1}
+.minicfg{position:fixed;z-index:3000;min-width:190px;max-width:260px;background:var(--card);color:var(--fg);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
+.mchead{font:700 12px var(--disp);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;opacity:.85}
+.mcrow{display:flex;align-items:center;gap:8px;padding:3px 0;font-size:13px;cursor:pointer}
+.mcfoot{display:flex;gap:6px;justify-content:flex-end;margin-top:8px}
+.mcfoot button{padding:5px 10px;font-size:12px}
 .boardwrap{opacity:.6;font-size:11px;text-align:center;margin:-14px 0 4px}
 #detailBody details{border-top:1px solid var(--bd);margin-top:6px}
 #detailBody summary{cursor:pointer;font-size:12px;opacity:.8;padding:7px 0;user-select:none}
@@ -128,6 +156,8 @@ header{background:repeating-linear-gradient(45deg,rgba(255,255,255,.035) 0 2px,t
 .plate{background:var(--chrome);color:#1a1a1a;border-radius:4px;padding:3px 14px 5px;box-shadow:0 2px 5px rgba(0,0,0,.6),inset 0 1px 0 #fff;text-align:center;white-space:nowrap}
 .plate b{display:block;font:700 24px/1 var(--disp);letter-spacing:.04em}
 .plate i{display:block;font:600 10px/1.2 var(--disp);letter-spacing:.28em;opacity:.75;font-style:normal}
+.theme-toggle{flex:none;padding:6px 10px;border-radius:6px;background:var(--chrome);color:#211b17;border:1px solid rgba(0,0,0,.55);box-shadow:0 2px 5px rgba(0,0,0,.45),inset 0 1px 0 #fff;text-shadow:none;font:700 13px var(--disp);letter-spacing:.04em;white-space:nowrap}
+.theme-toggle:hover{filter:brightness(1.08)}
 .hknobs{display:flex;gap:10px;align-items:center}
 .hknobs .hk{width:28px;height:28px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#666,#111 70%);border:2px solid #000;box-shadow:0 3px 6px rgba(0,0,0,.6),inset 0 1px 1px rgba(255,255,255,.25);position:relative;flex:none}
 .hknobs .hk:after{content:'';position:absolute;left:50%;top:3px;width:2px;height:9px;margin-left:-1px;background:#fff;border-radius:1px;transform-origin:50% 11px;transform:rotate(var(--r,0deg))}
@@ -146,7 +176,7 @@ button:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visi
 input[type=file]::file-selector-button{font:600 14px var(--disp);letter-spacing:.07em;text-transform:uppercase;padding:8px 14px;margin-right:10px;border-radius:7px;color:#fff;background:var(--acc2) linear-gradient(180deg,rgba(255,255,255,.2),rgba(0,0,0,.2));border:1px solid rgba(0,0,0,.5);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 3px 6px rgba(0,0,0,.3);text-shadow:0 1px 2px rgba(0,0,0,.5);cursor:pointer}
 select,input[type=text]{font-family:inherit}
 .chgrp button{font:700 15px var(--disp);letter-spacing:.07em}
-.chgrp button small{font:500 11px 'Barlow',sans-serif;letter-spacing:0;text-transform:none}
+.chgrp button small{font:500 11.5px 'Barlow Semi Condensed','Barlow',sans-serif;letter-spacing:0;text-transform:none}
 .tbtn{font:600 12px var(--disp);letter-spacing:.05em;text-transform:uppercase;border-radius:6px;box-shadow:none;text-shadow:none}
 .tbtn.sel{font-weight:700}
 .pill{font-family:var(--disp);letter-spacing:.08em}
@@ -164,12 +194,14 @@ select,input[type=text]{font-family:inherit}
 .subh{font:700 14px var(--disp);letter-spacing:.08em;opacity:.85}
 .ctitle,.sblk .stitle{font:600 13px var(--disp);letter-spacing:.08em;opacity:.85}
 .row label{font-size:13px}
-.vf label{font-size:11px}
+.vf label{font-size:11.5px}
 #detailBody summary{font:600 14px var(--disp);letter-spacing:.06em;text-transform:uppercase}
 
 /* Pedales y ampli */
 .pedal h3,.amp h3{font:700 14px var(--disp);letter-spacing:.05em}
-.pedtype{font-size:10.5px}
+.pedtype{font-size:11.5px}
+.pedal-type-select{display:block;width:100%;min-width:0;margin:4px 0 2px;padding:6px 5px;border:1px solid rgba(255,255,255,.48);border-radius:5px;background:rgba(0,0,0,.32);color:#fff;font:700 clamp(12px,1vw,16px)/1.1 'Barlow Semi Condensed','Barlow',sans-serif;letter-spacing:.01em;text-align:center;text-overflow:ellipsis}
+.pedal-type-select option{background:#241a17;color:#fff}
 
 /* Librería (panel oscuro) */
 .sidebar{background:linear-gradient(180deg,#241a17,#17110f);color:#efe9e4;border-color:#000;margin-top:12px;top:72px;max-height:calc(100vh - 92px)}
@@ -197,7 +229,20 @@ select,input[type=text]{font-family:inherit}
 .tuner-needle.in-tune{background:#2ecc71;box-shadow:0 0 16px 3px rgba(46,204,113,.8)}
 .tuner-needle.out-of-tune{background:var(--acc);box-shadow:0 0 12px 2px rgba(255,74,46,.7)}
 .tuner-content select{width:100%;max-width:100%;margin:0 0 14px;font-size:13px}
-.tuner-freq{font:600 14px var(--disp);letter-spacing:.08em;opacity:.6;margin-bottom:20px}
+.tuner-freq{font:600 14px var(--disp);letter-spacing:.08em;opacity:.6;margin-bottom:12px}
+.tuner-opts{display:flex;gap:8px;align-items:center;margin:0 0 12px}
+.tuner-opts select{flex:1;width:auto;margin:0}
+.tuner-ref{display:flex;align-items:center;gap:4px;font:600 13px var(--disp);letter-spacing:.06em;white-space:nowrap}
+.tuner-ref button{padding:5px 9px;font-size:14px;line-height:1}
+.tuner-ref span{min-width:62px;text-align:center;cursor:pointer;opacity:.85}
+.tuner-strings{display:flex;gap:6px;justify-content:center;margin:0 0 12px}
+.tuner-strings:empty{display:none}
+.tuner-chip{min-width:44px;padding:6px 0;border-radius:6px;background:#0f0b0a;border:1px solid #000;font:600 14px var(--disp);color:#a79c94;text-align:center;transition:background .15s,color .15s,box-shadow .15s}
+.tuner-chip.active{background:var(--acc);color:#fff;box-shadow:0 0 10px rgba(255,74,46,.6)}
+.tuner-chip.active.ok{background:#2ecc71;color:#06210f;box-shadow:0 0 12px rgba(46,204,113,.8)}
+.tuner-level{height:6px;background:#0f0b0a;border:1px solid #000;border-radius:4px;margin:0 0 14px;overflow:hidden}
+.tuner-level>div{height:100%;width:0;background:#2ecc71;transition:width .08s}
+.tuner-level.low>div{background:#c0392b}
 
 /* Práctica: MP3 · Ritmos · Favoritos */
 .kz-tabs{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:0 0 12px;padding-bottom:10px;border-bottom:2px solid var(--acc)}
@@ -282,9 +327,38 @@ select,input[type=text]{font-family:inherit}
 /* Panel de equivalencias MK2 -> MK1 */
 .kmap-back{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:1000;align-items:center;justify-content:center;padding:18px}
 .kmap-back.open{display:flex}.kmap{background:var(--card);color:var(--fg);border:1px solid var(--bd);border-radius:12px;width:min(900px,96vw);max-height:90vh;overflow:auto;padding:18px;box-shadow:0 18px 60px #000}.kmap h2{margin:0 0 6px}.kmap p{font-size:13px;opacity:.8;margin:5px 0 12px}.kmap-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}.kmap-table{width:100%;border-collapse:collapse;font-size:13px}.kmap-table th,.kmap-table td{border-bottom:1px solid var(--bd);padding:7px 6px;text-align:left;vertical-align:middle}.kmap-table th{font-size:11px;text-transform:uppercase;opacity:.72;letter-spacing:.06em}.kmap-table select{width:100%;min-width:180px;background:var(--bg);color:var(--fg);border:1px solid var(--bd);border-radius:5px;padding:6px}.kmap-code{font-family:monospace;opacity:.7}.kmap-cat{font-size:11px;text-transform:uppercase;opacity:.6}
+/* Modo de edición: recuperar altura y mantener a mano los controles extendidos */
+header{padding:4px 10px;padding-top:calc(4px + env(safe-area-inset-top,0px));gap:5px}
+header .hsp{gap:8px}
+#pname{font-size:25px;line-height:1.05;min-width:150px}
+header button,header select{padding:5px 8px}
+.layout{gap:10px}
+main{padding:5px 7px 24px}
+main>.card{margin:6px 0;padding:7px 10px}
+main>.card:first-child h2,main>.card:nth-child(2) h2{font-size:15px;margin-bottom:4px}
+main>.card:first-child #channels{gap:4px;margin:4px 0}
+main>.card:first-child .chgrp button{padding:5px 9px}
+main>.card:first-child>div:last-child{gap:5px!important;margin-top:5px!important}
+main>.card:first-child>div:last-child button{padding:5px 9px;font-size:12px}
+main>.card:nth-child(2){padding:5px 9px;margin:5px 0}
+main>.card:nth-child(2) .btnrow{gap:3px}
+main>.card:nth-child(2) .tbtn{padding:4px 6px;min-height:25px}
+.boardwrap{margin:-7px 0 1px;font-size:10px}
+.board{padding:8px 4px 12px;gap:8px}
+#board>.pedal,#board>.amp{padding:7px 5px 9px}
+#board .mini{margin-top:5px;gap:4px}
+#board .ms{height:12px}
+#detailPanel{position:sticky;bottom:6px;z-index:4;max-height:min(46vh,560px);overflow-y:auto;overscroll-behavior:contain;scroll-margin-top:64px;box-shadow:0 5px 22px rgba(0,0,0,.42)}
+#detailPanel h2{position:sticky;top:-7px;z-index:1;background:var(--card);padding:3px 0 5px}
+@media(max-width:899px){
+  #detailPanel{max-height:48vh;bottom:4px}
+  .layout{gap:6px;padding-left:7px;padding-right:7px}
+  .sidebar{width:min(var(--sbw,190px),32vw);flex-basis:min(var(--sbw,190px),32vw);padding:7px}
+  main{padding-left:3px;padding-right:3px}
+}
 </style></head><body>
 <header>
-<div class="hsp"><div class="hknobs" aria-hidden="true"><div class="hk" style="--r:-60deg"></div><div class="hk" style="--r:20deg"></div><div class="hk" style="--r:70deg"></div></div><div class="plate" aria-hidden="true"><b>KATANA MK1 / MK2</b><i>EDITOR · CONVERSOR</i></div></div>
+<div class="hsp"><div class="hknobs" aria-hidden="true"><div class="hk" style="--r:-60deg"></div><div class="hk" style="--r:20deg"></div><div class="hk" style="--r:70deg"></div></div><div class="plate" aria-hidden="true"><b>KATANA MK1 / MK2</b><i>EDITOR · CONVERSOR</i></div><button id="themeToggle" class="theme-toggle" type="button" onclick="toggleTheme()" aria-label="Cambiar tema" title="Cambiar modo claro/oscuro">☀ Claro</button></div>
 <input type="text" id="pname" placeholder="Nombre del preset" value="" maxlength="16" spellcheck="false">
 <div class="hr">
 <select id="langSel" onchange="setLang(this.value)" title="Idioma / Language"><option value="es">ESP</option><option value="en">ENG</option></select>
@@ -317,7 +391,7 @@ select,input[type=text]{font-family:inherit}
 <div class="card" style="padding:8px 12px"><h2 style="margin-bottom:6px">Orden de la cadena</h2><div id="chainBtns" class="btnrow"></div></div>
 <div class="boardwrap">señal → izquierda a derecha · toca un pedal o el ampli para ver sus controles</div>
 <div class="board" id="board"></div>
-<div class="card"><h2 id="detailTitle">—</h2><div id="detailBody"></div></div>
+<div class="card" id="detailPanel"><h2 id="detailTitle">—</h2><div id="detailBody"></div></div>
 
 <div class="card" id="practiceCard"><h2>Práctica</h2>
 <div class="kz-tabs" id="kzTabs"><button type="button" class="tbtn sel" data-z="audio">🎵 MP3</button><button type="button" class="tbtn" data-z="rhythm">🥁 RITMOS</button><button type="button" class="tbtn" data-z="favorites">⭐ FAVORITOS</button><div class="kz-hint" id="kzHint"></div></div>
@@ -428,11 +502,17 @@ select,input[type=text]{font-family:inherit}
 <div id="tunerModal" class="tuner-modal" role="dialog" aria-modal="true" aria-label="Afinador Cromático">
   <div class="tuner-content">
     <div class="tuner-title">🎸 Afinador Cromático</div>
+    <div class="tuner-opts">
+      <select id="tunerTuning" title="Afinación"></select>
+      <div class="tuner-ref" title="Frecuencia de referencia (La4)"><button type="button" id="tunerRefDown">−</button><span id="tunerRefVal">A=440</span><button type="button" id="tunerRefUp">+</button></div>
+    </div>
+    <div class="tuner-strings" id="tunerStrings"></div>
     <div class="tuner-note" id="tunerNote">—</div>
     <div class="tuner-octave" id="tunerOctave"></div>
     <div class="tuner-cents" id="tunerCents">—</div>
     <div class="tuner-bar-wrap"><div class="tuner-bar-center"></div><div class="tuner-needle" id="tunerNeedle"></div></div>
     <div class="tuner-freq" id="tunerFreq">— Hz</div>
+    <div class="tuner-level" title="Nivel de señal"><div id="tunerLevel"></div></div>
     <select id="tunerInput" title="Entrada de audio"></select>
     <button id="tunerCloseBtn" type="button">Cerrar</button>
   </div>
@@ -707,11 +787,36 @@ function pedalTypeName(pd){
 }
 function refreshPedalTypeCard(id){
   const pd=PEDALS.find(x=>x.id===id); if(!pd)return;
-  const card=document.querySelector(`[data-pedal-id=\"${id}\"]`); if(!card)return;
+  const card=document.querySelector(`[data-pedal-id="${id}"]`); if(!card)return;
   const oldLabel=card.querySelector('[data-pedal-type]');
   const name=pedalTypeName(pd);
+  if(oldLabel&&oldLabel.tagName==='SELECT')return;
   if(name){if(oldLabel)oldLabel.textContent=name;else{const d=document.createElement('div');d.className='pedtype';d.dataset.pedalType='';d.textContent=name;card.querySelector('h3')?.after(d);}}
   else if(oldLabel)oldLabel.remove();
+}
+function pedalTypeControl(pd){
+  const map={
+    boost:{list:BOOST_TYPE,b:'00',o:0x11},amp:{list:PREAMP_TYPE,b:'00',o:0x21},
+    delay:{list:DELAY_TYPE,b:'05',o:0x01},delay2:{list:DELAY_TYPE,b:'05',o:0x21},
+    reverb:{list:REVERB_TYPE,b:'05',o:0x41},misc:{list:PFX_TYPE,b:'05',o:0x51}
+  };
+  let list,current,fxSlot=0;
+  if(pd.id==='fx1'||pd.id==='fx2'){
+    fxSlot=pd.id==='fx1'?1:2;
+    list=FX_TYPE;current=P[fxSlot===1?'01':'03'][1];
+  }else{
+    const m=map[pd.id];if(!m)return '';
+    list=m.list;current=P[m.b][m.o];
+  }
+  const options=list.map(([v,n])=>`<option value="${v}" ${parseInt(v,16)===current?'selected':''}>${n}</option>`).join('');
+  return `<select class="pedal-type-select" data-pedal-type aria-label="Tipo de ${pd.name}" title="Cambiar tipo de ${pd.name}" onclick="event.stopPropagation()" onchange="selectedPedal='${pd.id}';changePedalType('${pd.id}',this.value)">${options}</select>`;
+}
+function changePedalType(id,value){
+  const pd=PEDALS.find(x=>x.id===id);if(!pd)return;
+  if(pd.fx){fxWrite(pd.fx,'type',value);return;}
+  const map={boost:['00',0x11],amp:['00',0x21],delay:['05',0x01],delay2:['05',0x21],reverb:['05',0x41],misc:['05',0x51]},a=map[id];
+  if(!a)return;
+  const i=PARAMS.findIndex(p=>p.b===a[0]&&p.o===a[1]&&p.t==='e');if(i>=0)onParam(i,value);
 }
 
 let midiOut=null, midiIn=null, midiAccess=null, chanCount=9;
@@ -1267,21 +1372,136 @@ function fxWrite(slot,key,val){
   else{const off=parseInt(key,16), blk=off<0x80?lo:hi, roff=off<0x80?off:off-0x80; writeParam(blk,roff,parseInt(val)&0x7F);}
   renderAll();
 }
-function selectPedal(id){selectedPedal=id;renderAll();}
+function selectPedal(id){
+  selectedPedal=id;renderAll();
+  requestAnimationFrame(()=>{
+    const panel=document.getElementById('detailPanel');if(!panel)return;
+    const r=panel.getBoundingClientRect();
+    if(r.bottom>innerHeight-12)panel.scrollIntoView({behavior:'smooth',block:'end'});
+  });
+}
 function toggleOnOff(id){
   const pd=PEDALS.find(p=>p.id===id); if(!pd.onoff)return;
   const [b,o]=pd.onoff; writeParam(b,o,P[b][o]?0:1); renderAll();
 }
+// ---- Sliders dentro de los pedales: cada pedal puede mostrar algunos controles clave (elegibles con el botón ⚙) ----
+let MINI_ITEMS=[];
+const MINI_LS='kat_mini';
+function miniStore(){try{return JSON.parse(localStorage.getItem(MINI_LS)||'{}')||{};}catch(e){return {};}}
+function miniSave(o){try{localStorage.setItem(MINI_LS,JSON.stringify(o));}catch(e){}}
+function miniSelected(av){
+  const stored=miniStore()[av.key],valid=new Set(av.items.map(x=>x.id));
+  const ids=Array.isArray(stored)?stored.filter(id=>valid.has(id)):av.def.slice();
+  const target=Math.min(5,av.items.length);
+  for(const id of [...av.def,...av.items.map(x=>x.id)]){if(ids.length>=target)break;if(valid.has(id)&&!ids.includes(id))ids.push(id);}
+  return av.items.filter(x=>ids.includes(x.id));
+}
+function pmItem(g,b,o){
+  const p=PARAMS.find(q=>q.g===g&&q.b===b&&q.o===o&&(q.t==='r'||q.t==='w'));
+  return p?{id:b+':'+o.toString(16),label:p.l,b:p.b,o:p.o,t:p.t,min:p.min||0,max:p.max,fmt:p.fmt}:null;
+}
+// Controles disponibles para cada pedal según su tipo actual: {key (para recordar la elección), items, def (ids por defecto)}
+function miniAvail(pd){
+  const I=(g,b,o)=>pmItem(g,b,o),L=a=>a.filter(Boolean),hx=n=>n.toString(16);
+  if(pd.id==='boost')return {key:'boost',items:L([I('boost','00',0x12),I('boost','00',0x13),I('boost','00',0x14),I('boost','00',0x17),I('boost','00',0x18)]),def:['00:12','00:13','00:14','00:17','00:18']};
+  if(pd.id==='amp')return {key:'amp',items:L([I('pre','00',0x22),I('pre','00',0x24),I('pre','00',0x25),I('pre','00',0x26),I('pre','00',0x27),I('pre','00',0x28)]),def:['00:22','00:24','00:25','00:26','00:28']};
+  if(pd.fx){
+    const lo=pd.fx===1?'01':'03',hi=pd.fx===1?'02':'04',th=hex2(P[lo][1]),spec=FXP[th],key=pd.id+'|'+th;
+    if(!spec)return {key,items:[],def:[]};
+    const g=vo=>vo<0x80?P[lo][vo]:P[hi][vo-0x80],items=[];
+    spec.split(',').forEach(ent=>{
+      const [offHex,label,mx]=ent.split(':'),off=parseInt(offHex,16),max=parseInt(mx,10),k=th+':'+offHex.toUpperCase(),h1=FXV2[th];
+      if(max<=1||FXSEL[k]||FX2OPT[k]||FXWORD[k])return;            // solo controles de rango simple
+      if(h1&&P[lo][h1.v]===0&&h1.hide.includes(off))return;
+      const wh=FXWHEN[k];if(wh&&!wh(g))return;
+      items.push({id:k,label,b:off<0x80?lo:hi,o:off<0x80?off:off-0x80,t:'r',min:0,max,fmt:FXFMT[k]});
+    });
+    let def=items.filter(x=>/^(effect|level|mix|rate|depth|direct)$/i.test(x.label)).slice(0,5).map(x=>x.id);
+    for(const it of items){if(def.length>=5)break;if(!def.includes(it.id))def.push(it.id);}
+    return {key,items,def};
+  }
+  if(pd.id==='delay'||pd.id==='delay2'){
+    const g=pd.id,base=pd.id==='delay'?0:0x20,dual=[3,4,5].includes(P['05'][base+1]),D=o=>'05:'+hx(base+o);
+    const items=dual?L([I(g,'05',base+9),I(g,'05',base+0x0B),I(g,'05',base+0x0D),I(g,'05',base+0x0E),I(g,'05',base+0x10),I(g,'05',base+0x12),I(g,'05',base+7)])
+                    :L([I(g,'05',base+2),I(g,'05',base+4),I(g,'05',base+5),I(g,'05',base+6),I(g,'05',base+7)]);
+    return {key:pd.id+'|'+(dual?'d':'s'),items,def:dual?[D(9),D(0x0B),D(0x0D),D(0x0E),D(0x12)]:[D(2),D(4),D(5),D(6),D(7)]};
+  }
+  if(pd.id==='reverb')return {key:'reverb',items:L([I('reverb','05',0x42),I('reverb','05',0x43),I('reverb','05',0x45),I('reverb','05',0x46),I('reverb','05',0x48),I('reverb','05',0x49)]),def:['05:42','05:43','05:45','05:48','05:49']};
+  return null;
+}
+const miniValue=it=>it.t==='w'?P[it.b][it.o]*128+P[it.b][it.o+1]:P[it.b][it.o];
+const miniFmt=(it,v)=>it.t==='w'?v+' ms':(it.fmt?it.fmt(v):v);
+function miniInput(i,val,el){
+  const it=MINI_ITEMS[i];if(!it)return;const v=parseInt(val,10);
+  if(it.t==='w'){P[it.b][it.o]=v>>7;P[it.b][it.o+1]=v&0x7F;dt1([0x60,0x00,parseInt(it.b,16),it.o],[v>>7,v&0x7F]);}
+  else writeParam(it.b,it.o,v&0x7F);
+  const lb=el.parentNode.querySelector('.ml b');if(lb)lb.textContent=miniFmt(it,v);
+}
+// Si se mueve un control en el panel de detalle, los sliders del pedal se actualizan sin repintar el tablero
+function refreshMini(){
+  document.querySelectorAll('#board .ms').forEach(el=>{
+    const it=MINI_ITEMS[+el.dataset.mi];if(!it)return;
+    const v=miniValue(it);el.value=v;const lb=el.parentNode.querySelector('.ml b');if(lb)lb.textContent=miniFmt(it,v);
+  });
+}
+function miniHTML(pd){
+  const av=miniAvail(pd);if(!av||!av.items.length)return {cfg:'',body:''};
+  const chosen=miniSelected(av);
+  const body=chosen.length?'<div class="mini" onclick="event.stopPropagation()">'+chosen.map(it=>{
+    const idx=MINI_ITEMS.push(it)-1,v=miniValue(it);
+    return `<div><div class="ml"><span>${it.label}</span><b>${miniFmt(it,v)}</b></div><input type="range" class="ms" data-mi="${idx}" min="${it.t==='w'?it.min:0}" max="${it.max}" value="${v}" oninput="miniInput(${idx},this.value,this)" onchange="renderDetail()"></div>`;
+  }).join('')+'</div>':'';
+  return {cfg:`<button type="button" class="mcfg" title="Sliders visibles" onclick="event.stopPropagation();openMiniCfg('${pd.id}',this)">⚙</button>`,body};
+}
+function closeMiniCfg(){const b=document.getElementById('miniCfg');if(b)b.remove();document.removeEventListener('mousedown',miniOutside);}
+function miniOutside(e){const b=document.getElementById('miniCfg');if(b&&!b.contains(e.target))closeMiniCfg();}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMiniCfg();});
+function openMiniCfg(pid,btn){
+  closeMiniCfg();
+  const pd=PEDALS.find(p=>p.id===pid),av=pd&&miniAvail(pd);if(!av||!av.items.length)return;
+  const sel=miniSelected(av).map(x=>x.id),box=document.createElement('div');
+  box.id='miniCfg';box.className='minicfg';
+  box.innerHTML='<div class="mchead"><span>Sliders visibles</span> · <span>'+pd.name+'</span></div>'+
+    av.items.map(it=>`<label class="mcrow"><input type="checkbox" data-id="${it.id}" ${sel.includes(it.id)?'checked':''}><span>${it.label}</span></label>`).join('')+
+    '<div class="mcfoot"><button type="button" data-act="reset">Restablecer</button><button type="button" data-act="close">Cerrar</button></div>';
+  document.body.appendChild(box);
+  const r=btn.getBoundingClientRect();
+  box.style.left=Math.max(8,Math.min(innerWidth-box.offsetWidth-8,r.right-box.offsetWidth))+'px';
+  box.style.top=Math.max(8,Math.min(innerHeight-box.offsetHeight-8,r.bottom+6))+'px';
+  box.addEventListener('change',()=>{const st=miniStore();st[av.key]=[...box.querySelectorAll('input:checked')].map(i=>i.dataset.id);miniSave(st);renderBoard();const now=new Set(miniSelected(av).map(x=>x.id));box.querySelectorAll('input[data-id]').forEach(i=>i.checked=now.has(i.dataset.id));});
+  box.addEventListener('click',e=>{const a=e.target.dataset&&e.target.dataset.act;if(a==='close')closeMiniCfg();
+    if(a==='reset'){const st=miniStore();delete st[av.key];miniSave(st);renderBoard();closeMiniCfg();}});
+  setTimeout(()=>document.addEventListener('mousedown',miniOutside),0);
+}
 function renderBoard(){
+  MINI_ITEMS=[];
+  const compactIds=new Set(['eq1','eq2','solo','misc']);
+  const compactRows=[
+    {id:'eq1',label:'EQ1',addr:['00',0x40]},
+    {id:'eq2',label:'EQ2',addr:['00',0x60]},
+    {id:'misc',label:'NS',addr:['05',0x66]},
+    {id:'solo',label:'SOLO',addr:['06',0x14]},
+  ];
+  let compactRendered=false;
+  const compactHTML=()=>'<div class="pedal-stack" role="group" aria-label="EQ1, EQ2, NS, SOLO">'+compactRows.map(r=>{
+    const [b,o]=r.addr,on=P[b][o]===1,selected=selectedPedal===r.id;
+    return `<div class="pedal-stack-row"><button type="button" class="pedal-stack-label ${selected?'sel':''}" aria-label="Seleccionar ${r.label}" onclick="selectPedal('${r.id}')">${r.label}</button><button type="button" class="pedal-stack-switch ${on?'on':''}" aria-label="${on?'Desactivar':'Activar'} ${r.label}" title="${on?'Desactivar':'Activar'} ${r.label}" onclick="event.stopPropagation();writeParam('${b}',${o},P['${b}'][${o}]?0:1);renderAll()"><span class="pedal-stack-led"></span></button></div>`;
+  }).join('')+'</div>';
   document.getElementById('board').innerHTML=orderedPedals().map(pd=>{
+    if(compactIds.has(pd.id)){
+      if(compactRendered)return '';
+      compactRendered=true;
+      return compactHTML();
+    }
     const on=pd.onoff?P[pd.onoff[0]][pd.onoff[1]]:1;
-    const fsw=pd.onoff?`<div class="fsw ${on?'on':''}" onclick="event.stopPropagation();toggleOnOff('${pd.id}')"></div>`:'';
+    const fsw=pd.onoff?`<div class="fswwrap"><div class="fsw ${on?'on':''}" onclick="event.stopPropagation();toggleOnOff('${pd.id}')"></div></div>`:'';
     const cls=pd.isAmp?'amp':'pedal';
     const style=pd.isAmp?'':`style="--pc:${pd.color}"`;
-    const tn=pedalTypeName(pd);
-    return `<div class="${cls} ${selectedPedal===pd.id?'sel':''}" data-pedal-id="${pd.id}" ${style} onclick="selectPedal('${pd.id}')"><h3>${pd.name}</h3>${tn?`<div class="pedtype" data-pedal-type>${tn}</div>`:''}${fsw}</div>`;
+    const typeControl=pedalTypeControl(pd),mini=miniHTML(pd);
+    return `<div class="${cls} ${selectedPedal===pd.id?'sel':''}" data-pedal-id="${pd.id}" ${style} onclick="selectPedal('${pd.id}')">${mini.cfg}<h3>${pd.name}</h3>${typeControl}${mini.body}${fsw}</div>`;
   }).join('');
 }
+document.getElementById('detailBody').addEventListener('input',refreshMini);
 // Panel Solo (Katana MkII 50W, como en BTS): Solo On/Off + Level, y Solo EQ On/Off con Position, Low, Mid, High y Level
 function soloGraphInner(){
   const g=o=>P['0F'][o], on=g(0x11)===1;
@@ -1681,11 +1901,27 @@ document.getElementById('fileload').onchange=e=>{
   const NOTE_NAMES=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
   const modal=document.getElementById('tunerModal'),devSel=document.getElementById('tunerInput');
   const DEV_KEY='kat_tuner_dev', FRAME_MS=40, HOLD_MS=1500;
+  // Afinaciones (notas MIDI de grave a aguda). 'Cromático' = sin cuerdas: muestra la nota más cercana, como antes.
+  const TUNINGS=[
+    {id:'chromatic',name:'Cromático (libre)',notes:[]},
+    {id:'std',name:'Estándar (EADGBE)',notes:[40,45,50,55,59,64]},
+    {id:'dropd',name:'Drop D',notes:[38,45,50,55,59,64]},
+    {id:'half',name:'Medio tono abajo (Eb)',notes:[39,44,49,54,58,63]},
+    {id:'whole',name:'Un tono abajo (D)',notes:[38,43,48,53,57,62]},
+    {id:'dadgad',name:'DADGAD',notes:[38,45,50,55,57,62]},
+    {id:'openg',name:'Open G (DGDGBD)',notes:[38,43,50,55,59,62]},
+    {id:'opend',name:'Open D (DADF#AD)',notes:[38,45,50,54,57,62]}
+  ];
+  let tuning=TUNINGS[0],ref=440;
+  try{
+    const r=parseInt(localStorage.getItem('kat_tuner_ref'),10);if(r>=410&&r<=470)ref=r;
+    const t=TUNINGS.find(x=>x.id===localStorage.getItem('kat_tuner_tuning'));if(t)tuning=t;
+  }catch(e){}
   let audioCtx=null,analyser=null,mediaStream=null,rafId=null,runId=0;
   let hist=[],lastGood=0,lastRun=0;
   function freqToNote(freq){
     if(!freq||freq<20)return null;
-    const semitones=12*Math.log2(freq/440),midi=Math.round(semitones)+69,cents=Math.round((semitones-Math.round(semitones))*100);
+    const semitones=12*Math.log2(freq/ref),midi=Math.round(semitones)+69,cents=Math.round((semitones-Math.round(semitones))*100);
     return {noteName:NOTE_NAMES[((midi%12)+12)%12],octave:Math.floor(midi/12)-1,cents,midi};
   }
   /*YIN-START*/
@@ -1710,14 +1946,33 @@ document.getElementById('fileload').onchange=e=>{
   /*YIN-END*/
   const median=a=>{const b=a.slice().sort((x,y)=>x-y),m=b.length>>1;return b.length%2?b[m]:(b[m-1]+b[m])/2;};
   function setHint(txt){document.getElementById('tunerOctave').textContent=txt;}
+  const targetFreq=m=>ref*Math.pow(2,(m-69)/12);
+  // Cuerda de la afinación elegida más cercana a la frecuencia detectada (a menos de 300 cents); null en modo cromático
+  function nearestString(freq){
+    let best=null;
+    for(const m of tuning.notes){const d=1200*Math.log2(freq/targetFreq(m));if(!best||Math.abs(d)<Math.abs(best.d))best={m,d};}
+    return best&&Math.abs(best.d)<=300?best:null;
+  }
+  function setChips(m,ok){
+    document.querySelectorAll('#tunerStrings .tuner-chip').forEach(c=>{const on=m!==null&&+c.dataset.m===m;c.classList.toggle('active',on);c.classList.toggle('ok',on&&ok);});
+  }
   function updateTunerUI(freq){
     const noteEl=document.getElementById('tunerNote'),octEl=document.getElementById('tunerOctave'),centsEl=document.getElementById('tunerCents'),freqEl=document.getElementById('tunerFreq'),needle=document.getElementById('tunerNeedle');
-    if(!freq||freq<0){noteEl.textContent='—';octEl.textContent='';centsEl.textContent='—';freqEl.textContent='— Hz';needle.style.left='50%';needle.className='tuner-needle';return;}
-    const info=freqToNote(freq);if(!info)return;
-    noteEl.textContent=info.noteName;octEl.textContent='Octava '+info.octave;
-    centsEl.textContent=(info.cents>=0?'+':'')+info.cents+' cents';freqEl.textContent=freq.toFixed(1)+' Hz';
-    needle.style.left=Math.max(2,Math.min(98,50+(info.cents/50)*50))+'%';
-    needle.className='tuner-needle '+(Math.abs(info.cents)<=5?'in-tune':'out-of-tune');
+    if(!freq||freq<0){noteEl.textContent='—';octEl.textContent='';centsEl.textContent='—';freqEl.textContent='— Hz';needle.style.left='50%';needle.className='tuner-needle';setChips(null);return;}
+    let name,oct,cents;const g=nearestString(freq);
+    if(g){name=NOTE_NAMES[g.m%12];oct=Math.floor(g.m/12)-1;cents=Math.round(g.d);} // con guía: cents respecto a la cuerda objetivo
+    else{const info=freqToNote(freq);if(!info)return;name=info.noteName;oct=info.octave;cents=info.cents;}
+    noteEl.textContent=name;octEl.textContent='Octava '+oct;
+    centsEl.textContent=(cents>=0?'+':'')+cents+' cents';freqEl.textContent=freq.toFixed(1)+' Hz';
+    needle.style.left=Math.max(2,Math.min(98,50+(cents/50)*50))+'%';
+    const ok=Math.abs(cents)<=5;needle.className='tuner-needle '+(ok?'in-tune':'out-of-tune');
+    setChips(g?g.m:null,ok);
+  }
+  const levelBox=document.querySelector('.tuner-level'),levelBar=document.getElementById('tunerLevel');
+  function setLevel(rms){
+    const db=20*Math.log10(Math.max(rms||0,1e-5));
+    levelBar.style.width=Math.round(Math.max(0,Math.min(1,(db+60)/50))*100)+'%';
+    levelBox.classList.toggle('low',!rms||rms<0.0015);
   }
   function tunerLoop(ts){
     if(!analyser)return;
@@ -1725,6 +1980,7 @@ document.getElementById('fileload').onchange=e=>{
     if(ts-lastRun<FRAME_MS)return;lastRun=ts;
     const buf=new Float32Array(analyser.fftSize);analyser.getFloatTimeDomainData(buf);
     const r=detectPitch(buf,audioCtx.sampleRate),now=performance.now();
+    setLevel(r.rms);
     if(r.freq>0){
       // Suavizado: mediana de las últimas 5 lecturas; si salta más de 80 cents es otra nota y se reinicia
       if(hist.length&&Math.abs(1200*Math.log2(r.freq/median(hist)))>80)hist=[];
@@ -1771,7 +2027,17 @@ document.getElementById('fileload').onchange=e=>{
     rafId=requestAnimationFrame(tunerLoop);
   }
   function startTuner(){let d='';try{d=localStorage.getItem(DEV_KEY)||'';}catch(e){}openStream(d);}
-  function closeTuner(){modal.style.display='none';runId++;stopStream();updateTunerUI(null);}
+  function closeTuner(){modal.style.display='none';runId++;stopStream();updateTunerUI(null);setLevel(0);}
+  const tuningSel=document.getElementById('tunerTuning'),stringsEl=document.getElementById('tunerStrings'),refVal=document.getElementById('tunerRefVal');
+  const noteLabel=m=>NOTE_NAMES[m%12]+(Math.floor(m/12)-1);
+  function renderStrings(){stringsEl.innerHTML=tuning.notes.map(m=>`<div class="tuner-chip" data-m="${m}">${noteLabel(m)}</div>`).join('');}
+  tuningSel.innerHTML=TUNINGS.map(t=>`<option value="${t.id}" ${t.id===tuning.id?'selected':''}>${t.name}</option>`).join('');
+  renderStrings();refVal.textContent='A='+ref;
+  tuningSel.addEventListener('change',()=>{tuning=TUNINGS.find(t=>t.id===tuningSel.value)||TUNINGS[0];try{localStorage.setItem('kat_tuner_tuning',tuning.id);}catch(e){}renderStrings();updateTunerUI(null);hist=[];});
+  function setRef(v){ref=Math.max(410,Math.min(470,v));refVal.textContent='A='+ref;try{localStorage.setItem('kat_tuner_ref',String(ref));}catch(e){}hist=[];}
+  document.getElementById('tunerRefDown').addEventListener('click',()=>setRef(ref-1));
+  document.getElementById('tunerRefUp').addEventListener('click',()=>setRef(ref+1));
+  refVal.addEventListener('click',()=>setRef(440));
   devSel.addEventListener('change',()=>{try{localStorage.setItem(DEV_KEY,devSel.value);}catch(e){}openStream(devSel.value);});
   document.getElementById('tunerBtn').addEventListener('click',e=>{e.stopPropagation();modal.style.display='flex';startTuner();});
   document.getElementById('tunerCloseBtn').addEventListener('click',closeTuner);
@@ -2341,7 +2607,7 @@ renderChannels(); renderChainBtns(); renderAll(); renderLibTree();
 // ---- Idioma ESP/ENG: traduce el texto de la interfaz (los datos del ampli no cambian) ----
 const I18N={'Nombre del preset':'Preset name','9 canales (50EX/100)':'9 channels (50EX/100)','5 canales (Katana\u201150)':'5 channels (Katana\u201150)','Conectar MIDI':'Connect MIDI','Sin conectar':'Not connected','Librería':'Library','Elegir carpeta':'Choose folder','Sin carpeta elegida':'No folder chosen','Canales — clic recupera, 💾 guarda el patch actual ahí':'Channels — click recalls, 💾 saves the current patch there','Guardar aquí':'Save here','(vacío)':'(empty)','Seleccionar archivo':'Choose file','Ningún archivo seleccionado':'No file selected','Convertir y guardar todo como ZIP':'Convert and save all as ZIP','Convertir a MK1':'Convert to MK1','Equivalencias MK2 → MK1':'MK2 → MK1 mappings','La columna izquierda muestra el tipo del preset MK2. El desplegable indica el tipo que se escribirá en el MK1. Los cambios se guardan en este navegador y se aplican al convertir o enviar un preset MK2 hacia MK1.':'The left column shows the type used by the MK2 preset. The dropdown sets the type that will be written to the MK1. Changes are saved in this browser and applied when converting or sending an MK2 preset to MK1.','Efecto o ampli MK2':'MK2 effect or amp','Sustitución MK1':'MK1 replacement','Restaurar valores predeterminados':'Restore defaults','Cancelar':'Cancel','Guardar equivalencias':'Save mappings','Descarga el preset actual convertido al formato MK1':'Downloads the current preset converted to MK1 format','Configurar equivalencias de conversión':'Configure conversion mappings','Guardar como .tsl (MK2)':'Save as .tsl (MK2)','Orden de la cadena':'Chain order','señal → izquierda a derecha · toca un pedal o el ampli para ver sus controles':'signal → left to right · tap a pedal or the amp to see its controls','Consola SysEx':'SysEx console','🎸 Afinador':'🎸 Tuner','🎸 Afinador Cromático':'🎸 Chromatic Tuner','Afinador Cromático':'Chromatic Tuner','Cerrar':'Close','Sin acceso al micrófono':'No microphone access','Afinador cromático (usa el micrófono)':'Chromatic tuner (uses the microphone)','FX1/FX2 muestran los parámetros propios del tipo de efecto seleccionado. Las asignaciones de pedal/GAFC y el detalle interno de algunos tipos menos comunes se conservan intactos al cargar/guardar un .tsl aunque aún no tengan control aquí.':'FX1/FX2 show the parameters of the selected effect type. Pedal/GAFC assignments and the internal detail of some less common types are kept intact when loading/saving a .tsl even if they have no control here yet.',
 'Amplificador':'Amplifier','Efecto':'Effect','Tipo':'Type','Tiempo':'Time','Tiempo 1':'Time 1','Tiempo 2':'Time 2','Nivel':'Level','Nivel de patch':'Patch level','Nivel de solo':'Solo level','Nivel EQ':'EQ level','Nivel1':'Level 1','Nivel2':'Level 2','Posición':'Position','Modo':'Mode','Modo1':'Mode 1','Modo2':'Mode 2','Fase feedback':'Feedback phase','Fase efecto':'Effect phase','Modulación':'Modulation','Filtro':'Filter','Tipo custom':'Custom type','Custom (avanzado)':'Custom (advanced)','Preamp tipo':'Preamp type','Reverb tipo':'Reverb type','Tipo de wah':'Wah type','Volumen de pedal':'Pedal volume','Tonalidad':'Key','Respuesta EQ':'EQ response','Paramétrico':'Parametric','Gráfico':'Graphic','Polaridad':'Polarity','Onda':'Wave','Reson':'Reson.','Rango':'Range','Octava':'Octave','Patron':'Pattern','Separ':'Separation','Cambiar modo':'Switch mode','(sin mapear aún)':'(not mapped yet)','—sin salidas—':'—no outputs—','—sin entradas—':'—no inputs—','Idioma / Language':'Language','Copiar log':'Copy log','Limpiar':'Clear','Todos':'All','Sin archivos de este tipo':'No files of this type','Escala de usuario · Voz 1':'User scale · Voice 1','Escala de usuario · Voz 2':'User scale · Voice 2','Variaciones':'Variations','Variaciones Reverb/Delay2':'Reverb/Delay2 variations','Capa':'Layer','KATANA Mk1 (este editor es para Mk2)':'KATANA Mk1 (this editor is for Mk2)','Dispositivo no Katana':'Not a Katana device','Convertido del Katana original (MK1)':'Converted from original Katana (MK1)','⚠ Archivo de Katana Gen3: el MkII no puede leerlo (solo el Gen3 lee todos los formatos).':'⚠ Katana Gen3 file: the MkII cannot read it (only the Gen3 reads every format).','⚠ Archivo de Katana original (MK1): el MkII puede leerlo, pero este editor aún no convierte ese formato.':'⚠ Original Katana (MK1) file: the MkII can read it, but this editor does not convert that format yet.','⚠ Formato .tsl no reconocido.':'⚠ Unrecognized .tsl format.','Este navegador no soporta Web MIDI (usa Chrome o Edge)':'This browser does not support Web MIDI (use Chrome or Edge)','Esperando al Katana… (conéctalo por USB y enciéndelo)':'Waiting for the Katana… (plug it in via USB and switch it on)','MIDI bloqueado en el navegador: permite el acceso MIDI/SysEx y pulsa Conectar MIDI':'MIDI is blocked in the browser: allow MIDI/SysEx access and press Connect MIDI'};
-Object.assign(I18N,{"Entrada de audio":"Audio input","Predeterminada":"Default","Toca una cuerda…":"Play a string…","Señal muy débil: revisa la entrada de audio":"Very weak signal: check the audio input","Arrastra para ajustar el ancho · doble clic para restablecer":"Drag to adjust the width · double-click to reset","Reproductor multimedia: carga tus archivos de audio, dale al play y toca encima con el ampli.":"Media player: load your audio files, hit play and play along with the amp.","Caja de ritmos: elige un groove, ajusta el tempo (BPM) y el volumen, y dale a Iniciar para practicar sobre la base.":"Drum machine: pick a groove, set the tempo (BPM) and volume, and press Start to practice over the backing.","Guarda la configuración o modificaciones actuales como favorito; se guarda en el localStorage de Chrome; puedes poner un nombre descriptivo.":"Saves the current settings or changes as a favorite; stored in Chrome's localStorage; you can give it a descriptive name.","Práctica": "Practice", "Volumen del ritmo": "Rhythm volume", "🥁 RITMOS": "🥁 RHYTHMS", "⭐ FAVORITOS": "⭐ FAVORITES", "LISTA": "PLAYLIST", "REPRODUCTOR": "PLAYER", "Sin canciones aún": "No songs yet", "Arrastra archivos MP3 aquí o haz click": "Drop MP3 files here or click", "Anterior": "Previous", "Siguiente": "Next", "GRAVES": "BASS", "MEDIOS": "MID", "AGUDOS": "TREBLE", "Graves": "Bass", "Medios": "Mid", "Agudos": "Treble", "Volumen": "Volume", "▶ INICIAR": "▶ START", "⏹ DETENER": "⏹ STOP", "🥁 Percusión": "🥁 Percussion", "SILENCIAR": "MUTE", "SEGUIR": "FOLLOW", "🎸 Bajo": "🎸 Bass", "Bajo": "Bass", "Tonalidad": "Key", "Progresión": "Progression", "Cambio cada": "Change every", "1 compás": "1 measure", "2 compases": "2 measures", "Octava": "Octave", "Grave (E1)": "Low (E1)", "Media (E2)": "Mid (E2)", "Alta (E3)": "High (E3)", "Fundamental": "Root", "Tercera": "Third", "Quinta": "Fifth", "· Clic en celda para cambiar el grado": "· Click cell to change degree", "Compás 1": "Bar 1", "Compás 2": "Bar 2", "Compás 3": "Bar 3", "Compás 4 · Fill": "Bar 4 · Fill", "🎲 Nuevo fill": "🎲 New fill", "Genera un redoble/fill distinto para el compás 4": "Generates a different fill for bar 4", "Tom alto": "High tom", "Tom bajo": "Low tom", "Caja": "Snare", "Bombo": "Kick", "Rock 1 – básico": "Rock 1 – basic", "Rock 2 – abierto": "Rock 2 – open", "Rock 3 – doble bombo": "Rock 3 – double kick", "Rock 4 – medio tiempo": "Rock 4 – half-time", "Blues 2 – lento": "Blues 2 – slow", "Pop 1 – básico": "Pop 1 – basic", "Pop 3 – medio tiempo": "Pop 3 – half-time", "Funk 1 – clásico": "Funk 1 – classic", "Funk 2 – pesado": "Funk 2 – heavy", "Funk 3 – 16vos": "Funk 3 – 16ths", "Metal 1 – básico": "Metal 1 – basic", "Balada 6/8": "Ballad 6/8", "Nombre (ej: Blues cálido)": "Name (e.g. Warm Blues)", "Etiquetas separadas por coma, o un enlace (ej: blues, limpio, youtube.com/...)": "Comma-separated tags, or a link (e.g. blues, clean, youtube.com/...)", "★ GUARDAR PATCH ACTUAL": "★ SAVE CURRENT PATCH", "⬇️ Exportar favoritos": "⬇️ Export favorites", "⬆️ Importar favoritos": "⬆️ Import favorites", "Guarda patches completos en tu navegador; al cargar uno se envía al ampli": "Saves full patches in your browser; loading one sends it to the amp", "Aún no tienes favoritos guardados": "You don't have any favorites saved yet", "▶ Cargar": "▶ Load", "Descargar .tsl": "Download .tsl", "Borrar": "Delete", "✅ Favorito guardado": "✅ Favorite saved", "▶ Favorito cargado": "▶ Favorite loaded", "❌ No se pudo cargar el favorito": "❌ Could not load the favorite", "❌ No se pudo guardar en este navegador": "❌ Could not save in this browser", "✅ Importado correctamente": "✅ Imported successfully", "❌ El archivo no es un JSON válido de esta app": "❌ That file isn't a valid JSON export from this app", "❌ Ese archivo no es una exportación de favoritos": "❌ That file isn't a favorites export"});
+Object.assign(I18N,{"Sliders visibles":"Visible sliders","Restablecer":"Reset","Cerrar":"Close","Afinación":"Tuning","Cromático (libre)":"Chromatic (free)","Estándar (EADGBE)":"Standard (EADGBE)","Medio tono abajo (Eb)":"Half step down (Eb)","Un tono abajo (D)":"Whole step down (D)","Frecuencia de referencia (La4)":"Reference pitch (A4)","Nivel de señal":"Signal level","Entrada de audio":"Audio input","Predeterminada":"Default","Toca una cuerda…":"Play a string…","Señal muy débil: revisa la entrada de audio":"Very weak signal: check the audio input","Arrastra para ajustar el ancho · doble clic para restablecer":"Drag to adjust the width · double-click to reset","Reproductor multimedia: carga tus archivos de audio, dale al play y toca encima con el ampli.":"Media player: load your audio files, hit play and play along with the amp.","Caja de ritmos: elige un groove, ajusta el tempo (BPM) y el volumen, y dale a Iniciar para practicar sobre la base.":"Drum machine: pick a groove, set the tempo (BPM) and volume, and press Start to practice over the backing.","Guarda la configuración o modificaciones actuales como favorito; se guarda en el localStorage de Chrome; puedes poner un nombre descriptivo.":"Saves the current settings or changes as a favorite; stored in Chrome's localStorage; you can give it a descriptive name.","Práctica": "Practice", "Volumen del ritmo": "Rhythm volume", "🥁 RITMOS": "🥁 RHYTHMS", "⭐ FAVORITOS": "⭐ FAVORITES", "LISTA": "PLAYLIST", "REPRODUCTOR": "PLAYER", "Sin canciones aún": "No songs yet", "Arrastra archivos MP3 aquí o haz click": "Drop MP3 files here or click", "Anterior": "Previous", "Siguiente": "Next", "GRAVES": "BASS", "MEDIOS": "MID", "AGUDOS": "TREBLE", "Graves": "Bass", "Medios": "Mid", "Agudos": "Treble", "Volumen": "Volume", "▶ INICIAR": "▶ START", "⏹ DETENER": "⏹ STOP", "🥁 Percusión": "🥁 Percussion", "SILENCIAR": "MUTE", "SEGUIR": "FOLLOW", "🎸 Bajo": "🎸 Bass", "Bajo": "Bass", "Tonalidad": "Key", "Progresión": "Progression", "Cambio cada": "Change every", "1 compás": "1 measure", "2 compases": "2 measures", "Octava": "Octave", "Grave (E1)": "Low (E1)", "Media (E2)": "Mid (E2)", "Alta (E3)": "High (E3)", "Fundamental": "Root", "Tercera": "Third", "Quinta": "Fifth", "· Clic en celda para cambiar el grado": "· Click cell to change degree", "Compás 1": "Bar 1", "Compás 2": "Bar 2", "Compás 3": "Bar 3", "Compás 4 · Fill": "Bar 4 · Fill", "🎲 Nuevo fill": "🎲 New fill", "Genera un redoble/fill distinto para el compás 4": "Generates a different fill for bar 4", "Tom alto": "High tom", "Tom bajo": "Low tom", "Caja": "Snare", "Bombo": "Kick", "Rock 1 – básico": "Rock 1 – basic", "Rock 2 – abierto": "Rock 2 – open", "Rock 3 – doble bombo": "Rock 3 – double kick", "Rock 4 – medio tiempo": "Rock 4 – half-time", "Blues 2 – lento": "Blues 2 – slow", "Pop 1 – básico": "Pop 1 – basic", "Pop 3 – medio tiempo": "Pop 3 – half-time", "Funk 1 – clásico": "Funk 1 – classic", "Funk 2 – pesado": "Funk 2 – heavy", "Funk 3 – 16vos": "Funk 3 – 16ths", "Metal 1 – básico": "Metal 1 – basic", "Balada 6/8": "Ballad 6/8", "Nombre (ej: Blues cálido)": "Name (e.g. Warm Blues)", "Etiquetas separadas por coma, o un enlace (ej: blues, limpio, youtube.com/...)": "Comma-separated tags, or a link (e.g. blues, clean, youtube.com/...)", "★ GUARDAR PATCH ACTUAL": "★ SAVE CURRENT PATCH", "⬇️ Exportar favoritos": "⬇️ Export favorites", "⬆️ Importar favoritos": "⬆️ Import favorites", "Guarda patches completos en tu navegador; al cargar uno se envía al ampli": "Saves full patches in your browser; loading one sends it to the amp", "Aún no tienes favoritos guardados": "You don't have any favorites saved yet", "▶ Cargar": "▶ Load", "Descargar .tsl": "Download .tsl", "Borrar": "Delete", "✅ Favorito guardado": "✅ Favorite saved", "▶ Favorito cargado": "▶ Favorite loaded", "❌ No se pudo cargar el favorito": "❌ Could not load the favorite", "❌ No se pudo guardar en este navegador": "❌ Could not save in this browser", "✅ Importado correctamente": "✅ Imported successfully", "❌ El archivo no es un JSON válido de esta app": "❌ That file isn't a valid JSON export from this app", "❌ Ese archivo no es una exportación de favoritos": "❌ That file isn't a favorites export"});
 const I18N_RX=[
  [/^✅ Importado correctamente \((\d+)\)$/,m=>'✅ Imported successfully ('+m[1]+')'],
  [/^Octava (-?\d+)$/,m=>'Octave '+m[1]],
@@ -2353,6 +2619,24 @@ const I18N_RX=[
  [/^(Sal: (.*)|Sin salida) \/ (Ent: (.*)|Sin entrada)$/,m=>(m[2]!==undefined?'Out: '+m[2]:'No output')+' / '+(m[4]!==undefined?'In: '+m[4]:'No input')]
 ];
 let lang='es';
+function effectiveTheme(){return document.documentElement.dataset.theme||(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');}
+function updateThemeButton(){
+  const b=document.getElementById('themeToggle');if(!b)return;
+  const dark=effectiveTheme()==='dark';
+  b.textContent=dark?(lang==='en'?'☾ Dark':'☾ Oscuro'):(lang==='en'?'☀ Light':'☀ Claro');
+  b.title=dark?(lang==='en'?'Switch to light mode':'Cambiar a modo claro'):(lang==='en'?'Switch to dark mode':'Cambiar a modo oscuro');
+  b.setAttribute('aria-label',b.title);b.setAttribute('aria-pressed',String(dark));
+}
+function initTheme(){
+  try{const saved=localStorage.getItem('kat_theme');if(saved==='light'||saved==='dark')document.documentElement.dataset.theme=saved;else delete document.documentElement.dataset.theme;}catch(e){}
+  updateThemeButton();
+}
+function toggleTheme(){
+  const next=effectiveTheme()==='dark'?'light':'dark';
+  document.documentElement.dataset.theme=next;
+  try{localStorage.setItem('kat_theme',next);}catch(e){}
+  updateThemeButton();
+}
 function trStr(s){
   const k=s.trim(); if(!k)return null;
   let r=I18N[k];
@@ -2381,8 +2665,10 @@ function setLang(l){
   lang=l;document.documentElement.lang=l==='en'?'en':'es';
   try{localStorage.setItem('kat_lang',l);}catch(e){}
   if(l==='en')i18nNode(document.body);else i18nRestore();
+  updateThemeButton();
 }
 new MutationObserver(ms=>{if(lang!=='en')return;ms.forEach(m=>{m.addedNodes.forEach(i18nNode);if(m.type==='characterData')i18nNode(m.target);});}).observe(document.body,{childList:true,subtree:true,characterData:true});
+initTheme();
 (async()=>{
   const st=document.getElementById('status');
   if(!navigator.requestMIDIAccess){st.textContent='Este navegador no soporta Web MIDI (usa Chrome o Edge)';return;}
