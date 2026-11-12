@@ -109,6 +109,13 @@ background:var(--pc);box-shadow:inset 0 2px 0 rgba(255,255,255,.28),inset 0 -16p
 .mcfg{position:absolute;top:4px;right:4px;width:18px;height:18px;padding:0;border-radius:50%;background:rgba(0,0,0,.35);color:#fff;font-size:11px;line-height:18px;opacity:.5}
 .mcfg:hover{opacity:1}
 .minicfg{position:fixed;z-index:3000;min-width:190px;max-width:260px;background:var(--card);color:var(--fg);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
+.compact-detail-back{display:none;position:fixed;inset:0;z-index:2500;background:rgba(0,0,0,.68);padding:clamp(10px,4vh,42px) clamp(8px,4vw,42px);align-items:center;justify-content:center}
+.compact-detail-back.open{display:flex}
+.compact-detail-modal{width:min(1120px,100%);max-height:min(92vh,900px);overflow:auto;background:var(--card);color:var(--fg);border:1px solid var(--bd);border-radius:12px;box-shadow:0 12px 45px rgba(0,0,0,.6);padding:12px 14px 16px}
+.compact-detail-head{position:sticky;top:-12px;z-index:2;display:flex;align-items:center;gap:10px;margin:-12px -14px 10px;padding:10px 14px 9px;background:var(--card);border-bottom:1px solid var(--bd)}
+.compact-detail-head h2{flex:1;margin:0;font:700 18px var(--disp);letter-spacing:.04em;text-transform:uppercase}
+.compact-detail-body{min-width:0}
+.compact-detail-body .vf input[type=range]{max-width:24px}
 .mchead{font:700 12px var(--disp);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;opacity:.85}
 .mcrow{display:flex;align-items:center;gap:8px;padding:3px 0;font-size:13px;cursor:pointer}
 .mcfoot{display:flex;gap:6px;justify-content:flex-end;margin-top:8px}
@@ -158,9 +165,77 @@ header{background:repeating-linear-gradient(45deg,rgba(255,255,255,.035) 0 2px,t
 .plate i{display:block;font:600 10px/1.2 var(--disp);letter-spacing:.28em;opacity:.75;font-style:normal}
 .theme-toggle{flex:none;padding:6px 10px;border-radius:6px;background:var(--chrome);color:#211b17;border:1px solid rgba(0,0,0,.55);box-shadow:0 2px 5px rgba(0,0,0,.45),inset 0 1px 0 #fff;text-shadow:none;font:700 13px var(--disp);letter-spacing:.04em;white-space:nowrap}
 .theme-toggle:hover{filter:brightness(1.08)}
+.compact-toggle{flex:none;padding:6px 10px;border-radius:6px;background:var(--chrome);color:#211b17;border:1px solid rgba(0,0,0,.55);box-shadow:0 2px 5px rgba(0,0,0,.45),inset 0 1px 0 #fff;text-shadow:none;font:700 13px var(--disp);letter-spacing:.04em;white-space:nowrap}
+.compact-toggle:hover{filter:brightness(1.08)}
 .hknobs{display:flex;gap:10px;align-items:center}
 .hknobs .hk{width:28px;height:28px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#666,#111 70%);border:2px solid #000;box-shadow:0 3px 6px rgba(0,0,0,.6),inset 0 1px 1px rgba(255,255,255,.25);position:relative;flex:none}
 .hknobs .hk:after{content:'';position:absolute;left:50%;top:3px;width:2px;height:9px;margin-left:-1px;background:#fff;border-radius:1px;transform-origin:50% 11px;transform:rotate(var(--r,0deg))}
+.hknobs .hk.midi-tx{background:radial-gradient(circle at 35% 30%,#ff7766,#8d160e 70%);box-shadow:0 0 12px rgba(255,54,35,.95),0 3px 6px rgba(0,0,0,.6),inset 0 1px 1px rgba(255,255,255,.35);animation:midiBlink .28s steps(2,end) infinite}
+.hknobs .hk.midi-rx{background:radial-gradient(circle at 35% 30%,#9affb0,#13733c 70%);box-shadow:0 0 12px rgba(47,210,105,.95),0 3px 6px rgba(0,0,0,.6),inset 0 1px 1px rgba(255,255,255,.35);animation:midiBlink .36s steps(2,end) infinite}
+.hknobs .hk.midi-busy{background:radial-gradient(circle at 35% 30%,#ffe994,#a96b00 70%);box-shadow:0 0 12px rgba(255,194,42,.95),0 3px 6px rgba(0,0,0,.6),inset 0 1px 1px rgba(255,255,255,.35);animation:midiBlink .22s steps(2,end) infinite}
+@keyframes midiBlink{50%{filter:brightness(.58);transform:scale(.88)} }
+body.compact header{padding-top:4px;padding-bottom:4px}
+body.compact #pname{font-size:27px}
+body.compact .layout{gap:8px;padding-left:8px;padding-right:8px}
+body.compact .sidebar{width:var(--sbw,190px);flex-basis:var(--sbw,190px);padding:7px}
+body.compact main{padding:6px 5px 24px}
+body.compact main>.card{margin:5px 0;padding:6px 8px}
+body.compact .card{padding:7px 9px;margin:7px 0}
+body.compact #channels{gap:4px;margin:6px 0}
+body.compact .chgrp button{padding:6px 10px}
+body.compact .board{gap:6px;padding:10px 4px 14px}
+body.compact .pedal,body.compact .amp{padding:7px 5px 9px}
+body.compact .pedal-stack{min-height:155px}
+body.compact .mini{margin-top:5px;gap:4px}
+body.compact .ms{height:11px}
+body.compact #detailPanel{max-height:min(40vh,480px)}
+body.compact .audio-card,body.compact .rhythm-card,body.compact .fav-card{padding:6px 8px}
+/* Vista compacta/directo: solo cadena de pedales y favoritos rápidos */
+body.compact .sidebar,body.compact .vsplit{display:none}
+body.compact .layout{display:block;max-width:1500px;padding:0 8px}
+body.compact main{padding:4px 0 18px}
+body.compact #chainCard,body.compact #detailPanel,body.compact #sysExCard,body.compact .boardwrap,body.compact main>p{display:none}
+body.compact #channelsCard{display:block;margin:3px 0;padding:5px 7px}
+body.compact #channelsCard>h2,body.compact #channelsCard>#chStatus,body.compact #channelsCard>div:last-child{display:none}
+body.compact #channelsCard #channels{margin:0;gap:4px}
+body.compact #channelsCard .chgrp{box-shadow:none;flex:1 1 auto}
+body.compact #channelsCard .chgrp button:first-child{border-right:0;border-radius:7px 0 0 7px;padding:5px 8px;flex:1 1 auto;width:auto;font-size:11px}
+body.compact #channelsCard .chgrp .store{display:block;padding:5px 6px;font-size:11px;border-radius:0 7px 7px 0;margin:0}
+body.compact #board{padding:8px 2px 10px;gap:7px;overflow-x:auto}
+body.compact #practiceCard{display:block;margin:4px 0;padding:6px 8px}
+body.compact #practiceCard>h2,body.compact #practiceCard>#kzTabs,body.compact #kz-audio,body.compact #kz-rhythm{display:none!important}
+body.compact #kz-favorites{display:block!important}
+body.compact #kz-favorites:before{content:'FAVORITOS';display:block;margin:1px 0 4px;color:var(--acc);font:700 12px var(--disp);letter-spacing:.06em}
+body.compact #kz-favorites .fav-bar{display:flex;gap:5px;margin:0 0 5px;align-items:center}
+body.compact #kz-favorites .fav-bar:nth-of-type(2){display:none}
+body.compact #kz-favorites #favName{display:block;min-width:120px;flex:1;padding:5px 7px;font-size:11px}
+body.compact #kz-favorites #favTags{display:none}
+body.compact #kz-favorites #favSaveBtn{display:block;flex:0 0 auto;padding:5px 8px;font-size:11px;white-space:nowrap}
+body.compact #kz-favorites #favStatus{display:none}
+body.compact #kz-favorites .favgrid{display:flex;flex-wrap:wrap;gap:5px;max-height:none;overflow:visible}
+body.compact #kz-favorites .fav-card{flex:0 1 auto;min-width:120px;padding:2px;background:var(--card);border:1px solid var(--bd);border-radius:6px;box-shadow:0 1px 2px rgba(0,0,0,.18)}
+body.compact #kz-favorites .fav-card-name{display:none}
+body.compact #kz-favorites .fav-tags{display:none}
+body.compact #kz-favorites .fav-actions{display:flex;gap:3px;align-items:stretch}
+body.compact #kz-favorites .fav-load{display:block;flex:1;padding:5px 7px;background:var(--acc2);color:#fff;border:1px solid var(--bd);border-radius:5px;font-size:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.compact #kz-favorites .fav-load:after{content:'▶ ' attr(data-fav-name);font-size:11px}
+body.compact #kz-favorites .fav-rewrite{display:block;flex:0 0 28px;padding:5px 4px;background:#9b6a20;color:#fff;border:1px solid var(--bd);border-radius:5px;font-size:13px;line-height:1}
+body.compact #kz-favorites .fav-dl,body.compact #kz-favorites .fav-btn-delete{display:none}
+body.compact #kz-favorites .favempty{padding:4px;min-width:100%;font-size:11px;text-align:left}
+/* Explorador TSL inferior, estilo vista pequeña de Windows */
+body.compact .layout{display:flex;flex-direction:column;gap:5px;max-width:1700px;padding:0 8px}
+body.compact main{order:1;width:100%;padding:4px 0 6px}
+body.compact .sidebar{display:block;order:2;width:100%;flex:0 0 auto;position:static;max-height:none;overflow:visible;margin:2px 0 12px;padding:7px 9px;border-radius:9px}
+body.compact .sidebar h2{display:inline-block;margin:0 8px 4px 0;font-size:12px}
+body.compact .sidebar>button:first-of-type{width:auto!important;padding:4px 9px;font-size:11px;margin-right:4px}
+body.compact #libFilter{display:inline-block;width:auto;min-width:90px;margin:0;padding:4px 7px;font-size:11px}
+body.compact #convertZipMk1Btn,body.compact #batchConvertStatus{display:none}
+body.compact #libTree{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:2px 7px;margin-top:5px!important;max-height:190px;overflow-y:auto;padding:2px 1px;border-top:1px solid var(--bd)}
+body.compact #libTree .libfile,body.compact #libTree details{min-width:0;padding:3px 5px;font-size:11px}
+body.compact #libTree summary{padding:3px 4px;font-size:11px}
+body.compact #libTree .libpatch{padding:2px 4px 2px 18px;font-size:10.5px}
+body.compact #libTree .fmtb{font-size:9px;padding:1px 3px;margin-right:3px}
+body.compact #libTree details[open]{grid-column:span 1}
 @media(max-width:1300px){.hknobs{display:none}}
 #pname{font:700 34px/1.15 var(--disp);letter-spacing:.04em}
 header select{background:rgba(0,0,0,.55);color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:6px;padding:5px 8px;font:700 14px var(--disp);letter-spacing:.06em;cursor:pointer}
@@ -358,7 +433,7 @@ main>.card:nth-child(2) .tbtn{padding:4px 6px;min-height:25px}
 }
 </style></head><body>
 <header>
-<div class="hsp"><div class="hknobs" aria-hidden="true"><div class="hk" style="--r:-60deg"></div><div class="hk" style="--r:20deg"></div><div class="hk" style="--r:70deg"></div></div><div class="plate" aria-hidden="true"><b>KATANA MK1 / MK2</b><i>EDITOR · CONVERSOR</i></div><button id="themeToggle" class="theme-toggle" type="button" onclick="toggleTheme()" aria-label="Cambiar tema" title="Cambiar modo claro/oscuro">☀ Claro</button></div>
+<div class="hsp"><div class="hknobs" aria-label="Actividad MIDI"><div id="midiTxLed" class="hk" style="--r:-60deg" title="MIDI OUT"></div><div id="midiRxLed" class="hk" style="--r:20deg" title="MIDI IN"></div><div id="midiBusyLed" class="hk" style="--r:70deg" title="Actividad MIDI"></div></div><div class="plate" aria-hidden="true"><b>KATANA MK1 / MK2</b><i>EDITOR · CONVERSOR</i></div><button id="themeToggle" class="theme-toggle" type="button" onclick="toggleTheme()" aria-label="Cambiar tema" title="Cambiar modo claro/oscuro">☀ Claro</button><button id="compactToggle" class="compact-toggle" type="button" onclick="toggleCompact()" aria-label="Activar vista compacta" title="Reduce los espacios de la interfaz">▣ Vista compacta</button></div>
 <input type="text" id="pname" placeholder="Nombre del preset" value="" maxlength="16" spellcheck="false">
 <div class="hr">
 <select id="langSel" onchange="setLang(this.value)" title="Idioma / Language"><option value="es">ESP</option><option value="en">ENG</option></select>
@@ -386,9 +461,9 @@ main>.card:nth-child(2) .tbtn{padding:4px 6px;min-height:25px}
 </aside>
 <div class="vsplit" id="vsplit" role="separator" aria-orientation="vertical" tabindex="0" title="Arrastra para ajustar el ancho · doble clic para restablecer"></div>
 <main>
-<div class="card"><h2>Canales — clic recupera, 💾 guarda el patch actual ahí</h2><div id="channels"></div><div id="chStatus" style="font-size:11px;opacity:.75;margin-top:4px">—</div><div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px"><button onclick="saveTSL()">Guardar como .tsl (MK2)</button><button onclick="convertCurrentToMK1()" title="Descarga el preset actual convertido al formato MK1">Convertir a MK1</button><button onclick="openMK1Map()" title="Configurar equivalencias de conversión">Equivalencias MK2 → MK1</button><div class="filebar"><input type="file" id="fileload" accept=".tsl,application/json" style="display:none"><button id="fileloadBtn" type="button" onclick="document.getElementById('fileload').click()">Seleccionar archivo</button><span id="fileloadName">Ningún archivo seleccionado</span></div></div></div>
+<div class="card" id="channelsCard"><h2>Canales — clic recupera, 💾 guarda el patch actual ahí</h2><div id="channels"></div><div id="chStatus" style="font-size:11px;opacity:.75;margin-top:4px">—</div><div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px"><button onclick="saveTSL()">Guardar como .tsl (MK2)</button><button onclick="convertCurrentToMK1()" title="Descarga el preset actual convertido al formato MK1">Convertir a MK1</button><button onclick="openMK1Map()" title="Configurar equivalencias de conversión">Equivalencias MK2 → MK1</button><div class="filebar"><input type="file" id="fileload" accept=".tsl,application/json" style="display:none"><button id="fileloadBtn" type="button" onclick="document.getElementById('fileload').click()">Seleccionar archivo</button><span id="fileloadName">Ningún archivo seleccionado</span></div></div></div>
 
-<div class="card" style="padding:8px 12px"><h2 style="margin-bottom:6px">Orden de la cadena</h2><div id="chainBtns" class="btnrow"></div></div>
+<div class="card" id="chainCard" style="padding:8px 12px"><h2 style="margin-bottom:6px">Orden de la cadena</h2><div id="chainBtns" class="btnrow"></div></div>
 <div class="boardwrap">señal → izquierda a derecha · toca un pedal o el ampli para ver sus controles</div>
 <div class="board" id="board"></div>
 <div class="card" id="detailPanel"><h2 id="detailTitle">—</h2><div id="detailBody"></div></div>
@@ -495,7 +570,7 @@ main>.card:nth-child(2) .tbtn{padding:4px 6px;min-height:25px}
 <div class="favgrid" id="favGrid"></div></div>
 </div>
 
-<div class="card"><h2 style="display:flex;align-items:center;gap:8px">Consola SysEx <button id="logCopyBtn" onclick="logCopy()" style="font-size:11px;padding:3px 8px">Copiar log</button><button onclick="logClear()" style="font-size:11px;padding:3px 8px;background:#666">Limpiar</button></h2><pre id="log"></pre></div>
+<div class="card" id="sysExCard"><h2 style="display:flex;align-items:center;gap:8px">Consola SysEx <button id="logCopyBtn" onclick="logCopy()" style="font-size:11px;padding:3px 8px">Copiar log</button><button onclick="logClear()" style="font-size:11px;padding:3px 8px;background:#666">Limpiar</button></h2><pre id="log"></pre></div>
 <p style="opacity:.55;font-size:11px">FX1/FX2 muestran los parámetros propios del tipo de efecto seleccionado. Las asignaciones de pedal/GAFC y el detalle interno de algunos tipos menos comunes se conservan intactos al cargar/guardar un .tsl aunque aún no tengan control aquí.</p>
 </main>
 </div>
@@ -876,10 +951,22 @@ function logCopy(){ // copia el log en orden cronológico
 }
 function logCopyFallback(txt,done){const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done();}catch(e){}ta.remove();}
 function logClear(){document.getElementById('log').textContent='';}
+let midiActivityTimer=null;
+function midiActivity(kind){
+  const tx=document.getElementById('midiTxLed'),rx=document.getElementById('midiRxLed'),busy=document.getElementById('midiBusyLed');
+  if(!tx||!rx||!busy)return;
+  if(kind==='tx')tx.classList.add('midi-tx');
+  if(kind==='rx')rx.classList.add('midi-rx');
+  busy.classList.add('midi-busy');
+  clearTimeout(midiActivityTimer);
+  midiActivityTimer=setTimeout(()=>{
+    tx.classList.remove('midi-tx');rx.classList.remove('midi-rx');busy.classList.remove('midi-busy');
+  },220);
+}
 function sendRaw(arr){
   logMsg((midiOut?'TX ':'TX(sin salida seleccionada) ')+arr.map(hex2).join(' '));
   if(!midiOut)return;
-  try{midiOut.send(arr);}catch(err){logMsg('ERROR al enviar: '+err.message);}
+  try{midiActivity('tx');midiOut.send(arr);}catch(err){logMsg('ERROR al enviar: '+err.message);}
 }
 const SYSEX={mk1:{prefix:[0xF0,0x41,0,0,0,0x60],write:0x12,read:0x11},mk2:{prefix:[0xF0,0x41,0,0,0,0,0x33],write:0x12,read:0x11}};
 function wireKind(){return ampKind==='mk1'?'mk1':'mk2';}
@@ -1086,6 +1173,7 @@ function recall(ch){
 function storeChannel(ch){writeToSlot(ch);}
 
 function onMidiMsg(e){
+  midiActivity('rx');
   const d=e.data;logMsg('RX '+Array.from(d).map(hex2).join(' '));
   if(d[0]===0xF0&&d[1]===0x7E){handleIdentity(d);return;}
   if(d[0]!==0xF0||d[1]!==0x41)return;
@@ -1374,6 +1462,7 @@ function fxWrite(slot,key,val){
 }
 function selectPedal(id){
   selectedPedal=id;renderAll();
+  if(document.body.classList.contains('compact'))openCompactDetail();
   requestAnimationFrame(()=>{
     const panel=document.getElementById('detailPanel');if(!panel)return;
     const r=panel.getBoundingClientRect();
@@ -1384,6 +1473,19 @@ function toggleOnOff(id){
   const pd=PEDALS.find(p=>p.id===id); if(!pd.onoff)return;
   const [b,o]=pd.onoff; writeParam(b,o,P[b][o]?0:1); renderAll();
 }
+function closeCompactDetail(){const modal=document.getElementById('compactDetail');if(modal)modal.classList.remove('open');renderDetail();renderBoard();}
+function syncCompactDetail(){
+  const modal=document.getElementById('compactDetail');if(!modal||!modal.classList.contains('open'))return;
+  const title=document.getElementById('detailTitle'),body=document.getElementById('detailBody');
+  const mt=modal.querySelector('.compact-detail-title'),mb=modal.querySelector('.compact-detail-body');
+  if(title&&mt)mt.textContent=title.textContent;
+  if(body&&mb)mb.innerHTML=body.innerHTML;
+}
+function openCompactDetail(){
+  const modal=document.getElementById('compactDetail');if(!modal)return;
+  modal.classList.add('open');syncCompactDetail();
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeCompactDetail();});
 // ---- Sliders dentro de los pedales: cada pedal puede mostrar algunos controles clave (elegibles con el botón ⚙) ----
 let MINI_ITEMS=[];
 const MINI_LS='kat_mini';
@@ -1606,6 +1708,7 @@ function renderDetail(){
   else html=paramsHTML([pd.group],'',pd.id==='misc');
   if(VARID[pd.id])html='<div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start"><div style="flex:1 1 auto;min-width:0">'+html+'</div>'+variationHTML(VARID[pd.id])+'</div>';
   document.getElementById('detailBody').innerHTML=html;
+  syncCompactDetail();
 }
 function renderAll(){
   renderBoard();
@@ -1685,7 +1788,29 @@ function mapMK1TypeValues(q){q.od_ds_type=parseInt(mappedMK1Code('booster',P['00
 loadMK1Map();
 function qFromCurrent(){const q={};MK1_CORE.split(';').forEach(e=>{const[n,b,o]=e.split(':');q[n]=P[b][parseInt(o,16)]||0;});[1,2].forEach(sl=>{const lo=sl===1?'01':'03',hi=sl===1?'02':'04';MK1_FX1.split(';').forEach(e=>{const[n,o]=e.split(':'),off=parseInt(o,16),nm=sl===2?n.replace('fx1_','fx2_'):n;q[nm]=P[off<128?lo:hi][off<128?off:off-128]||0;});q['fx'+sl+'_on_off']=P[lo][0];q['fx'+sl+'_fx_type']=P[lo][1];});for(let i=1;i<=16;i++)q['patch_name'+i]=P['00'][i-1]||0x20;return mapMK1TypeValues(q);}
 function buildMK1TSL(name){const q=qFromCurrent();q.chainParams={positionList:Array.from(P['06'].slice(0,20))};return{liveSetData:{path:null,url:null,id:null,image:null,orderNumber:0,name:'Converted MK1'},device:'GT',version:'1.0.0',patchList:[{patchID:null,name,params:q}]};}
-function sendMK1Q(q){cancelPatchSend();const bytes=[];for(const n in MK1MAP){if(q[n]===undefined)continue;const[b,o]=MK1MAP[n];bytes.push({a:b*128+o,b,o,v:q[n]&127});}bytes.sort((x,y)=>x.a-y.a);let groups=[];for(const x of bytes){const g=groups[groups.length-1];if(g&&x.a===g.a+g.data.length)g.data.push(x.v);else groups.push({a:x.a,b:x.b,o:x.o,data:[x.v]});}groups.forEach((g,i)=>patchSendTimers.push(setTimeout(()=>{logMsg('MK1 → '+hex2(g.b)+':'+hex2(g.o)+' ('+g.data.length+' bytes)');dt1([0x60,0,g.b,g.o],g.data,'mk1');},i*45)));patchSendTimers.push(setTimeout(()=>logMsg('Preset enviado al Katana MK1 mediante el mapa MK1'),groups.length*45+100));}
+const MK1_ONOFF=['od_ds_on_off','eq_on_off','fx1_on_off','fx2_on_off','delay_on_off','delay2_on_off','reverb_on_off','pedal_fx_on_off','send_return_on_off','ns1_on_off'];
+function mk1Mem(q){
+  const mem={},mask={};let n=0;
+  for(const name in MK1MAP){const v=q[name];if(v===undefined)continue;const [b,o]=MK1MAP[name];(mem[b]=mem[b]||new Uint8Array(128))[o]=v&0x7F;(mask[b]=mask[b]||new Uint8Array(128))[o]=1;n++;}
+  return {mem,mask,n};
+}
+function mk1Runs(m){
+  const runs=[];
+  Object.keys(m.mem).map(Number).sort((a,b)=>a-b).forEach(b=>{let o=0;while(o<128){if(!m.mask[b][o]){o++;continue;}const start=o;while(o<128&&m.mask[b][o]&&o-start<48)o++;runs.push([b,start,Array.from(m.mem[b].slice(start,o))]);}});
+  return runs;
+}
+function sendMK1Q(q){
+  cancelPatchSend();
+  const token=patchToken,m=mk1Mem(q),runs=mk1Runs(m);
+  const at=(delay,fn)=>patchSendTimers.push(setTimeout(()=>{if(token===patchToken)fn();},delay));
+  at(120,()=>dt1([0x7F,0,0,1],[1],'mk1'));
+  runs.forEach((r,i)=>at(120+i*45,()=>{logMsg('MK1 → '+hex2(r[0])+':'+hex2(r[1])+' ('+r[2].length+' bytes)');dt1([0x60,0,r[0],r[1]],r[2],'mk1');}));
+  const end=120+runs.length*45;
+  const onoff=MK1_ONOFF.filter(name=>MK1MAP[name]&&q[name]!==undefined);
+  const reassert=delay=>onoff.forEach((name,i)=>at(delay+i*40,()=>{const [b,o]=MK1MAP[name];dt1([0x60,0,b,o],[q[name]&0x7F],'mk1');}));
+  reassert(end+150);reassert(end+150+onoff.length*40+250);
+  at(end+150+onoff.length*80+500,()=>logMsg('Preset enviado al Katana MK1 mediante el mapa MK1 ('+m.n+' parámetros, '+runs.length+' tramos)'));
+}
 function sendMK1Current(){sendMK1Q(qFromCurrent());}
 function convertCurrentToMK1(){if(!P)return;const nm=(document.getElementById('pname').value||'EDITED').slice(0,16),blob=new Blob([JSON.stringify(buildMK1TSL(nm))],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=nm.trim()+'_MK1.tsl';a.click();logMsg('Convertido y guardado como formato MK1');}
 
@@ -1791,7 +1916,7 @@ function loadTSL(json){
   EXTRA_MAP.forEach(([k])=>{const v=ps['UserPatch%'+k];if(v)extra[k]=v.join('').toUpperCase();});
   [['Contour(1)',0x30],['Contour(2)',0x38],['Contour(3)',0x40]].forEach(([k,o])=>{const b=extraBytes(k);P['0F'][o]=b[0];P['0F'][o+1]=b[1];});
   P['05'][0x70]=100; // Patch Level fijo al máximo
-  writePatchBTS(); // siempre se envía el bloque completo, como hace BTS
+  if(ampKind==='mk1')sendMK1Q(qFromCurrent());else writePatchBTS();
   renderAll();return true;
 }
 let libFiles=[];
@@ -2566,8 +2691,9 @@ document.getElementById('fileload').onchange=e=>{
     grid.innerHTML='';
     list.slice().reverse().forEach(it=>{
       const c=document.createElement('div');c.className='fav-card';
-      c.innerHTML='<div class="fav-card-name" title="'+esc(it.name)+'">'+esc(it.name)+'</div><div class="fav-tags">'+(it.tags||[]).map(tagHtml).join('')+'</div><div class="fav-actions"><button type="button" class="fav-btn fav-load">▶ Cargar</button><button type="button" class="fav-btn fav-dl" title="Descargar .tsl">⬇</button><button type="button" class="fav-btn fav-btn-delete" title="Borrar">🗑</button></div>';
+      c.innerHTML='<div class="fav-card-name" title="'+esc(it.name)+'">'+esc(it.name)+'</div><div class="fav-tags">'+(it.tags||[]).map(tagHtml).join('')+'</div><div class="fav-actions"><button type="button" class="fav-btn fav-load" data-fav-name="'+esc(it.name)+'">▶ Cargar</button><button type="button" class="fav-btn fav-dl" title="Descargar .tsl">⬇</button><button type="button" class="fav-btn fav-rewrite" title="Reescribir favorito">↻</button><button type="button" class="fav-btn fav-btn-delete" title="Borrar">🗑</button></div>';
       c.querySelector('.fav-load').onclick=()=>{try{if(loadTSL(it.tsl))st.textContent='▶ Favorito cargado';logMsg('Favorito cargado: '+it.name);}catch(e){st.textContent='❌ No se pudo cargar el favorito';logMsg('Error al cargar favorito: '+e.message);}};
+      c.querySelector('.fav-rewrite').onclick=()=>{const list=get(),idx=list.findIndex(x=>x.id===it.id);if(idx<0)return;list[idx]={...list[idx],tsl:buildTSL(String(it.name).slice(0,16)),savedAt:new Date().toISOString()};if(put(list)){st.textContent='↻ Favorito reescrito: '+it.name;logMsg('Favorito reescrito: '+it.name);render();}};
       c.querySelector('.fav-dl').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(it.tsl)],{type:'application/json'}));a.download=(String(it.name).replace(/[\\/:*?"<>|]/g,'_').trim()||'favorito')+'.tsl';a.click();};
       c.querySelector('.fav-btn-delete').onclick=()=>{put(get().filter(x=>x.id!==it.id));render();};
       grid.appendChild(c);
@@ -2637,6 +2763,22 @@ function toggleTheme(){
   try{localStorage.setItem('kat_theme',next);}catch(e){}
   updateThemeButton();
 }
+function updateCompactButton(){
+  const b=document.getElementById('compactToggle');if(!b)return;
+  const on=document.body.classList.contains('compact');
+  b.textContent=on?(lang==='en'?'▣ Full view':'▣ Vista completa'):(lang==='en'?'▣ Compact view':'▣ Vista compacta');
+  b.title=on?(lang==='en'?'Restore full spacing':'Restaurar espacios normales'):(lang==='en'?'Reduce interface spacing':'Reduce los espacios de la interfaz');
+  b.setAttribute('aria-label',b.title);b.setAttribute('aria-pressed',String(on));
+}
+function initCompact(){
+  try{if(localStorage.getItem('kat_compact')==='1')document.body.classList.add('compact');}catch(e){}
+  updateCompactButton();
+}
+function toggleCompact(){
+  const on=document.body.classList.toggle('compact');
+  try{localStorage.setItem('kat_compact',on?'1':'0');}catch(e){}
+  updateCompactButton();
+}
 function trStr(s){
   const k=s.trim(); if(!k)return null;
   let r=I18N[k];
@@ -2665,10 +2807,11 @@ function setLang(l){
   lang=l;document.documentElement.lang=l==='en'?'en':'es';
   try{localStorage.setItem('kat_lang',l);}catch(e){}
   if(l==='en')i18nNode(document.body);else i18nRestore();
-  updateThemeButton();
+  updateThemeButton();updateCompactButton();
 }
 new MutationObserver(ms=>{if(lang!=='en')return;ms.forEach(m=>{m.addedNodes.forEach(i18nNode);if(m.type==='characterData')i18nNode(m.target);});}).observe(document.body,{childList:true,subtree:true,characterData:true});
 initTheme();
+initCompact();
 (async()=>{
   const st=document.getElementById('status');
   if(!navigator.requestMIDIAccess){st.textContent='Este navegador no soporta Web MIDI (usa Chrome o Edge)';return;}
@@ -2679,6 +2822,7 @@ try{if(localStorage.getItem('kat_lang')==='en'){document.getElementById('langSel
 </script>
 
 <div id="mk1MapModal" class="kmap-back" onclick="if(event.target===this)closeMK1Map()"><div class="kmap"><h2>Equivalencias MK2 → MK1</h2><p>La columna izquierda muestra el tipo del preset MK2. El desplegable indica el tipo que se escribirá en el MK1. Los cambios se guardan en este navegador y se aplican al convertir o enviar un preset MK2 hacia MK1.</p><table class="kmap-table"><thead><tr><th>Efecto o ampli MK2</th><th>Sustitución MK1</th></tr></thead><tbody id="mk1MapBody"></tbody></table><div class="kmap-actions"><button type="button" onclick="resetMK1Map()">Restaurar valores predeterminados</button><button type="button" onclick="closeMK1Map()">Cancelar</button><button type="button" onclick="saveMK1MapFromUI()">Guardar equivalencias</button></div></div></div>
+<div id="compactDetail" class="compact-detail-back" role="dialog" aria-modal="true" aria-labelledby="compactDetailTitle" onclick="if(event.target===this)closeCompactDetail()"><div class="compact-detail-modal"><div class="compact-detail-head"><h2 id="compactDetailTitle" class="compact-detail-title">—</h2></div><div class="compact-detail-body"></div></div></div>
 <script>
 // Divisor vertical: arrastra para cambiar el ancho de la biblioteca. Doble clic = 230 px. Flechas con el divisor enfocado. Se recuerda en este navegador.
 (function(){
